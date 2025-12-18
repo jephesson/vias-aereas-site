@@ -1,9 +1,14 @@
-const data: Record<string, { titulo: string; subtitulo: string; conteudo: string[] }> = {
+import { notFound } from "next/navigation";
+
+const data: Record<
+  string,
+  { titulo: string; subtitulo: string; conteudo: string[] }
+> = {
   tromso: {
     titulo: "Tromsø • Noruega",
     subtitulo: "Ártico de verdade: neve, cidade segura e vibe de Natal.",
     conteudo: [
-      "📌 Melhor época (pra neve): outono final / inverno.",
+      "📌 Melhor época (pra neve): final do outono / inverno.",
       "🚶‍♂️ Dá pra fazer muita coisa a pé (mas cuidado com gelo).",
       "🍽️ Dica: coma bem antes dos passeios noturnos (frio derruba).",
       "✨ Atualização futura: aurora boreal, tours e custos.",
@@ -29,29 +34,40 @@ const data: Record<string, { titulo: string; subtitulo: string; conteudo: string
   },
 };
 
-export default async function CityPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default function GuiaCidadePage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = params;
   const post = data[slug];
+
+  if (!post) notFound();
 
   return (
     <main className="va-bg">
       <div className="va-shell">
         <div className="va-card">
-          <a href="/vlog" style={{ textDecoration: "none", color: "var(--muted)" }}>← Voltar</a>
-          <h1 className="va-title" style={{ marginTop: 10 }}>{post?.titulo ?? "Cidade não encontrada"}</h1>
+          <a
+            href="/guias"
+            style={{ textDecoration: "none", color: "var(--muted)" }}
+          >
+            ← Voltar
+          </a>
 
-          {post ? (
-            <>
-              <p className="va-subtitle">{post.subtitulo}</p>
-              <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-                {post.conteudo.map((line, i) => (
-                  <div key={i} className="va-box">{line}</div>
-                ))}
+          <h1 className="va-title" style={{ marginTop: 10 }}>
+            {post.titulo}
+          </h1>
+
+          <p className="va-subtitle">{post.subtitulo}</p>
+
+          <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+            {post.conteudo.map((line, i) => (
+              <div key={i} className="va-box">
+                {line}
               </div>
-            </>
-          ) : (
-            <p className="va-subtitle">Essa página ainda não foi criada.</p>
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </main>
