@@ -21,6 +21,7 @@ export default function SobrePage() {
             </p>
 
             <ul className="va-list">
+              <li>Jephesson Santos</li>
               <li>Eduarda Santos</li>
               <li>Lucas Araújo</li>
               <li>Paola Ziani</li>
