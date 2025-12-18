@@ -35,6 +35,7 @@ export default function SobrePage() {
             <div className="va-divider" />
 
             <h2 className="va-h2">Como funciona a cotação e a emissão</h2>
+
             <p className="va-text">
               Quando você solicita uma cotação, nós analisamos diferentes combinações de datas, turnos e rotas
               (incluindo opções com e sem bagagem) para encontrar a alternativa mais vantajosa para o seu perfil.
@@ -43,15 +44,19 @@ export default function SobrePage() {
             <p className="va-text">
               Além disso, nós <b>comparamos os custos</b> entre:
               <br />
-              • <b>Passagens compradas em dinheiro</b> (tarifa tradicional) <br />
+              • <b>Passagens compradas em dinheiro</b> (tarifa tradicional)
+              <br />
               • <b>Passagens emitidas com milhas</b>, quando houver disponibilidade e fizer sentido no custo-benefício
             </p>
 
+            <div className="va-divider" />
+
             <h2 className="va-h2">Por que conseguimos preços competitivos com milhas</h2>
+
             <p className="va-text">
-              Trabalhamos com um <b>banco de pontos</b> (estoque próprio) formado ao longo do tempo por meio de
+              Trabalhamos com um <b>banco de pontos</b> (estoque próprio), formado ao longo do tempo por meio de
               <b> campanhas promocionais</b> e condições especiais oferecidas por programas de fidelidade,
-              bancos e parceiros oficiais. Quando essas promoções aparecem, adquirimos pontos estrategicamente
+              bancos e parceiros oficiais. Quando essas oportunidades aparecem, adquirimos pontos estrategicamente
               para manter um custo competitivo e, assim, conseguir oferecer <b>opções mais econômicas</b> em determinadas rotas e datas.
             </p>
 
@@ -72,50 +77,23 @@ export default function SobrePage() {
               Em geral, enviamos a cotação em até <b>2 horas</b>, sempre com clareza sobre a melhor alternativa disponível no momento.
             </p>
 
+            <p className="va-disclaimer">
+              *Valores e disponibilidade podem variar conforme regras das companhias e programas de fidelidade.
+              A cotação reflete as condições encontradas no momento da pesquisa.*
+            </p>
+
             <div className="va-divider" />
 
             <p className="va-meta">
               <b>CNPJ:</b> {CNPJ}
               <br />
               <b>Instagram:</b>{" "}
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
+              <a className="va-link" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
                 {INSTAGRAM_USER}
               </a>
             </p>
           </div>
         </div>
-
-        <style jsx>{`
-          .va-stack {
-            display: grid;
-            gap: 12px;
-            margin-top: 10px;
-          }
-          .va-text {
-            margin: 0;
-            line-height: 1.6;
-          }
-          .va-h2 {
-            margin: 10px 0 0;
-            font-size: 16px;
-            font-weight: 800;
-          }
-          .va-list {
-            margin: 0;
-            padding-left: 18px;
-            display: grid;
-            gap: 6px;
-          }
-          .va-divider {
-            height: 1px;
-            background: rgba(0, 0, 0, 0.08);
-            margin: 6px 0;
-          }
-          .va-meta {
-            margin: 0;
-            line-height: 1.6;
-          }
-        `}</style>
       </div>
     </main>
   );
