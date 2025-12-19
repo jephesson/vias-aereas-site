@@ -1,3 +1,5 @@
+import React from "react";
+
 export const metadata = {
   title: "Tromsø • Noruega | Vias Aéreas",
   description:
@@ -41,9 +43,24 @@ function Photo({
   );
 }
 
-function P({ children }: { children: React.ReactNode }) {
+function P(
+  props: React.HTMLAttributes<HTMLParagraphElement> & {
+    children: React.ReactNode;
+  }
+) {
+  const { children, style, ...rest } = props;
   return (
-    <p style={{ marginTop: 12, lineHeight: 1.75, fontSize: 16 }}>{children}</p>
+    <p
+      {...rest}
+      style={{
+        marginTop: 12,
+        lineHeight: 1.75,
+        fontSize: 16,
+        ...style,
+      }}
+    >
+      {children}
+    </p>
   );
 }
 
@@ -102,8 +119,9 @@ export default function TromsoPage() {
           <P>
             Pegamos um voo direto da <strong>Norwegian</strong>, com{" "}
             <strong>1 bagagem despachada</strong>. Pagamos algo em torno de{" "}
-            <strong>100 euros por pessoa</strong>. Foi muito tranquilo e, honestamente,
-            achei um ótimo custo para um destino tão “lá em cima” no mapa.
+            <strong>100 euros por pessoa</strong>. Foi muito tranquilo e,
+            honestamente, achei um ótimo custo para um destino tão “lá em cima” no
+            mapa.
           </P>
           <P>
             O aeroporto é pequeno, bem organizado. Mas o impacto vem quando você
@@ -152,7 +170,8 @@ export default function TromsoPage() {
           <P>
             Pagamos em média <strong>R$ 3.000</strong> para 5 dias (eu e meu pai).
             Era uma casa incrível — dois quartos, sala enorme, e um quarto muito
-            confortável. Dividimos a casa com mais um hóspede, mas isso não atrapalhou.
+            confortável. Dividimos a casa com mais um hóspede, mas isso não
+            atrapalhou.
           </P>
           <P>
             Foi, até agora, a <strong>melhor hospedagem</strong> que já fiquei na
@@ -162,8 +181,8 @@ export default function TromsoPage() {
           <P>
             Tromsø é uma cidade pequena, mas o centrinho é lindo. Tem cafés,
             restaurantes, supermercados, fast food… e uma sensação de segurança
-            que impressiona. Você sente a vibe da cidade e se sente completo, tranquilo,
-            como se o lugar “funcionasse”.
+            que impressiona. Você sente a vibe da cidade e se sente completo,
+            tranquilo, como se o lugar “funcionasse”.
           </P>
 
           <Photo
@@ -180,32 +199,33 @@ export default function TromsoPage() {
             <strong>1 ano planejando</strong> essa viagem.
           </P>
           <P>
-            Em Tromsø, eu devo ter gastado por volta de{" "}
-            <strong>R$ 4.000</strong>, considerando:
+            Em Tromsø, eu devo ter gastado por volta de <strong>R$ 4.000</strong>,
+            considerando o tour para a aurora boreal, comer em alguns restaurantes,
+            experimentar o king crab e fazer comprinhas.
           </P>
           <div className="va-box" style={{ marginTop: 12 }}>
             <div>✅ Tour da aurora boreal: ~R$ 1.500</div>
             <div>✅ King Crab: ~R$ 600</div>
             <div>✅ Restaurantes e cafés</div>
-            <div>✅ Comprinhas e lembrancinhas</div>
+            <div>✅ Lembrancinhas e extras</div>
           </div>
           <P>
-            E um ponto curioso: em outros lugares da Europa, quando você caça demais
-            “economia”, às vezes cai em comida suspeita. Na Noruega, mesmo gastando
-            menos em alguns lugares, a qualidade costuma ser boa.
+            E um ponto curioso: em outros lugares da Europa, quando você caça
+            demais “economia”, às vezes cai em comida suspeita. Na Noruega, mesmo
+            gastando menos em alguns lugares, a qualidade costuma ser boa.
           </P>
 
           <H2>🚶‍♂️ Caminhadas, aquário e o bondinho</H2>
           <P>
             Nos dias seguintes, visitei o aquário e caminhei bastante. Tromsø é
-            pequena, e as distâncias geralmente ficam abaixo de 5 km — dá para fazer
-            quase tudo a pé.
+            pequena, e as distâncias geralmente ficam abaixo de 5 km — dá para
+            fazer quase tudo a pé.
           </P>
           <P>
-            Subi no bondinho (teleférico) e a vista lá de cima é algo que não dá para
-            esquecer. No dia que fui, estava por volta de <strong>-7°C</strong>.
-            Era muito mais frio lá em cima — mas foi incrível. Até meu pai, que não
-            é fã de frio, amou.
+            Subi no bondinho (teleférico) e a vista lá de cima é algo que não dá
+            para esquecer. No dia que fui, estava por volta de{" "}
+            <strong>-7°C</strong>. Era muito mais frio lá em cima — mas foi
+            incrível. Até meu pai, que não é fã de frio, amou.
           </P>
 
           <Photo
@@ -222,80 +242,84 @@ export default function TromsoPage() {
 
           <H2>🍽️ Culinária: King Crab, cafés e a realidade do McDonald’s</H2>
           <P>
-            A culinária foi uma das partes mais legais. Eu evitava fast food, mas em
-            um dia de pressa acabei indo ao McDonald’s. Um combo que no Brasil pode
-            custar uns 60 reais, em Tromsø me custou uns <strong>150 reais</strong>.
+            A culinária foi uma das partes mais legais. Eu evitava fast food, mas
+            em um dia de pressa acabei indo ao McDonald’s. Um combo que no Brasil
+            pode custar uns 60 reais, em Tromsø me custou uns{" "}
+            <strong>150 reais</strong>.
           </P>
           <P>
             A experiência do <strong>King Crab</strong> foi surreal. Lembra comer
-            lagosta pela primeira vez: vale muito a pena viver isso, mas não é algo
-            para repetir todo dia (e dá um trabalho absurdo para comer).
+            lagosta pela primeira vez: vale muito a pena viver isso, mas não é
+            algo para repetir todo dia (e dá um trabalho absurdo para comer).
           </P>
           <P>
-            Os cafés são excelentes. Até eu, que não sou muito fã de café, fui algumas
-            vezes tomar um mocaccino.
+            Os cafés são excelentes. Até eu, que não sou muito fã de café, fui
+            algumas vezes tomar um mocaccino.
           </P>
 
           <H2>💊 Farmácia na Noruega: meu lado farmacêutico falou alto</H2>
           <P>
-            Com tanta massa na Europa, ficamos constipados — e eu fui comprar lactulose.
-            A lactulose comprei sem receita, mas a maioria dos medicamentos precisa de
-            prescrição.
+            Com tanta massa na Europa, ficamos constipados — e eu fui comprar
+            lactulose. A lactulose comprei sem receita, mas a maioria dos
+            medicamentos precisa de prescrição.
           </P>
           <P>
-            Por exemplo: o fluconazol, que no Brasil é vendido sem receita, na Noruega
-            tinha retenção. Foi interessante ver como a lógica de controle muda de país
-            para país.
+            Por exemplo: o fluconazol, que no Brasil é vendido sem receita, na
+            Noruega tinha retenção. Foi interessante ver como a lógica de controle
+            muda de país para país.
           </P>
 
           <H2>👥 Pessoas, segurança e uma reflexão que ficou comigo</H2>
           <P>
-            As pessoas são incríveis. Quando descobriam que éramos brasileiros, algumas
-            até tentavam falar português. Tromsø é muito receptiva ao turismo.
+            As pessoas são incríveis. Quando descobriam que éramos brasileiros,
+            algumas até tentavam falar português. Tromsø é muito receptiva ao
+            turismo.
           </P>
           <P>
-            Um ponto que me surpreendeu: não se vê mendigos ou pedintes. O nível da cidade
-            é altíssimo e a qualidade de vida é surreal. Isso faz a gente refletir se, no
-            Brasil, a gente vive ou só sobrevive — mesmo quando acha que tem um salário bom.
+            Um ponto que me surpreendeu: não se vê mendigos ou pedintes. O nível
+            da cidade é altíssimo e a qualidade de vida é surreal. Isso faz a gente
+            refletir se, no Brasil, a gente vive ou só sobrevive — mesmo quando
+            acha que tem um salário bom.
           </P>
           <P>
-            Em um dia, vimos um homem caído no chão. Não sei se era bêbado, doente ou outra
-            coisa. Mas várias pessoas pararam para ajudar e chamaram a ambulância. No Brasil,
-            em muitos lugares, a tendência seria ignorar por medo.
-          </P>
-          <P>
-            Ali eu senti, na prática, uma diferença cultural enorme: em um país com alto IDH,
-            abandonar alguém não parece ser uma opção “normal”.
+            Em um dia, vimos um homem caído no chão. Não sei se era bêbado, doente
+            ou outra coisa. Mas várias pessoas pararam para ajudar e chamaram a
+            ambulância. No Brasil, em muitos lugares, a tendência seria ignorar por
+            medo.
           </P>
 
           <H2>🤖 Como o ChatGPT me ajudou — e como pode ajudar você</H2>
           <P>
-            Eu usei o ChatGPT como um parceiro de viagem. Não foi só “perguntar uma coisa ou
-            outra”. Eu usei para:
+            Eu usei o ChatGPT como um parceiro de viagem. Não foi só “perguntar
+            uma coisa ou outra”. Eu usei para: entender transporte (ônibus,
+            tickets e apps), planejar rotas a pé com neve, organizar a ordem dos
+            passeios, estimar custos e até tirar dúvidas culturais.
           </P>
           <div className="va-box" style={{ marginTop: 12 }}>
-            <div>✅ Entender transporte (ônibus, tickets e apps)</div>
-            <div>✅ Rotas a pé com neve e pontos mais seguros</div>
-            <div>✅ Sugestões de passeios e ordem ideal dos dias</div>
+            <div>✅ Transporte (ônibus, tickets e apps)</div>
+            <div>✅ Rotas a pé com gelo e pontos mais seguros</div>
+            <div>✅ Sugestão de passeios e ordem ideal dos dias</div>
             <div>✅ Dicas do que fazer no frio e o que evitar</div>
-            <div>✅ Estimar custos (com comida, passeios, ingressos)</div>
-            <div>✅ Explicações culturais e curiosidades locais</div>
+            <div>✅ Estimativa de custos (comida, passeios, ingressos)</div>
+            <div>✅ Curiosidades locais e contexto cultural</div>
           </div>
           <P>
-            A melhor parte é que você pode pedir roteiros em sequência (“dia 1”, “dia 2”),
-            roteiros econômicos, ou até um roteiro focado em um objetivo — tipo “quero ver
-            aurora, mas tenho só 3 dias e orçamento limitado”. Dá para ajustar tudo.
+            E dá para usar ainda melhor: você pode pedir roteiro em sequência
+            (dia 1, dia 2, dia 3…), roteiro econômico, roteiro confortável, ou um
+            roteiro focado em um objetivo (“quero ver aurora, mas tenho só 3 dias e
+            orçamento limitado”). Isso economiza tempo e evita perrengue — e, se
+            der perrengue, pelo menos você sabe o que fazer.
           </P>
 
           <H2>🌌 A aurora boreal: linda, mas cansativa (e realista)</H2>
           <P>
-            Talvez o ponto “baixo” foi a aurora boreal. No dia do tour, a atividade estava
-            fraca. A olho nu, vimos algo mais cinza, como uma nuvem, e por poucos segundos.
-            No celular, aí sim aparecia verde.
+            Talvez o ponto “baixo” foi a aurora boreal. No dia do tour, a atividade
+            estava fraca. A olho nu, vimos algo mais cinza, como uma nuvem, e por
+            poucos segundos. No celular, aí sim aparecia verde.
           </P>
           <P>
-            E é verdade: a caçada à aurora é extremamente cansativa. Depois de um dia,
-            eu senti que estava ótimo — eu não aguentaria outro.
+            E é verdade: a caçada à aurora é extremamente cansativa. Depois de um
+            dia, eu senti que estava ótimo — eu não aguentaria outro.
           </P>
 
           <Photo
@@ -307,8 +331,8 @@ export default function TromsoPage() {
           <H2>🛫 Volta: Tromsø → Berlim (escala em Oslo)</H2>
           <P>
             Na volta, pegamos um voo para <strong>Berlim</strong> com escala em{" "}
-            <strong>Oslo</strong>. Foi super tranquilo — e praticamente o mesmo custo
-            da ida, também com bagagem incluída.
+            <strong>Oslo</strong>. Foi super tranquilo — e praticamente o mesmo
+            custo da ida, também com bagagem incluída.
           </P>
 
           <Photo
@@ -319,16 +343,17 @@ export default function TromsoPage() {
 
           <H2>✨ Despedida: por que Tromsø foi o melhor lugar que já conheci</H2>
           <P>
-            No dia de ir embora, eu senti algo muito forte: ainda bem que eu estive vivo para
-            viver aquilo. Por mais que eu escreva, conte ou faça vídeo, a sensação real de
-            sentir o vento do Ártico e ver a neve é indescritível.
+            No dia de ir embora, eu senti algo muito forte: ainda bem que eu estive
+            vivo para viver aquilo. Por mais que eu escreva, conte ou faça vídeo, a
+            sensação real de sentir o vento do Ártico e ver a neve é indescritível.
           </P>
           <P>
             Eu quero voltar. Quero levar minha esposa, <strong>Eduarda Santos</strong>.
-            Nossa lua de mel praticamente não existiu porque eu tinha essa viagem com meu pai.
-            E Tromsø virou um lugar que eu quero reviver — com mais tempo, mais passeios e,
-            quem sabe, uma aurora mais forte.
+            Nossa lua de mel praticamente não existiu porque eu tinha essa viagem
+            com meu pai. E Tromsø virou um lugar que eu quero reviver — com mais
+            tempo, mais passeios e, quem sabe, uma aurora mais forte.
           </P>
+
           <P style={{ marginTop: 18, color: "var(--muted)" }}>
             2025 — Jephesson Santos
           </P>
@@ -336,8 +361,8 @@ export default function TromsoPage() {
           <div className="va-box" style={{ marginTop: 18 }}>
             <strong>Quer fazer Tromsø do seu jeito?</strong>
             <div style={{ marginTop: 8 }}>
-              Eu posso montar um roteiro em sequência (dia 1 a dia 5), estimar custos e
-              comparar opções de passagem com dinheiro ou milhas.{" "}
+              Eu posso montar um roteiro em sequência (dia 1 a dia 5), estimar
+              custos e comparar opções de passagem com dinheiro ou milhas.{" "}
               <a href="/" style={{ fontWeight: 800 }}>
                 Clique aqui para solicitar uma cotação.
               </a>
