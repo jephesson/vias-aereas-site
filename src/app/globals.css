@@ -4,7 +4,7 @@
    - tab ativa + hover da ativa
    - foco/teclado mais bonito
    - componentes extras (cards de preço / badges) pra Bússola
-   - ✅ HERO Bússola: logo retângulo inteiro + legenda embaixo (SEM cortar)
+   - ✅ HERO Bússola: logo em cima + texto embaixo (desktop e mobile)
    - ✅ CTA pulse+shimmer, Toast
    ========================= */
 
@@ -226,54 +226,50 @@ button, input, select, textarea{ font: inherit; }
 }
 
 /* =========================
-   ✅ HERO BÚSSOLA (logo retângulo inteiro + legenda embaixo)
+   ✅ HERO BÚSSOLA (logo em cima + texto embaixo)
    ========================= */
-.va-brand--hero{ align-items: stretch; }
+.va-brand--hero{
+  align-items: stretch;
+  flex-direction: column; /* ✅ força coluna no desktop também */
+}
 
 .va-brandMedia{
-  width: 260px;
-  min-width: 260px;
+  width: 100%;
+  min-width: 0;
   display: grid;
   gap: 10px;
 }
 
-/* ✅ retângulo (não quadrado) */
+/* ✅ banner retangular grande */
 .va-logoCard{
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 6;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(2,16,48,.10);
   background: #fff;
   overflow: hidden;
   box-shadow: 0 10px 28px rgba(2,16,48,.10);
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding: 12px;               /* respiro pro contain */
+  padding: 0;
 }
 
-/* ✅ NÃO CORTA A LOGO */
+/* ✅ “come” o branco do PNG (sem distorcer). Pode cortar levemente nas bordas. */
 .va-logoFill{
   width: 100%;
   height: 100%;
-  object-fit: contain;         /* chave */
+  object-fit: cover;
   object-position: center;
-  transform: none;             /* sem zoom/crop */
+  transform: scale(1.22);
 }
 
-.va-logoCaption{
-  text-align: center;
-  line-height: 1.25;
-  font-size: 12px;
-  color: var(--muted2);
+.va-heroContent{
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
 }
 
-@media (max-width: 820px){
-  .va-brand--hero{ flex-direction: column; }
-  .va-brandMedia{ width: 100%; min-width: 0; }
+@media (max-width: 640px){
   .va-logoCard{ aspect-ratio: 16 / 9; }
-  .va-logoCaption{ text-align: left; }
+  .va-logoFill{ transform: scale(1.18); }
 }
 
 /* =========================
