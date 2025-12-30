@@ -1,37 +1,72 @@
+/* =========================
+   Vias Aéreas — globals.css (v2)
+   - sem duplicações
+   - tab ativa + hover da ativa
+   - foco/teclado mais bonito
+   - componentes extras (cards de preço / badges) pra Bússola
+   ========================= */
+
 :root{
   --bgA:#EAF4FF;      /* céu claro */
   --bgB:#FFFFFF;      /* branco */
   --card:#FFFFFF;
+
   --border: rgba(2, 16, 48, .10);
   --text:#0B1B3A;
   --muted: rgba(11,27,58,.70);
   --muted2: rgba(11,27,58,.55);
 
-  /* cores “brand” (azul + laranja) */
+  /* cores brand (azul + laranja) */
   --blue:#1D4ED8;
   --blue2:#0EA5E9;
   --orange:#F97316;
 
   --shadow: 0 18px 60px rgba(2, 16, 48, .12);
+
+  --radius-lg: 22px;
+  --radius-md: 18px;
+  --radius-sm: 14px;
+
+  --ringA: rgba(29,78,216,.12);
+  --ringB: rgba(249,115,22,.18);
 }
 
+/* =========================
+   Base / Reset
+   ========================= */
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 body{
   margin:0;
   color:var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   background:
     radial-gradient(900px 500px at 15% 0%, rgba(14,165,233,.20), transparent 60%),
     radial-gradient(900px 500px at 85% 10%, rgba(249,115,22,.14), transparent 55%),
     linear-gradient(180deg, var(--bgA), var(--bgB));
 }
+
+a{ color:inherit; }
+img{ max-width:100%; display:block; }
+button, input, select, textarea{ font: inherit; }
+
+/* reduz animações pra quem prefere */
+@media (prefers-reduced-motion: reduce){
+  *{ scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+}
+
+/* =========================
+   Topbar / Menu
+   ========================= */
 .va-topnav{
   position: sticky;
   top: 0;
   z-index: 50;
   background: rgba(255,255,255,.72);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
@@ -76,18 +111,63 @@ body{
 }
 
 .va-tab{
+  position: relative;
   text-decoration:none;
   color: rgba(11,27,58,.86);
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(29,78,216,.16);
   background: rgba(29,78,216,.06);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 13px;
+  transition: transform .08s ease, filter .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
+
 .va-tab:hover{
   background: rgba(29,78,216,.10);
   border-color: rgba(29,78,216,.26);
+  transform: translateY(-1px);
+}
+
+/* TAB ATIVA */
+.va-tab--active,
+.va-tab[aria-current="page"]{
+  background: linear-gradient(135deg, rgba(29,78,216,.16), rgba(14,165,233,.12));
+  border-color: rgba(29,78,216,.34);
+  box-shadow: 0 10px 26px rgba(29,78,216,.14);
+  color: rgba(11,27,58,.95);
+}
+
+/* hover da ativa (pra não “lavar”) */
+.va-tab--active:hover,
+.va-tab[aria-current="page"]:hover{
+  background: linear-gradient(135deg, rgba(29,78,216,.18), rgba(14,165,233,.14));
+  border-color: rgba(29,78,216,.38);
+}
+
+/* mini dot na ativa */
+.va-tab--active::after,
+.va-tab[aria-current="page"]::after{
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  margin-left: 10px;
+  background: var(--orange);
+  box-shadow: 0 0 0 6px rgba(249,115,22,.16);
+  transform: translateY(-1px);
+}
+
+/* foco acessível */
+.va-tab:focus-visible,
+.va-chip:focus-visible,
+.va-cta:focus-visible,
+.va-counterBtn:focus-visible,
+.va-input:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px var(--ringB), 0 0 0 7px var(--ringA);
+  border-color: rgba(249,115,22,.35);
 }
 
 @media (max-width: 640px){
@@ -95,23 +175,31 @@ body{
   .va-tabs{ justify-content:flex-start; }
 }
 
-
+/* =========================
+   Layout Base
+   ========================= */
 .va-bg{ min-height:100vh; padding: 32px 16px; }
 .va-shell{ max-width: 980px; margin: 0 auto; }
 
 .va-header{ margin-bottom: 16px; }
+
 .va-brand{
-  display:flex; gap:16px; align-items:center;
+  display:flex;
+  gap:16px;
+  align-items:center;
   padding: 18px;
   border: 1px solid var(--border);
   background: rgba(255,255,255,.75);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
 }
 
 .va-logo{
-  width: 88px; height: 88px; object-fit: contain;
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
   border-radius: 18px;
   border: 1px solid rgba(2, 16, 48, .10);
   background: #fff;
@@ -120,7 +208,9 @@ body{
 }
 
 .va-pill{
-  display:inline-flex; align-items:center; gap:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
   font-size: 12px;
   padding: 8px 12px;
   border-radius: 999px;
@@ -129,8 +219,11 @@ body{
   color: rgba(11,27,58,.78);
   width: fit-content;
 }
+
 .va-dot{
-  width: 8px; height: 8px; border-radius: 999px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
   background: var(--orange);
   box-shadow: 0 0 0 6px rgba(249,115,22,.18);
 }
@@ -138,10 +231,14 @@ body{
 .va-title{ margin: 10px 0 6px; font-size: 30px; letter-spacing: -0.02em; }
 .va-subtitle{ margin:0; color: var(--muted); line-height: 1.35; }
 
+/* =========================
+   Card / Seções
+   ========================= */
 .va-card{
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: rgba(255,255,255,.80);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
   padding: 18px;
@@ -151,22 +248,11 @@ body{
 .va-label{ font-size: 13px; color: var(--muted); }
 
 .va-row{ display:flex; gap:10px; flex-wrap: wrap; }
+.va-stack{ display:grid; gap: 10px; } /* ✅ única definição */
 
-.va-chip{
-  border: 1px solid rgba(29,78,216,.18);
-  background: rgba(29,78,216,.06);
-  color: rgba(11,27,58,.86);
-  padding: 10px 12px;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: transform .08s ease, filter .2s ease, background .2s ease;
-}
-.va-chip:hover{ transform: translateY(-1px); filter: brightness(1.02); }
-.va-chip--on{
-  background: linear-gradient(135deg, rgba(29,78,216,.14), rgba(14,165,233,.12));
-  border-color: rgba(29,78,216,.28);
-}
-
+/* =========================
+   Inputs / Boxes
+   ========================= */
 .va-grid2{ display:grid; gap:10px; grid-template-columns: 1fr; }
 .va-grid3{ display:grid; gap:10px; grid-template-columns: 1fr; }
 .va-grid3x{ display:grid; gap:10px; grid-template-columns: 1fr; }
@@ -181,20 +267,20 @@ body{
   border: 1px solid rgba(2, 16, 48, .10);
   background: rgba(255,255,255,.70);
   padding: 14px;
-  border-radius: 18px;
+  border-radius: var(--radius-md);
 }
 .va-boxTitle{ font-size: 13px; color: var(--muted2); margin-bottom: 8px; }
-.va-stack{ display:grid; gap: 10px; }
 .va-disabled{ opacity: .60; }
 
 .va-input{
   width: 100%;
   padding: 12px 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(2, 16, 48, .12);
   background: #fff;
   color: var(--text);
   outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .08s ease;
 }
 .va-input::placeholder{ color: rgba(11,27,58,.40); }
 .va-input:focus{
@@ -205,22 +291,29 @@ body{
 .va-check{ display:flex; gap:10px; align-items:center; color: var(--muted); font-size: 13px; }
 .va-check input{ transform: translateY(1px); }
 
-.va-footer{
-  display:flex; flex-direction: column; gap: 10px;
-  border-top: 1px solid rgba(2, 16, 48, .10);
-  padding-top: 14px;
-  margin-top: 6px;
+/* =========================
+   Chips / Botões
+   ========================= */
+.va-chip{
+  border: 1px solid rgba(29,78,216,.18);
+  background: rgba(29,78,216,.06);
+  color: rgba(11,27,58,.86);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform .08s ease, filter .2s ease, background .2s ease, border-color .2s ease;
 }
-@media (min-width: 820px){
-  .va-footer{ flex-direction: row; align-items:center; justify-content: space-between; }
+.va-chip:hover{ transform: translateY(-1px); filter: brightness(1.02); }
+.va-chip--on{
+  background: linear-gradient(135deg, rgba(29,78,216,.14), rgba(14,165,233,.12));
+  border-color: rgba(29,78,216,.28);
 }
-.va-note{ font-size: 12px; color: var(--muted2); }
 
 .va-cta{
   border: none;
   border-radius: 16px;
   padding: 14px 16px;
-  font-weight: 800;
+  font-weight: 900;
   cursor: pointer;
   color: #fff;
   background: linear-gradient(135deg, var(--blue), var(--blue2));
@@ -230,25 +323,34 @@ body{
 .va-cta:hover{ filter: brightness(1.03); transform: translateY(-1px); }
 .va-cta--off{ opacity: .45; cursor: not-allowed; }
 
-.va-counter{
-  border: 1px solid rgba(2, 16, 48, .10);
-  background: rgba(255,255,255,.70);
-  padding: 14px;
-  border-radius: 18px;
-}
-.va-counterLabel{ font-size: 13px; color: var(--muted2); margin-bottom: 10px; }
-.va-counterRow{ display:flex; align-items:center; justify-content: space-between; gap: 10px; }
-.va-counterBtn{
-  width: 44px; height: 44px;
-  border-radius: 14px;
-  border: 1px solid rgba(2, 16, 48, .12);
-  background: rgba(29,78,216,.06);
-  color: var(--text);
-  font-size: 18px;
+/* botão secundário (pra páginas tipo Bússola) */
+.va-cta2{
+  border-radius: 16px;
+  padding: 14px 16px;
+  font-weight: 900;
   cursor: pointer;
+  border: 1px solid rgba(29,78,216,.22);
+  background: rgba(255,255,255,.75);
+  color: rgba(11,27,58,.92);
+  transition: transform .08s ease, filter .2s ease, background .2s ease, border-color .2s ease;
 }
-.va-counterBtn:hover{ background: rgba(29,78,216,.10); }
-.va-counterVal{ font-size: 18px; font-weight: 900; }
+.va-cta2:hover{ transform: translateY(-1px); background: rgba(29,78,216,.06); border-color: rgba(29,78,216,.32); }
+
+/* =========================
+   Footer da página (form)
+   ========================= */
+.va-footer{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid rgba(2, 16, 48, .10);
+  padding-top: 14px;
+  margin-top: 6px;
+}
+@media (min-width: 820px){
+  .va-footer{ flex-direction: row; align-items:center; justify-content: space-between; }
+}
+.va-note{ font-size: 12px; color: var(--muted2); }
 
 .va-copy{
   text-align:center;
@@ -257,44 +359,121 @@ body{
   color: var(--muted2);
 }
 
-.va-stack {
-  display: grid;
-  gap: 12px;
-  margin-top: 10px;
+/* =========================
+   Counter
+   ========================= */
+.va-counter{
+  border: 1px solid rgba(2, 16, 48, .10);
+  background: rgba(255,255,255,.70);
+  padding: 14px;
+  border-radius: var(--radius-md);
 }
-
-.va-text {
-  margin: 0;
-  line-height: 1.6;
+.va-counterLabel{ font-size: 13px; color: var(--muted2); margin-bottom: 10px; }
+.va-counterRow{ display:flex; align-items:center; justify-content: space-between; gap: 10px; }
+.va-counterBtn{
+  width: 44px; height: 44px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(2, 16, 48, .12);
+  background: rgba(29,78,216,.06);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background .2s ease, transform .08s ease, border-color .2s ease;
 }
+.va-counterBtn:hover{ background: rgba(29,78,216,.10); transform: translateY(-1px); border-color: rgba(29,78,216,.22); }
+.va-counterVal{ font-size: 18px; font-weight: 900; }
 
-.va-h2 {
-  margin: 10px 0 0;
-  font-size: 16px;
-  font-weight: 800;
-}
+/* =========================
+   Tipografia / Blocos (usado na Bússola também)
+   ========================= */
+.va-text{ margin: 0; line-height: 1.6; color: rgba(11,27,58,.86); }
+.va-h2{ margin: 10px 0 0; font-size: 16px; font-weight: 900; letter-spacing: -0.01em; }
 
-.va-list {
+.va-list{
   margin: 0;
   padding-left: 18px;
   display: grid;
   gap: 6px;
+  color: rgba(11,27,58,.86);
 }
 
-.va-divider {
+.va-divider{
   height: 1px;
   background: rgba(0, 0, 0, 0.08);
-  margin: 6px 0;
+  margin: 10px 0;
 }
 
-.va-meta {
-  margin: 0;
-  line-height: 1.6;
-}
+.va-meta{ margin: 0; line-height: 1.6; color: rgba(11,27,58,.78); }
 
-.va-disclaimer {
+.va-disclaimer{
   margin: 0;
   font-size: 12px;
-  opacity: 0.8;
+  opacity: 0.85;
   line-height: 1.5;
+  color: rgba(11,27,58,.78);
+}
+
+/* =========================
+   EXTRAS: Cards de preço (PIX) — pra Bússola Aérea
+   ========================= */
+.va-pricegrid{
+  display:grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 820px){
+  .va-pricegrid{ grid-template-columns: 1fr 1fr 1fr; }
+}
+
+.va-pricecard{
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(2,16,48,.10);
+  background: rgba(255,255,255,.78);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 16px 44px rgba(2,16,48,.10);
+  padding: 16px;
+  display:grid;
+  gap: 10px;
+}
+
+.va-pricetop{
+  display:flex;
+  align-items:flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.va-tag{
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(249,115,22,.22);
+  background: rgba(249,115,22,.10);
+  color: rgba(11,27,58,.92);
+  width: fit-content;
+}
+
+.va-price{
+  font-size: 26px;
+  font-weight: 1000;
+  letter-spacing: -0.02em;
+}
+
+.va-priceSub{
+  font-size: 12px;
+  color: rgba(11,27,58,.65);
+  line-height: 1.4;
+}
+
+.va-priceActions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.va-mini{
+  font-size: 12px;
+  color: rgba(11,27,58,.70);
 }
