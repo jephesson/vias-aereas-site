@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 const WHATSAPP_NUMBER = "5553999760707";
 const CNPJ = "63.817.773/0001-85";
 const BUSSOLA_LOGO = "/logo-bussola-aerea.png";
 
 type TripType = "ida" | "ida_volta";
+type ToastState = { title: string; desc?: string } | null;
 
 function todayISO() {
   const d = new Date();
@@ -28,11 +29,15 @@ function fmtMoneyBR(cents: number) {
 }
 
 // 🔹 Regras de preço
+// - 30 dias ida: R$30,00
+// - 30 dias ida+volta: R$49,90
+// - a partir de 60 dias, cada bloco extra de 30 dias tem 50% de desconto
 function calcPriceCents(tipo: TripType, totalDias: number) {
   const blocks = Math.max(1, Math.ceil(totalDias / 30));
   const base = tipo === "ida_volta" ? 4990 : 3000;
 
   if (blocks === 1) return base;
+
   const extraBlocks = blocks - 1;
   const extra = Math.round(base * 0.5) * extraBlocks;
   return base + extra;
@@ -40,6 +45,7 @@ function calcPriceCents(tipo: TripType, totalDias: number) {
 
 export default function Page() {
   const minToday = useMemo(() => todayISO(), []);
+
   const [nome, setNome] = useState("");
   const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
@@ -47,6 +53,16 @@ export default function Page() {
   const [dataInicial, setDataInicial] = useState("");
   const [periodoDias, setPeriodoDias] = useState(30);
   const [obs, setObs] = useState("");
+
+  // ✅ toast
+  const [toast, setToast] = useState<ToastState>(null);
+  const toastTimer = useRef<number | null>(null);
+
+  function showToast(next: ToastState, ms = 3500) {
+    setToast(next);
+    if (toastTimer.current) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(null), ms);
+  }
 
   const blocks = Math.max(1, Math.ceil(periodoDias / 30));
   const priceCents = calcPriceCents(tipo, periodoDias);
@@ -68,13 +84,15 @@ export default function Page() {
       "",
       "📌 Pesquisa do menor preço (Pix) por dia no 123milhas + relatório (Excel + PDF).",
       "",
-      `👤 *Nome:* ${nome}`,
-      `✈️ *Trecho:* ${origem} → ${destino}`,
-      `🧾 *Tipo:* ${tipo === "ida_volta" ? "Ida e volta (inclui trecho inverso)" : "Só ida"}`,
+      `👤 *Nome:* ${nome.trim()}`,
+      `✈️ *Trecho:* ${origem.trim()} → ${destino.trim()}`,
+      `🧾 *Tipo:* ${
+        tipo === "ida_volta" ? "Ida e volta (inclui trecho inverso)" : "Só ida"
+      }`,
       `📅 *Data inicial:* ${isoToBR(dataInicial)}`,
       `🗓️ *Período:* ${periodoDias} dias (${blocks} bloco(s) de 30)`,
       `💰 *Valor:* ${priceLabel}`,
-      obs.trim() ? `📝 *Obs:* ${obs}` : null,
+      obs.trim() ? `📝 *Obs:* ${obs.trim()}` : null,
       "",
       "✅ Pedido pronto para confirmação e pagamento.",
       "",
@@ -87,35 +105,64 @@ export default function Page() {
   function openWhats() {
     const msg = buildMessage();
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
+    const win = window.open(url, "_blank");
+
+    if (win) {
+      showToast({
+        title: "WhatsApp aberto ✅",
+        desc: "Se não abriu, permita pop-ups para este site e tente novamente.",
+      });
+    } else {
+      showToast({
+        title: "Pop-up bloqueado ⚠️",
+        desc: "Permita pop-ups no navegador e clique em “Enviar pedido” de novo.",
+      });
+    }
   }
 
   return (
     <main className="va-bg">
+      {/* ✅ Toast */}
+      {toast ? (
+        <div className="va-toast-wrap" role="status" aria-live="polite">
+          <div className="va-toast">
+            <div className="va-toast-text">
+              <strong>{toast.title}</strong>
+              {toast.desc ? <small>{toast.desc}</small> : null}
+            </div>
+            <button
+              type="button"
+              className="va-toast-x"
+              aria-label="Fechar"
+              onClick={() => setToast(null)}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <div className="va-shell">
         <header className="va-header">
           <div className="va-brand">
             <img
               src={BUSSOLA_LOGO}
               alt="Bússola Aérea"
-              className="va-logo"
-              style={{
-                width: 110,
-                height: 110,
-                borderRadius: "20px",
-                background: "#fff",
-                padding: 10,
-                objectFit: "contain",
-              }}
+              className="va-logo va-logo--bussola"
             />
+
             <div>
               <div className="va-pill">
                 <span className="va-dot" /> Pesquisa de menor preço por dia
               </div>
+
               <h1 className="va-title">Bússola Aérea</h1>
+
               <p className="va-subtitle">
-                Você escolhe o trecho e o período. Nós pesquisamos o <b>menor preço (Pix) por dia</b> no 123milhas e
-                entregamos <b>Excel + PDF</b> (Top 5). Ideal para decidir o melhor dia de viajar.
+                Você escolhe o trecho e o período. Nós pesquisamos o{" "}
+                <b>menor preço (Pix) por dia</b> no 123milhas e entregamos{" "}
+                <b>Excel + PDF</b> (Top 5). Ideal para decidir o melhor dia de
+                viajar.
               </p>
             </div>
           </div>
@@ -125,7 +172,8 @@ export default function Page() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (canSubmit) openWhats();
+              if (!canSubmit) return;
+              openWhats();
             }}
           >
             <section className="va-section">
@@ -138,11 +186,14 @@ export default function Page() {
                   onChange={(e) => setNome(e.target.value)}
                   placeholder="Seu nome"
                 />
+
                 <div className="va-row">
                   <button
                     type="button"
                     onClick={() => setTipo("ida_volta")}
-                    className={`va-chip ${tipo === "ida_volta" ? "va-chip--on" : ""}`}
+                    className={`va-chip ${
+                      tipo === "ida_volta" ? "va-chip--on" : ""
+                    }`}
                   >
                     Ida e volta
                   </button>
@@ -197,7 +248,8 @@ export default function Page() {
                     ))}
                   </select>
                   <div style={{ fontSize: 12, opacity: 0.8, marginTop: 6 }}>
-                    A partir de 60 dias: cada bloco adicional de 30 dias tem <b>50% off</b>.
+                    A partir de 60 dias: cada bloco adicional de 30 dias tem{" "}
+                    <b>50% off</b>.
                   </div>
                 </div>
               </div>
@@ -213,7 +265,15 @@ export default function Page() {
               </div>
 
               {error ? (
-                <div style={{ marginTop: 10, fontSize: 12, color: "rgba(249,115,22,.95)" }}>{error}</div>
+                <div
+                  style={{
+                    marginTop: 10,
+                    fontSize: 12,
+                    color: "rgba(249,115,22,.95)",
+                  }}
+                >
+                  {error}
+                </div>
               ) : null}
             </section>
 
@@ -222,22 +282,35 @@ export default function Page() {
               <div className="va-box">
                 <div className="va-boxTitle">Detalhes</div>
                 <div style={{ fontSize: 14, opacity: 0.9, marginTop: 6 }}>
-                  <b>Tipo:</b> {tipo === "ida_volta" ? "Ida e volta" : "Só ida"} <br />
+                  <b>Tipo:</b> {tipo === "ida_volta" ? "Ida e volta" : "Só ida"}{" "}
+                  <br />
                   <b>Período:</b> {periodoDias} dias ({blocks} bloco(s)) <br />
                   <b>Valor:</b>{" "}
-                  <span style={{ fontSize: 18, fontWeight: 900, color: "var(--blue)" }}>{priceLabel}</span>
+                  <span
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 900,
+                      color: "var(--blue)",
+                    }}
+                  >
+                    {priceLabel}
+                  </span>
                 </div>
               </div>
             </section>
 
             <div className="va-footer">
               <div className="va-note">
-                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta para confirmação.
+                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta
+                para finalizar o pedido.
               </div>
+
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className={`va-cta ${canSubmit ? "" : "va-cta--off"}`}
+                className={`va-cta va-cta--pulse ${
+                  canSubmit ? "" : "va-cta--off"
+                }`}
               >
                 Enviar pedido no WhatsApp
               </button>
@@ -245,7 +318,9 @@ export default function Page() {
           </form>
         </section>
 
-        <footer className="va-copy">© {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}</footer>
+        <footer className="va-copy">
+          © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}
+        </footer>
       </div>
     </main>
   );
