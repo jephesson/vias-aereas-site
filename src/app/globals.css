@@ -1,11 +1,13 @@
 /* =========================
-   Vias Aéreas — globals.css (v2.2)
+   Vias Aéreas — globals.css (v2.3)
    - sem duplicações
    - tab ativa + hover da ativa
    - foco/teclado mais bonito
    - componentes extras (cards de preço / badges) pra Bússola
    - ✅ HERO Bússola: logo em cima + texto embaixo (desktop e mobile)
    - ✅ CTA pulse+shimmer, Toast
+   - ✅ Cupom/Badges/Disclaimers (Bússola)
+   - ✅ Banner um pouco menor (aspect-ratio + max-height)
    ========================= */
 
 :root{
@@ -240,10 +242,11 @@ button, input, select, textarea{ font: inherit; }
   gap: 10px;
 }
 
-/* ✅ banner retangular grande */
+/* ✅ banner retangular (um pouco menor) */
 .va-logoCard{
   width: 100%;
-  aspect-ratio: 16 / 6;
+  aspect-ratio: 16 / 4.8;     /* ↓ menor que 16/6 */
+  max-height: 240px;          /* trava altura no desktop */
   border-radius: var(--radius-lg);
   border: 1px solid rgba(2,16,48,.10);
   background: #fff;
@@ -258,7 +261,7 @@ button, input, select, textarea{ font: inherit; }
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transform: scale(1.02);
+  transform: scale(1.04);
 }
 
 .va-heroContent{
@@ -268,8 +271,11 @@ button, input, select, textarea{ font: inherit; }
 }
 
 @media (max-width: 640px){
-  .va-logoCard{ aspect-ratio: 16 / 9; }
-  .va-logoFill{ transform: scale(1.18); }
+  .va-logoCard{
+    aspect-ratio: 16 / 6.6;
+    max-height: 230px;
+  }
+  .va-logoFill{ transform: scale(1.12); }
 }
 
 /* =========================
@@ -507,9 +513,97 @@ button, input, select, textarea{ font: inherit; }
 .va-disclaimer{
   margin: 0;
   font-size: 12px;
-  opacity: 0.85;
+  opacity: 0.90;
   line-height: 1.5;
   color: rgba(11,27,58,.78);
+}
+
+/* =========================
+   ✅ Extras Bússola: badges / cupom / preço / ressalvas
+   ========================= */
+
+/* badge inline (ex.: "Cupom aplicado") */
+.va-inlineBadge{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(2,16,48,.10);
+  background: rgba(255,255,255,.70);
+  color: rgba(11,27,58,.92);
+  width: fit-content;
+}
+
+.va-inlineBadge--ok{
+  border-color: rgba(14,165,233,.26);
+  background: rgba(14,165,233,.10);
+}
+
+.va-inlineBadge--warn{
+  border-color: rgba(249,115,22,.28);
+  background: rgba(249,115,22,.10);
+}
+
+/* wrapper do campo cupom (mantém alinhado com grid) */
+.va-promoWrap{ display:block; }
+
+/* linha com badge + texto auxiliar */
+.va-promoHintRow{
+  margin-top: 8px;
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items:center;
+}
+
+.va-promoSub{
+  font-size: 12px;
+  color: var(--muted2);
+}
+.va-promoSub b{ color: rgba(11,27,58,.92); }
+
+/* preço com cupom no resumo */
+.va-priceRow{
+  display:inline-flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.va-oldPrice{
+  color: rgba(11,27,58,.55);
+  text-decoration: line-through;
+  font-weight: 900;
+}
+.va-priceNow{
+  font-size: 18px;
+  font-weight: 1000;
+  color: var(--blue);
+}
+
+/* card de ressalvas (no hero) */
+.va-disclaimerCard{
+  border: 1px dashed rgba(2,16,48,.18);
+  background: rgba(255,255,255,.65);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+.va-disclaimerTitle{
+  font-size: 12px;
+  font-weight: 1000;
+  color: rgba(11,27,58,.92);
+  margin-bottom: 6px;
+}
+
+/* ressalvas no rodapé do form */
+.va-formDisclaimer{
+  margin-top: 12px;
+  border: 1px solid rgba(2,16,48,.10);
+  background: rgba(255,255,255,.60);
+  border-radius: var(--radius-md);
+  padding: 12px;
 }
 
 /* =========================
