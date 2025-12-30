@@ -85,7 +85,7 @@ export default function Page() {
   const minToday = useMemo(() => todayISO(), []);
 
   const [nome, setNome] = useState("");
-  const [empresa, setEmpresa] = useState(""); // ✅ novo (opcional)
+  const [empresa, setEmpresa] = useState(""); // opcional
   const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
   const [tipo, setTipo] = useState<TripType>("ida_volta");
@@ -117,19 +117,16 @@ export default function Page() {
   }
 
   const blocks = Math.max(1, Math.ceil(periodoDias / 30));
-
   const basePriceCents = calcPriceCents(tipo, periodoDias);
 
-  const promoStatus = useMemo(
-    () => getPromoStatus(cupom, promoUsed),
-    [cupom, promoUsed]
-  );
+  const promoStatus = useMemo(() => getPromoStatus(cupom, promoUsed), [cupom, promoUsed]);
   const promoApplied = promoStatus === "applied";
-  const discountCents = promoApplied
-    ? Math.round(basePriceCents * PROMO_DISCOUNT)
-    : 0;
+  const discountCents = promoApplied ? Math.round(basePriceCents * PROMO_DISCOUNT) : 0;
   const finalPriceCents = Math.max(0, basePriceCents - discountCents);
 
+  const priceLabel = fmtMoneyBR(finalPriceCents);
+
+  // (mantém cálculo interno p/ WhatsApp/operacional)
   const etaMinutes = calcEtaMinutes(tipo, periodoDias);
   const etaLabel = fmtDurationPT(etaMinutes);
 
@@ -137,8 +134,7 @@ export default function Page() {
     if (!nome.trim()) return "Informe seu nome.";
     if (!origem.trim() || !destino.trim()) return "Informe origem e destino.";
     if (!dataInicial) return "Escolha a data inicial.";
-    if (periodoDias < 30 || periodoDias > 180)
-      return "Escolha entre 30 e 180 dias.";
+    if (periodoDias < 30 || periodoDias > 180) return "Escolha entre 30 e 180 dias.";
     return "";
   }, [nome, origem, destino, dataInicial, periodoDias]);
 
@@ -146,48 +142,39 @@ export default function Page() {
 
   function promoHint() {
     if (promoStatus === "idle") return null;
-    if (promoStatus === "invalid")
+
+    if (promoStatus === "invalid") {
+      return <span className="va-inlineBadge va-inlineBadge--warn">Cupom inválido.</span>;
+    }
+    if (promoStatus === "expired") {
       return (
         <span className="va-inlineBadge va-inlineBadge--warn">
-          Cupom inválido.
+          Cupom expirado (até {PROMO_END_LABEL}).
         </span>
       );
-    if (promoStatus === "expired")
-      return (
-        <span className="va-inlineBadge va-inlineBadge--warn">
-          Cupom expirado (válido até {PROMO_END_LABEL}).
-        </span>
-      );
-    if (promoStatus === "used")
+    }
+    if (promoStatus === "used") {
       return (
         <span className="va-inlineBadge va-inlineBadge--warn">
           Cupom já usado neste navegador (somente 1º pedido).
         </span>
       );
-    return (
-      <span className="va-inlineBadge va-inlineBadge--ok">
-        Cupom aplicado ✅ (-20%)
-      </span>
-    );
+    }
+    return <span className="va-inlineBadge va-inlineBadge--ok">Desconto aplicado ✅ (-20%)</span>;
   }
 
   function buildMessage() {
-    const legsTxt =
-      tipo === "ida_volta" ? "2 trechos (ida + volta)" : "1 trecho (só ida)";
+    const legsTxt = tipo === "ida_volta" ? "2 trechos (ida + volta)" : "1 trecho (só ida)";
 
     const linhas: Array<string | null> = [
       "🧭 *Bússola Aérea — Pedido de pesquisa (Agência/Empresa)*",
       "",
-      "🤖 Robô de busca no 123milhas: menor preço (Pix) por dia + relatórios para decisão de promoções e cotação.",
+      "🤖 Triagem automática no 123milhas: menor preço (Pix) por dia + relatórios para decisão de promoções/cotação.",
       "",
       `👤 *Nome:* ${nome.trim()}`,
       empresa.trim() ? `🏢 *Empresa/Agência:* ${empresa.trim()}` : null,
       `✈️ *Trecho:* ${origem.trim()} → ${destino.trim()}`,
-      `🧾 *Tipo:* ${
-        tipo === "ida_volta"
-          ? "Ida e volta (inclui trecho inverso)"
-          : "Só ida"
-      }`,
+      `🧾 *Tipo:* ${tipo === "ida_volta" ? "Ida e volta (inclui trecho inverso)" : "Só ida"}`,
       `📅 *Data inicial:* ${isoToBR(dataInicial)}`,
       `🗓️ *Período:* ${periodoDias} dias (${blocks} bloco(s) de 30)`,
       `🧭 *Processamento:* ${legsTxt}`,
@@ -196,15 +183,15 @@ export default function Page() {
       "• Excel completo com *todos os dias* (com filtros por data e por preço)",
       "• Resumo *Top 5 melhores datas* em *Excel + PDF*",
       "",
-      promoApplied ? `🎟️ *Cupom:* ${PROMO_CODE} (-20%)` : null,
+      promoApplied ? `🎟️ *Cupom:* aplicado (-20%)` : null,
       promoApplied ? `💳 *Subtotal:* ${fmtMoneyBR(basePriceCents)}` : null,
       promoApplied ? `💸 *Desconto:* -${fmtMoneyBR(discountCents)}` : null,
       `💰 *Total:* ${fmtMoneyBR(finalPriceCents)}`,
       `⏱️ *Prazo estimado:* ${etaLabel} (após confirmação do funcionário)`,
       obs.trim() ? `📝 *Obs:* ${obs.trim()}` : null,
       "",
-      "⚠️ *Ressalvas:* este serviço é uma automação de busca de preço. Valores/condições podem mudar a qualquer momento sem aviso pela companhia aérea ou pelo 123milhas.",
-      "✅ A confirmação final do valor e disponibilidade acontece no atendimento.",
+      "⚠️ *Ressalvas:* este serviço faz *triagem automática* dos menores preços exibidos no 123milhas. Valores/condições podem mudar sem aviso pela companhia aérea e/ou pelo 123milhas.",
+      "✅ A confirmação final (disponibilidade e valor em milhas) ocorre no atendimento, conferindo a data no site da companhia aérea e/ou no 123milhas.",
       "",
       `Vias Aéreas • CNPJ ${CNPJ}`,
     ];
@@ -223,13 +210,11 @@ export default function Page() {
 
   function openWhats() {
     const msg = buildMessage();
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      msg
-    )}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
     const win = window.open(url, "_blank");
 
     if (win) {
-      if (promoApplied) markPromoUsed(); // ✅ cupom só 1x (neste navegador)
+      if (promoApplied) markPromoUsed();
 
       showToast({
         title: "WhatsApp aberto ✅",
@@ -245,7 +230,6 @@ export default function Page() {
 
   return (
     <main className="va-bg">
-      {/* ✅ Toast */}
       {toast ? (
         <div className="va-toast-wrap" role="status" aria-live="polite">
           <div className="va-toast">
@@ -253,12 +237,7 @@ export default function Page() {
               <strong>{toast.title}</strong>
               {toast.desc ? <small>{toast.desc}</small> : null}
             </div>
-            <button
-              type="button"
-              className="va-toast-x"
-              aria-label="Fechar"
-              onClick={() => setToast(null)}
-            >
+            <button type="button" className="va-toast-x" aria-label="Fechar" onClick={() => setToast(null)}>
               ×
             </button>
           </div>
@@ -267,71 +246,53 @@ export default function Page() {
 
       <div className="va-shell">
         <header className="va-header">
-          {/* ✅ HERO: logo em cima + conteúdo embaixo */}
           <div className="va-brand va-brand--hero">
             <div className="va-brandMedia">
               <div className="va-logoCard">
-                <img
-                  src={BUSSOLA_LOGO}
-                  alt="Logo Bússola Aérea"
-                  className="va-logoFill"
-                />
+                <img src={BUSSOLA_LOGO} alt="Logo Bússola Aérea" className="va-logoFill" />
               </div>
             </div>
 
             <div className="va-heroContent">
               <div className="va-pill">
-                <span className="va-dot" /> Pesquisa de menor preço por dia (para
-                Agência/Empresa)
+                <span className="va-dot" /> Pesquisa de menor preço por dia (para Agência/Empresa)
               </div>
 
               <p className="va-subtitle" style={{ marginTop: 10 }}>
-                Você escolhe o trecho e o período. Nosso robô entra no{" "}
-                <b>123milhas</b>, coleta a <b>tarifa mais barata (Pix)</b> de cada
-                dia e entrega relatórios prontos para a{" "}
-                <b>agência/empresa identificar os melhores dias de promoção</b> e
-                montar a oferta.
+                Você escolhe o trecho e o período. Nosso robô entra no <b>123milhas</b>, coleta a{" "}
+                <b>tarifa mais barata (Pix)</b> de cada dia e entrega relatórios prontos para a{" "}
+                <b>agência/empresa identificar os melhores dias de promoção</b> e montar a oferta.
               </p>
 
               <ul className="va-list" style={{ marginTop: 10 }}>
                 <li>
-                  <b>Excel completo</b> com o preço de <b>todos os dias</b>{" "}
-                  (filtre por data ou menor preço)
+                  <b>Excel completo</b> com o preço de <b>todos os dias</b> (filtre por data ou menor preço)
                 </li>
                 <li>
-                  <b>Resumo Top 5</b> melhores datas em <b>Excel + PDF</b> (ideal
-                  para enviar ao cliente/aprovação)
+                  <b>Resumo Top 5</b> melhores datas em <b>Excel + PDF</b> (ideal para enviar ao cliente/aprovação)
                 </li>
-                <li>
-                  Organização clara para decidir rapidamente quando lançar
-                  promoções
-                </li>
+                <li>Organização clara para decidir rapidamente quando lançar promoções</li>
               </ul>
 
               <div className="va-divider" />
 
               <p className="va-text">
-                <b>Como funciona:</b> o robô simula a busca, identifica a menor
-                tarifa disponível em cada data e consolida os resultados.
+                <b>Como funciona:</b> o robô simula a busca, identifica a menor tarifa disponível em cada data e consolida os resultados.
               </p>
 
               <p className="va-text" style={{ marginTop: 8 }}>
-                <b>Importante:</b> o 123milhas usa tarifa em{" "}
-                <b>dinheiro + milhas</b>, então não é possível estimar a
-                quantidade de milhas por dia aqui. Mesmo assim, o dia mais barato
-                em Pix geralmente é o dia que{" "}
+                <b>Importante:</b> o 123milhas usa tarifa em <b>dinheiro + milhas</b>, então não é possível estimar a
+                quantidade de milhas por dia aqui. Mesmo assim, o dia mais barato em Pix geralmente é o dia que{" "}
                 <b>também tende a ser o mais econômico em milhas</b>.
               </p>
-
-              {/* ✅ REMOVIDO do topo: "Prazo estimado" e "Cálculo" (fica só no cálculo lá embaixo) */}
 
               <div className="va-disclaimerCard" style={{ marginTop: 12 }}>
                 <div className="va-disclaimerTitle">Ressalvas</div>
                 <p className="va-disclaimer">
-                  Este serviço é uma <b>automação de busca de preços</b>.
-                  Valores/condições podem ser alterados <b>sem aviso</b> pela
-                  companhia aérea e/ou pelo 123milhas. A confirmação final ocorre
-                  no atendimento.
+                  Este serviço é uma <b>triagem automatizada</b> dos menores preços exibidos no <b>123milhas</b>.
+                  Valores/condições podem ser alterados <b>sem aviso</b> pela companhia aérea e/ou pelo 123milhas.{" "}
+                  A confirmação final (incluindo valor em milhas e disponibilidade) acontece no atendimento,{" "}
+                  conferindo a data no site da companhia aérea e/ou no 123milhas.
                 </p>
               </div>
             </div>
@@ -350,34 +311,19 @@ export default function Page() {
               <div className="va-label">Dados</div>
 
               <div className="va-grid2">
-                <input
-                  className="va-input"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Seu nome"
-                />
+                <input className="va-input" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Seu nome" />
 
                 <div className="va-row">
-                  <button
-                    type="button"
-                    onClick={() => setTipo("ida_volta")}
-                    className={`va-chip ${
-                      tipo === "ida_volta" ? "va-chip--on" : ""
-                    }`}
-                  >
+                  <button type="button" onClick={() => setTipo("ida_volta")} className={`va-chip ${tipo === "ida_volta" ? "va-chip--on" : ""}`}>
                     Ida e volta
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setTipo("ida")}
-                    className={`va-chip ${tipo === "ida" ? "va-chip--on" : ""}`}
-                  >
+                  <button type="button" onClick={() => setTipo("ida")} className={`va-chip ${tipo === "ida" ? "va-chip--on" : ""}`}>
                     Só ida
                   </button>
                 </div>
               </div>
 
-              {/* ✅ Empresa/Agência + Cupom */}
+              {/* Empresa/Agência + Cupom */}
               <div className="va-grid2" style={{ marginTop: 10 }}>
                 <input
                   className="va-input"
@@ -391,53 +337,27 @@ export default function Page() {
                     className="va-input"
                     value={cupom}
                     onChange={(e) => setCupom(e.target.value)}
-                    placeholder={`Cupom (opcional) — ex: ${PROMO_CODE}`}
+                    placeholder="Cupom (opcional)"
                     autoCapitalize="characters"
                   />
-                  <div className="va-promoHintRow">
-                    {promoHint()}
-                    <span className="va-promoSub">
-                      Cupom <b>{PROMO_CODE}</b>: 20% off • válido até{" "}
-                      <b>{PROMO_END_LABEL}</b> • apenas no <b>1º pedido</b>
-                    </span>
-                  </div>
+                  <div className="va-promoHintRow">{promoHint()}</div>
                 </div>
               </div>
 
               <div className="va-grid2" style={{ marginTop: 10 }}>
-                <input
-                  className="va-input"
-                  value={origem}
-                  onChange={(e) => setOrigem(e.target.value)}
-                  placeholder="Origem (ex: JPA ou João Pessoa)"
-                />
-                <input
-                  className="va-input"
-                  value={destino}
-                  onChange={(e) => setDestino(e.target.value)}
-                  placeholder="Destino (ex: POA ou Porto Alegre)"
-                />
+                <input className="va-input" value={origem} onChange={(e) => setOrigem(e.target.value)} placeholder="Origem (ex: JPA ou João Pessoa)" />
+                <input className="va-input" value={destino} onChange={(e) => setDestino(e.target.value)} placeholder="Destino (ex: POA ou Porto Alegre)" />
               </div>
 
               <div className="va-grid2" style={{ marginTop: 10 }}>
                 <div className="va-box">
                   <div className="va-boxTitle">Data inicial</div>
-                  <input
-                    className="va-input"
-                    type="date"
-                    min={minToday}
-                    value={dataInicial}
-                    onChange={(e) => setDataInicial(e.target.value)}
-                  />
+                  <input className="va-input" type="date" min={minToday} value={dataInicial} onChange={(e) => setDataInicial(e.target.value)} />
                 </div>
 
                 <div className="va-box">
                   <div className="va-boxTitle">Período</div>
-                  <select
-                    className="va-input"
-                    value={periodoDias}
-                    onChange={(e) => setPeriodoDias(Number(e.target.value))}
-                  >
+                  <select className="va-input" value={periodoDias} onChange={(e) => setPeriodoDias(Number(e.target.value))}>
                     {[30, 60, 90, 120, 150, 180].map((d) => (
                       <option key={d} value={d}>
                         {d} dias ({d / 30} bloco(s) de 30)
@@ -446,33 +366,16 @@ export default function Page() {
                   </select>
 
                   <div style={{ fontSize: 12, opacity: 0.8, marginTop: 6 }}>
-                    A partir de 60 dias: cada bloco adicional de 30 dias tem{" "}
-                    <b>50% off</b>.
+                    A partir de 60 dias: cada bloco adicional de 30 dias tem <b>50% off</b>.
                   </div>
                 </div>
               </div>
 
               <div style={{ marginTop: 10 }}>
-                <textarea
-                  className="va-input"
-                  rows={3}
-                  value={obs}
-                  onChange={(e) => setObs(e.target.value)}
-                  placeholder="Observações (opcional)"
-                />
+                <textarea className="va-input" rows={3} value={obs} onChange={(e) => setObs(e.target.value)} placeholder="Observações (opcional)" />
               </div>
 
-              {error ? (
-                <div
-                  style={{
-                    marginTop: 10,
-                    fontSize: 12,
-                    color: "rgba(249,115,22,.95)",
-                  }}
-                >
-                  {error}
-                </div>
-              ) : null}
+              {error ? <div style={{ marginTop: 10, fontSize: 12, color: "rgba(249,115,22,.95)" }}>{error}</div> : null}
             </section>
 
             <section className="va-section">
@@ -481,97 +384,56 @@ export default function Page() {
                 <div className="va-boxTitle">Detalhes</div>
 
                 <div style={{ fontSize: 14, opacity: 0.9, marginTop: 6 }}>
-                  <b>Tipo:</b>{" "}
-                  {tipo === "ida_volta" ? "Ida e volta" : "Só ida"} <br />
+                  <b>Tipo:</b> {tipo === "ida_volta" ? "Ida e volta" : "Só ida"} <br />
                   <b>Período:</b> {periodoDias} dias ({blocks} bloco(s)) <br />
-                  <b>Entrega:</b> Excel completo (todos os dias) + Top 5 (Excel +
-                  PDF) <br />
+                  <b>Entrega:</b> Excel completo (todos os dias) + Top 5 (Excel + PDF) <br />
 
                   <div style={{ marginTop: 8 }}>
                     <b>Valor:</b>{" "}
                     {promoApplied ? (
                       <span className="va-priceRow">
-                        <span className="va-oldPrice">
-                          {fmtMoneyBR(basePriceCents)}
-                        </span>
-                        <span className="va-priceNow">
-                          {fmtMoneyBR(finalPriceCents)}
-                        </span>
-                        <span className="va-inlineBadge va-inlineBadge--ok">
-                          -20% cupom
-                        </span>
+                        <span className="va-oldPrice">{fmtMoneyBR(basePriceCents)}</span>
+                        <span className="va-priceNow">{fmtMoneyBR(finalPriceCents)}</span>
+                        <span className="va-inlineBadge va-inlineBadge--ok">-20%</span>
                       </span>
                     ) : (
-                      <span
-                        style={{
-                          fontSize: 18,
-                          fontWeight: 900,
-                          color: "var(--blue)",
-                        }}
-                      >
-                        {fmtMoneyBR(finalPriceCents)}
-                      </span>
+                      <span style={{ fontSize: 18, fontWeight: 900, color: "var(--blue)" }}>{priceLabel}</span>
                     )}
                   </div>
 
-                  {/* ✅ REMOVIDO aqui também: "Prazo estimado" (fica só no cálculo abaixo) */}
-
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: "var(--muted2)",
-                      marginTop: 8,
-                    }}
-                  >
-                    <b>Cálculo do processamento:</b> 1h + 1 min/dia{" "}
-                    {tipo === "ida_volta"
-                      ? "(por trecho — ida+volta = 2x)"
-                      : ""}
-                    . <span style={{ marginLeft: 6 }}>{/* opcional */}</span>
+                  <div style={{ fontSize: 12, color: "var(--muted2)", marginTop: 8 }}>
+                    <b>Cálculo do processamento:</b> 1h + 1 min/dia {tipo === "ida_volta" ? "(por trecho — ida+volta = 2x)" : ""}.
                   </div>
 
-                  {/* (se você quiser continuar calculando por trás) */}
-                  <div style={{ display: "none" }}>
-                    {etaLabel}
-                  </div>
+                  {/* mantido só “por trás” */}
+                  <div style={{ display: "none" }}>{etaLabel}</div>
                 </div>
               </div>
             </section>
 
             <div className="va-footer">
               <div className="va-note">
-                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta
-                para finalizar o pedido. <br />
-                <b>Atenção:</b> valores e disponibilidade podem mudar sem aviso
-                (CIA/123milhas).
+                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta para finalizar o pedido. <br />
+                <b>Atenção:</b> valores e disponibilidade podem mudar sem aviso (CIA/123milhas).
               </div>
 
-              <button
-                type="submit"
-                disabled={!canSubmit}
-                className={`va-cta va-cta--pulse ${
-                  canSubmit ? "" : "va-cta--off"
-                }`}
-              >
+              <button type="submit" disabled={!canSubmit} className={`va-cta va-cta--pulse ${canSubmit ? "" : "va-cta--off"}`}>
                 Enviar pedido no WhatsApp
               </button>
             </div>
 
-            {/* ✅ rodapé do form com ressalvas */}
             <div className="va-formDisclaimer">
               <p className="va-disclaimer" style={{ margin: 0 }}>
-                <b>Ressalvas:</b> este serviço é uma automação de busca de preço.
-                As tarifas podem ser alteradas <b>sem aviso prévio</b> pela
-                companhia aérea e/ou pelo 123milhas. A confirmação final ocorre
-                no atendimento.
+                <b>Ressalvas:</b> este serviço faz <b>triagem automatizada</b> de preço no <b>123milhas</b>. As tarifas podem mudar{" "}
+                <b>sem aviso</b> pela companhia aérea e/ou pelo 123milhas. A confirmação final (incluindo valor em milhas e disponibilidade)
+                ocorre no atendimento, conferindo a data no site da companhia aérea e/ou no 123milhas.
               </p>
             </div>
           </form>
         </section>
 
         <footer className="va-copy">
-          © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ} • Valores
-          sujeitos a alteração sem aviso.
+          © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ} • Valores sujeitos a alteração sem aviso.
         </footer>
       </div>
     </main>
