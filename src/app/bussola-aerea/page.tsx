@@ -72,8 +72,7 @@ export default function Page() {
     if (!nome.trim()) return "Informe seu nome.";
     if (!origem.trim() || !destino.trim()) return "Informe origem e destino.";
     if (!dataInicial) return "Escolha a data inicial.";
-    if (periodoDias < 30 || periodoDias > 180)
-      return "Escolha entre 30 e 180 dias.";
+    if (periodoDias < 30 || periodoDias > 180) return "Escolha entre 30 e 180 dias.";
     return "";
   }, [nome, origem, destino, dataInicial, periodoDias]);
 
@@ -88,9 +87,7 @@ export default function Page() {
       `👤 *Nome:* ${nome.trim()}`,
       `✈️ *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${
-        tipo === "ida_volta"
-          ? "Ida e volta (inclui trecho inverso)"
-          : "Só ida"
+        tipo === "ida_volta" ? "Ida e volta (inclui trecho inverso)" : "Só ida"
       }`,
       `📅 *Data inicial:* ${isoToBR(dataInicial)}`,
       `🗓️ *Período:* ${periodoDias} dias (${blocks} bloco(s) de 30)`,
@@ -107,9 +104,7 @@ export default function Page() {
 
   function openWhats() {
     const msg = buildMessage();
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      msg
-    )}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
     const win = window.open(url, "_blank");
 
     if (win) {
@@ -149,7 +144,7 @@ export default function Page() {
 
       <div className="va-shell">
         <header className="va-header">
-          {/* ✅ “Hero” com logo ocupando o card + texto embaixo */}
+          {/* ✅ Logo retângulo completo + descrição embaixo (sem repetir o nome do lado direito) */}
           <div className="va-brand va-brand--hero">
             <div className="va-brandMedia">
               <div className="va-logoCard">
@@ -161,7 +156,6 @@ export default function Page() {
               </div>
 
               <div className="va-logoCaption">
-                <strong>Bússola Aérea</strong>
                 <span>Preço por dia + relatório pronto para o cliente.</span>
               </div>
             </div>
@@ -171,14 +165,17 @@ export default function Page() {
                 <span className="va-dot" /> Pesquisa de menor preço por dia
               </div>
 
-              <h1 className="va-title">Bússola Aérea</h1>
-
-              <p className="va-subtitle">
+              <p className="va-subtitle" style={{ marginTop: 10 }}>
                 Você escolhe o trecho e o período. Nós pesquisamos o{" "}
                 <b>menor preço (Pix) por dia</b> no 123milhas e entregamos{" "}
-                <b>Excel + PDF</b> (Top 5). Ideal para decidir o melhor dia de
-                viajar.
+                <b>Excel + PDF</b> (Top 5). Ideal para decidir o melhor dia de viajar.
               </p>
+
+              <ul className="va-list" style={{ marginTop: 10 }}>
+                <li>Preço por dia (Pix)</li>
+                <li>Relatório Excel + PDF</li>
+                <li>Top 5 melhores datas</li>
+              </ul>
             </div>
           </div>
         </header>
@@ -206,9 +203,7 @@ export default function Page() {
                   <button
                     type="button"
                     onClick={() => setTipo("ida_volta")}
-                    className={`va-chip ${
-                      tipo === "ida_volta" ? "va-chip--on" : ""
-                    }`}
+                    className={`va-chip ${tipo === "ida_volta" ? "va-chip--on" : ""}`}
                   >
                     Ida e volta
                   </button>
@@ -263,8 +258,7 @@ export default function Page() {
                     ))}
                   </select>
                   <div style={{ fontSize: 12, opacity: 0.8, marginTop: 6 }}>
-                    A partir de 60 dias: cada bloco adicional de 30 dias tem{" "}
-                    <b>50% off</b>.
+                    A partir de 60 dias: cada bloco adicional de 30 dias tem <b>50% off</b>.
                   </div>
                 </div>
               </div>
@@ -280,13 +274,7 @@ export default function Page() {
               </div>
 
               {error ? (
-                <div
-                  style={{
-                    marginTop: 10,
-                    fontSize: 12,
-                    color: "rgba(249,115,22,.95)",
-                  }}
-                >
+                <div style={{ marginTop: 10, fontSize: 12, color: "rgba(249,115,22,.95)" }}>
                   {error}
                 </div>
               ) : null}
@@ -297,17 +285,10 @@ export default function Page() {
               <div className="va-box">
                 <div className="va-boxTitle">Detalhes</div>
                 <div style={{ fontSize: 14, opacity: 0.9, marginTop: 6 }}>
-                  <b>Tipo:</b> {tipo === "ida_volta" ? "Ida e volta" : "Só ida"}{" "}
-                  <br />
+                  <b>Tipo:</b> {tipo === "ida_volta" ? "Ida e volta" : "Só ida"} <br />
                   <b>Período:</b> {periodoDias} dias ({blocks} bloco(s)) <br />
                   <b>Valor:</b>{" "}
-                  <span
-                    style={{
-                      fontSize: 18,
-                      fontWeight: 900,
-                      color: "var(--blue)",
-                    }}
-                  >
+                  <span style={{ fontSize: 18, fontWeight: 900, color: "var(--blue)" }}>
                     {priceLabel}
                   </span>
                 </div>
@@ -316,14 +297,13 @@ export default function Page() {
 
             <div className="va-footer">
               <div className="va-note">
-                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta
-                para finalizar o pedido.
+                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta para finalizar o pedido.
               </div>
 
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className={`va-cta ${canSubmit ? "" : "va-cta--off"}`}
+                className={`va-cta va-cta--pulse ${canSubmit ? "" : "va-cta--off"}`}
               >
                 Enviar pedido no WhatsApp
               </button>
