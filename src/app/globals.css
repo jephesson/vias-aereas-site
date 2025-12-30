@@ -259,7 +259,7 @@ button, input, select, textarea{ font: inherit; }
   height: 100%;
   object-fit: contain;         /* chave */
   object-position: center;
-  transform: none;             /* remove scale */
+  transform: none;             /* sem zoom/crop */
 }
 
 .va-logoCaption{
