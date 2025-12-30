@@ -191,7 +191,7 @@ export default function Page() {
       obs.trim() ? `📝 *Obs:* ${obs.trim()}` : null,
       "",
       "⚠️ *Ressalvas:* este serviço faz *triagem automática* dos menores preços exibidos no 123milhas. Valores/condições podem mudar sem aviso pela companhia aérea e/ou pelo 123milhas.",
-      "✅ A confirmação final (disponibilidade e valor em milhas) ocorre no atendimento, conferindo a data no site da companhia aérea e/ou no 123milhas.",
+      "✅ A confirmação final (disponibilidade e valor em milhas) ocorre conferindo a data no site da companhia aérea e/ou no 123milhas.",
       "",
       `Vias Aéreas • CNPJ ${CNPJ}`,
     ];
@@ -426,7 +426,7 @@ export default function Page() {
               <p className="va-disclaimer" style={{ margin: 0 }}>
                 <b>Ressalvas:</b> este serviço faz <b>triagem automatizada</b> de preço no <b>123milhas</b>. As tarifas podem mudar{" "}
                 <b>sem aviso</b> pela companhia aérea e/ou pelo 123milhas. A confirmação final (incluindo valor em milhas e disponibilidade)
-                ocorre no atendimento, conferindo a data no site da companhia aérea e/ou no 123milhas.
+                ocorre conferindo a data no site da companhia aérea e/ou no 123milhas.
               </p>
             </div>
           </form>
