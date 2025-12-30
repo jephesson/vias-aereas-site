@@ -43,6 +43,23 @@ function calcPriceCents(tipo: TripType, totalDias: number) {
   return base + extra;
 }
 
+// ⏱️ Prazo: 1 min por dia + 1h (e em ida+volta considera 2 trechos)
+function calcEtaMinutes(tipo: TripType, totalDias: number) {
+  const legs = tipo === "ida_volta" ? 2 : 1;
+  const minutesPerDay = 1 * legs;
+  return 60 + totalDias * minutesPerDay;
+}
+
+function fmtDurationPT(totalMinutes: number) {
+  const m = Math.max(0, Math.round(totalMinutes));
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+
+  if (h <= 0) return `${r} min`;
+  if (r === 0) return `${h}h`;
+  return `${h}h ${r}min`;
+}
+
 export default function Page() {
   const minToday = useMemo(() => todayISO(), []);
 
@@ -68,33 +85,43 @@ export default function Page() {
   const priceCents = calcPriceCents(tipo, periodoDias);
   const priceLabel = fmtMoneyBR(priceCents);
 
+  const etaMinutes = calcEtaMinutes(tipo, periodoDias);
+  const etaLabel = fmtDurationPT(etaMinutes);
+
   const error = useMemo(() => {
     if (!nome.trim()) return "Informe seu nome.";
     if (!origem.trim() || !destino.trim()) return "Informe origem e destino.";
     if (!dataInicial) return "Escolha a data inicial.";
-    if (periodoDias < 30 || periodoDias > 180) return "Escolha entre 30 e 180 dias.";
+    if (periodoDias < 30 || periodoDias > 180)
+      return "Escolha entre 30 e 180 dias.";
     return "";
   }, [nome, origem, destino, dataInicial, periodoDias]);
 
   const canSubmit = !error;
 
   function buildMessage() {
+    const legsTxt = tipo === "ida_volta" ? "2 trechos (ida + volta)" : "1 trecho (só ida)";
     const linhas = [
       "🧭 *Bússola Aérea — Pedido de pesquisa*",
       "",
-      "📌 Pesquisa do menor preço (Pix) por dia no 123milhas + relatório (Excel + PDF).",
+      "🤖 Pesquisa automatizada do menor preço (Pix) por dia no 123milhas + relatório (Excel + PDF).",
       "",
       `👤 *Nome:* ${nome.trim()}`,
       `✈️ *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${
-        tipo === "ida_volta" ? "Ida e volta (inclui trecho inverso)" : "Só ida"
+        tipo === "ida_volta"
+          ? "Ida e volta (inclui trecho inverso)"
+          : "Só ida"
       }`,
       `📅 *Data inicial:* ${isoToBR(dataInicial)}`,
       `🗓️ *Período:* ${periodoDias} dias (${blocks} bloco(s) de 30)`,
+      `🧭 *Processamento:* ${legsTxt}`,
       `💰 *Valor:* ${priceLabel}`,
+      `⏱️ *Prazo estimado:* ${etaLabel} (após confirmação do funcionário)`,
       obs.trim() ? `📝 *Obs:* ${obs.trim()}` : null,
       "",
-      "✅ Pedido pronto para confirmação e pagamento.",
+      "ℹ️ O 123milhas utiliza tarifa em dinheiro + milhas; não dá para estimar o valor em milhas por dia aqui.",
+      "✅ Porém, ao encontrar o dia mais barato em Pix, geralmente é o dia que também tende a ter o menor custo em milhas.",
       "",
       `Vias Aéreas • CNPJ ${CNPJ}`,
     ].filter(Boolean);
@@ -104,7 +131,9 @@ export default function Page() {
 
   function openWhats() {
     const msg = buildMessage();
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+      msg
+    )}`;
     const win = window.open(url, "_blank");
 
     if (win) {
@@ -144,7 +173,7 @@ export default function Page() {
 
       <div className="va-shell">
         <header className="va-header">
-          {/* ✅ Logo retângulo completo + descrição embaixo (sem repetir o nome do lado direito) */}
+          {/* ✅ Logo retângulo completo (sem legenda “Preço por dia...”) */}
           <div className="va-brand va-brand--hero">
             <div className="va-brandMedia">
               <div className="va-logoCard">
@@ -154,10 +183,6 @@ export default function Page() {
                   className="va-logoFill"
                 />
               </div>
-
-              <div className="va-logoCaption">
-                <span>Preço por dia + relatório pronto para o cliente.</span>
-              </div>
             </div>
 
             <div>
@@ -166,16 +191,42 @@ export default function Page() {
               </div>
 
               <p className="va-subtitle" style={{ marginTop: 10 }}>
-                Você escolhe o trecho e o período. Nós pesquisamos o{" "}
-                <b>menor preço (Pix) por dia</b> no 123milhas e entregamos{" "}
-                <b>Excel + PDF</b> (Top 5). Ideal para decidir o melhor dia de viajar.
+                Você escolhe o trecho e o período. Nosso robô entra no{" "}
+                <b>123milhas</b>, coleta a <b>tarifa mais barata (Pix)</b> de cada
+                dia e organiza tudo em um relatório pronto.
               </p>
 
               <ul className="va-list" style={{ marginTop: 10 }}>
-                <li>Preço por dia (Pix)</li>
-                <li>Relatório Excel + PDF</li>
-                <li>Top 5 melhores datas</li>
+                <li>Preço por dia (Pix) no período escolhido</li>
+                <li>Relatório em <b>Excel + PDF</b> (Top 5 melhores datas)</li>
+                <li>Organização clara para você decidir o melhor dia de viajar</li>
               </ul>
+
+              <div className="va-divider" />
+
+              <p className="va-text">
+                <b>Como o robô funciona:</b> ele simula a busca no site do 123milhas,
+                identifica a menor tarifa disponível em cada data e consolida os dados.
+              </p>
+
+              <p className="va-text" style={{ marginTop: 8 }}>
+                <b>Importante:</b> o 123milhas usa tarifa em <b>dinheiro + milhas</b>,
+                então não é possível estimar a quantidade de milhas por dia aqui.
+                Mesmo assim, o dia mais barato em Pix geralmente é o dia que{" "}
+                <b>também tende a ser o mais econômico em milhas</b>.
+              </p>
+
+              <p className="va-meta" style={{ marginTop: 10 }}>
+                <b>Prazo estimado:</b> {etaLabel}{" "}
+                <span style={{ color: "var(--muted2)" }}>
+                  (após confirmação do funcionário)
+                </span>
+                <br />
+                <span style={{ color: "var(--muted2)" }}>
+                  Cálculo: 1h + 1 min/dia{" "}
+                  {tipo === "ida_volta" ? "(por trecho — ida+volta = 2x)" : ""}.
+                </span>
+              </p>
             </div>
           </div>
         </header>
@@ -203,7 +254,9 @@ export default function Page() {
                   <button
                     type="button"
                     onClick={() => setTipo("ida_volta")}
-                    className={`va-chip ${tipo === "ida_volta" ? "va-chip--on" : ""}`}
+                    className={`va-chip ${
+                      tipo === "ida_volta" ? "va-chip--on" : ""
+                    }`}
                   >
                     Ida e volta
                   </button>
@@ -258,7 +311,8 @@ export default function Page() {
                     ))}
                   </select>
                   <div style={{ fontSize: 12, opacity: 0.8, marginTop: 6 }}>
-                    A partir de 60 dias: cada bloco adicional de 30 dias tem <b>50% off</b>.
+                    A partir de 60 dias: cada bloco adicional de 30 dias tem{" "}
+                    <b>50% off</b>.
                   </div>
                 </div>
               </div>
@@ -274,7 +328,13 @@ export default function Page() {
               </div>
 
               {error ? (
-                <div style={{ marginTop: 10, fontSize: 12, color: "rgba(249,115,22,.95)" }}>
+                <div
+                  style={{
+                    marginTop: 10,
+                    fontSize: 12,
+                    color: "rgba(249,115,22,.95)",
+                  }}
+                >
                   {error}
                 </div>
               ) : null}
@@ -285,25 +345,44 @@ export default function Page() {
               <div className="va-box">
                 <div className="va-boxTitle">Detalhes</div>
                 <div style={{ fontSize: 14, opacity: 0.9, marginTop: 6 }}>
-                  <b>Tipo:</b> {tipo === "ida_volta" ? "Ida e volta" : "Só ida"} <br />
+                  <b>Tipo:</b> {tipo === "ida_volta" ? "Ida e volta" : "Só ida"}{" "}
+                  <br />
                   <b>Período:</b> {periodoDias} dias ({blocks} bloco(s)) <br />
                   <b>Valor:</b>{" "}
-                  <span style={{ fontSize: 18, fontWeight: 900, color: "var(--blue)" }}>
+                  <span
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 900,
+                      color: "var(--blue)",
+                    }}
+                  >
                     {priceLabel}
                   </span>
+                  <br />
+                  <b>Prazo estimado:</b>{" "}
+                  <span style={{ fontWeight: 900 }}>{etaLabel}</span>{" "}
+                  <span style={{ color: "var(--muted2)" }}>
+                    (após confirmação do funcionário)
+                  </span>
+                  <div style={{ fontSize: 12, color: "var(--muted2)", marginTop: 6 }}>
+                    Cálculo: 1h + 1 min/dia {tipo === "ida_volta" ? "(por trecho — ida+volta = 2x)" : ""}.
+                  </div>
                 </div>
               </div>
             </section>
 
             <div className="va-footer">
               <div className="va-note">
-                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta para finalizar o pedido.
+                Ao clicar em enviar, abriremos o WhatsApp com a mensagem pronta
+                para finalizar o pedido. O prazo acima é uma estimativa.
               </div>
 
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className={`va-cta va-cta--pulse ${canSubmit ? "" : "va-cta--off"}`}
+                className={`va-cta va-cta--pulse ${
+                  canSubmit ? "" : "va-cta--off"
+                }`}
               >
                 Enviar pedido no WhatsApp
               </button>
