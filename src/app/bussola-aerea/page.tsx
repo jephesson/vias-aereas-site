@@ -72,7 +72,8 @@ export default function Page() {
     if (!nome.trim()) return "Informe seu nome.";
     if (!origem.trim() || !destino.trim()) return "Informe origem e destino.";
     if (!dataInicial) return "Escolha a data inicial.";
-    if (periodoDias < 30 || periodoDias > 180) return "Escolha entre 30 e 180 dias.";
+    if (periodoDias < 30 || periodoDias > 180)
+      return "Escolha entre 30 e 180 dias.";
     return "";
   }, [nome, origem, destino, dataInicial, periodoDias]);
 
@@ -87,7 +88,9 @@ export default function Page() {
       `👤 *Nome:* ${nome.trim()}`,
       `✈️ *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${
-        tipo === "ida_volta" ? "Ida e volta (inclui trecho inverso)" : "Só ida"
+        tipo === "ida_volta"
+          ? "Ida e volta (inclui trecho inverso)"
+          : "Só ida"
       }`,
       `📅 *Data inicial:* ${isoToBR(dataInicial)}`,
       `🗓️ *Período:* ${periodoDias} dias (${blocks} bloco(s) de 30)`,
@@ -104,7 +107,9 @@ export default function Page() {
 
   function openWhats() {
     const msg = buildMessage();
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+      msg
+    )}`;
     const win = window.open(url, "_blank");
 
     if (win) {
@@ -144,12 +149,22 @@ export default function Page() {
 
       <div className="va-shell">
         <header className="va-header">
-          <div className="va-brand">
-            <img
-              src={BUSSOLA_LOGO}
-              alt="Bússola Aérea"
-              className="va-logo va-logo--bussola"
-            />
+          {/* ✅ “Hero” com logo ocupando o card + texto embaixo */}
+          <div className="va-brand va-brand--hero">
+            <div className="va-brandMedia">
+              <div className="va-logoCard">
+                <img
+                  src={BUSSOLA_LOGO}
+                  alt="Logo Bússola Aérea"
+                  className="va-logoFill"
+                />
+              </div>
+
+              <div className="va-logoCaption">
+                <strong>Bússola Aérea</strong>
+                <span>Preço por dia + relatório pronto para o cliente.</span>
+              </div>
+            </div>
 
             <div>
               <div className="va-pill">
@@ -308,9 +323,7 @@ export default function Page() {
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className={`va-cta va-cta--pulse ${
-                  canSubmit ? "" : "va-cta--off"
-                }`}
+                className={`va-cta ${canSubmit ? "" : "va-cta--off"}`}
               >
                 Enviar pedido no WhatsApp
               </button>
