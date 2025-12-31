@@ -39,13 +39,16 @@ function normalizeCode(s: string) {
   return (s || "").trim().toUpperCase();
 }
 
-// 🔹 Regras de preço
-// - 30 dias ida: R$30,00
-// - 30 dias ida+volta: R$49,90
+// 🔹 Regras de preço (já com -25% aplicado nos valores)
+// - 30 dias ida: R$22,50
+// - 30 dias ida+volta: R$37,43
 // - a partir de 60 dias, cada bloco extra de 30 dias tem 50% de desconto
 function calcPriceCents(tipo: TripType, totalDias: number) {
   const blocks = Math.max(1, Math.ceil(totalDias / 30));
-  const base = tipo === "ida_volta" ? 4990 : 3000;
+
+  // ✅ valores já reduzidos em 25% (direto)
+  // antes: ida=3000 / ida+volta=4990
+  const base = tipo === "ida_volta" ? 3743 : 2250;
 
   if (blocks === 1) return base;
 
