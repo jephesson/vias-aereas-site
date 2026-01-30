@@ -9,13 +9,19 @@ const tabs: Tab[] = [
   { href: "/", label: "Cotação", match: "exact" },
   { href: "/bussola-aerea", label: "Bússola Aérea", match: "prefix" },
   { href: "/guias", label: "Guias de Viagem", match: "prefix" },
+
+  // ✅ NOVO: Venda seus pontos
+  { href: "/venda-seus-pontos", label: "Venda seus pontos", match: "prefix" },
+
   { href: "/afiliados", label: "Afiliados", match: "prefix" },
   { href: "/sobre", label: "Sobre", match: "prefix" },
 ];
 
 function isActive(pathname: string, tab: Tab) {
-  if (tab.match === "exact") return pathname === tab.href;
-  return tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
+  const path = (pathname || "/").split("?")[0].split("#")[0];
+
+  if (tab.match === "exact") return path === tab.href;
+  return tab.href === "/" ? path === "/" : path.startsWith(tab.href);
 }
 
 export default function NavTabs() {
