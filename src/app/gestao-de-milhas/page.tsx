@@ -42,6 +42,21 @@ const RECURSOS = [
   },
 ];
 
+const DESTAQUES = [
+  {
+    titulo: "LATAM + Smiles",
+    texto: "Campos e validacoes dedicados para cada programa.",
+  },
+  {
+    titulo: "Financeiro integrado",
+    texto: "Entradas, saidas, pendencias e projecao no mesmo painel.",
+  },
+  {
+    titulo: "Operacao personalizada",
+    texto: "Fluxo adaptado ao seu processo real de venda.",
+  },
+];
+
 const DIFERENCIAIS = [
   "Personalizacao total de campos, validacoes e status.",
   "Fluxo adaptado ao seu processo real, nao ao padrao do mercado.",
@@ -54,6 +69,21 @@ const LIMITACOES = [
   "Campos e regras normalmente padronizados.",
   "Menor controle sobre modelagem do processo.",
   "Personalizacao mais limitada para cenarios especificos.",
+];
+
+const PASSOS = [
+  {
+    titulo: "Diagnostico rapido",
+    texto: "Mapeamos seu fluxo atual para configurar campos, status e regras do jeito certo.",
+  },
+  {
+    titulo: "Configuracao da operacao",
+    texto: "Ativamos vendas, cedentes, financeiro e localizadores com estrutura pronta para uso.",
+  },
+  {
+    titulo: "Videochamada exclusiva",
+    texto: "Mostro o painel ao vivo, sem compromisso, para voce validar antes de decidir.",
+  },
 ];
 
 export default function GestaoDeMilhasPage() {
@@ -69,10 +99,13 @@ export default function GestaoDeMilhasPage() {
               localizadores e analise de dados em um unico painel.
             </p>
 
-            <div className="gm-pillRow">
-              <span className="gm-pill">LATAM + Smiles</span>
-              <span className="gm-pill">Financeiro integrado</span>
-              <span className="gm-pill">Operacao personalizada</span>
+            <div className="gm-highlightGrid">
+              {DESTAQUES.map((item) => (
+                <article key={item.titulo} className="gm-highlightCard">
+                  <h3 className="gm-highlightTitle">{item.titulo}</h3>
+                  <p className="gm-highlightText">{item.texto}</p>
+                </article>
+              ))}
             </div>
           </div>
 
@@ -86,6 +119,9 @@ export default function GestaoDeMilhasPage() {
             <p className="gm-offerText">+ hospedagem para dominio .com.br (media de R$ 70,00 a cada 2 anos).</p>
             <p className="gm-offerCallout">
               Inclui <b>videochamada exclusiva</b> para mostrar o produto, sem compromisso.
+            </p>
+            <p className="gm-offerMini">
+              Atendimento 1:1 para tirar duvidas e apresentar o painel com foco no seu processo.
             </p>
 
             <div className="gm-offerActions">
@@ -137,7 +173,7 @@ export default function GestaoDeMilhasPage() {
               </ul>
             </article>
 
-            <article className="gm-compareCard">
+            <article className="gm-compareCard gm-compareCard--baseline">
               <h3 className="gm-compareTitle">Plataforma padrao de mercado</h3>
               <ul className="gm-compareList">
                 {LIMITACOES.map((item) => (
@@ -145,6 +181,23 @@ export default function GestaoDeMilhasPage() {
                 ))}
               </ul>
             </article>
+          </div>
+        </section>
+
+        <section className="va-card gm-card gm-processCard">
+          <div className="gm-sectionHead">
+            <h2 className="gm-sectionTitle">Como funciona na pratica</h2>
+            <p className="gm-sectionSubtitle">Processo simples para voce avaliar com seguranca e sem compromisso.</p>
+          </div>
+
+          <div className="gm-processGrid">
+            {PASSOS.map((item, idx) => (
+              <article key={item.titulo} className="gm-processStep">
+                <div className="gm-processIndex">{String(idx + 1).padStart(2, "0")}</div>
+                <h3 className="gm-processTitle">{item.titulo}</h3>
+                <p className="gm-processText">{item.texto}</p>
+              </article>
+            ))}
           </div>
         </section>
 
