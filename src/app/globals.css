@@ -77,13 +77,11 @@ button, input, select, textarea{ font: inherit; }
 }
 
 .va-topnav-inner{
-  max-width: 980px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 10px 16px;
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 12px;
+  padding: 10px 16px 12px;
+  display: grid;
+  gap: 10px;
 }
 
 .va-brandlink{
@@ -92,6 +90,7 @@ button, input, select, textarea{ font: inherit; }
   gap: 10px;
   text-decoration:none;
   color: var(--text);
+  width: fit-content;
 }
 
 .va-toplogo{
@@ -111,9 +110,16 @@ button, input, select, textarea{ font: inherit; }
 .va-tabs{
   display:flex;
   gap: 8px;
-  flex-wrap: wrap;
-  justify-content:flex-end;
+  flex-wrap: nowrap;
+  justify-content:flex-start;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 2px 1px 4px;
 }
+.va-tabs::-webkit-scrollbar{ display: none; }
 
 .va-tab{
   position: relative;
@@ -125,6 +131,8 @@ button, input, select, textarea{ font: inherit; }
   background: rgba(29,78,216,.06);
   font-weight: 800;
   font-size: 13px;
+  white-space: nowrap;
+  flex: 0 0 auto;
   transition: transform .08s ease, filter .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 
@@ -176,8 +184,10 @@ button, input, select, textarea{ font: inherit; }
 }
 
 @media (max-width: 640px){
-  .va-topnav-inner{ align-items:flex-start; flex-direction: column; }
-  .va-tabs{ justify-content:flex-start; }
+  .va-topnav-inner{ padding: 10px 12px 12px; }
+  .va-brandname{ font-size: 24px; }
+  .va-brandsub{ font-size: 11px; }
+  .va-tab{ padding: 9px 11px; }
 }
 
 /* =========================
