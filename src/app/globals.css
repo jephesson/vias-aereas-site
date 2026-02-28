@@ -765,8 +765,11 @@ button, input, select, textarea{ font: inherit; }
 
 .gm-badge{
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
   font-weight: 900;
+  line-height: 1.2;
   color: rgba(11,27,58,.86);
   background: rgba(255,255,255,.76);
   border: 1px solid rgba(2,16,48,.12);
@@ -797,8 +800,11 @@ button, input, select, textarea{ font: inherit; }
 }
 
 .gm-pill{
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
   font-weight: 800;
+  line-height: 1.2;
   color: rgba(11,27,58,.84);
   border: 1px solid rgba(2,16,48,.12);
   background: rgba(255,255,255,.72);
@@ -808,17 +814,26 @@ button, input, select, textarea{ font: inherit; }
 
 .gm-offerCard{
   display: grid;
-  gap: 10px;
+  gap: 9px;
   border: 1px solid rgba(2,16,48,.14);
   border-radius: var(--radius-md);
   background: rgba(255,255,255,.84);
   padding: 14px;
 }
 
+.gm-offerTagRow{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .gm-offerTag{
   width: fit-content;
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
   font-weight: 900;
+  line-height: 1.2;
   border-radius: 999px;
   border: 1px solid rgba(249,115,22,.30);
   background: rgba(249,115,22,.12);
@@ -826,16 +841,41 @@ button, input, select, textarea{ font: inherit; }
   padding: 6px 10px;
 }
 
+.gm-offerTag--urgent{
+  border-color: rgba(29,78,216,.28);
+  background: rgba(29,78,216,.12);
+}
+
+.gm-offerOldPrice{
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(11,27,58,.56);
+  text-decoration: line-through;
+}
+
 .gm-offerPrice{
+  margin-top: -2px;
   font-size: clamp(30px, 3.8vw, 44px);
   font-weight: 1000;
   letter-spacing: -0.03em;
+  line-height: 1.05;
   color: rgba(11,27,58,.96);
 }
 
 .gm-offerText{
   margin: 0;
   color: rgba(11,27,58,.72);
+  line-height: 1.35;
+}
+
+.gm-offerCallout{
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(29,78,216,.18);
+  background: rgba(29,78,216,.08);
+  color: rgba(11,27,58,.84);
   line-height: 1.35;
 }
 

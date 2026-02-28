@@ -1,7 +1,7 @@
 const TRADEMILES_URL = "https://www.trademiles.com.br";
 const WHATSAPP_NUMBER = "5551983474413";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Ola! Tenho interesse no Site de Gestao de Milhas e quero mais informacoes."
+  "Ola! Tenho interesse no Site de Gestao de Milhas. Quero agendar a videochamada exclusiva sem compromisso."
 )}`;
 
 const RECURSOS = [
@@ -78,16 +78,23 @@ export default function GestaoDeMilhasPage() {
           </div>
 
           <aside className="gm-offerCard">
-            <div className="gm-offerTag">Oferta promocional</div>
-            <div className="gm-offerPrice">R$ 600,00</div>
+            <div className="gm-offerTagRow">
+              <div className="gm-offerTag">Oferta promocional</div>
+              <div className="gm-offerTag gm-offerTag--urgent">Tempo limitado</div>
+            </div>
+            <p className="gm-offerOldPrice">De R$ 1.299,90</p>
+            <div className="gm-offerPrice">Por R$ 599,90</div>
             <p className="gm-offerText">+ hospedagem para dominio .com.br (media de R$ 70,00 a cada 2 anos).</p>
+            <p className="gm-offerCallout">
+              Inclui <b>videochamada exclusiva</b> para mostrar o produto, sem compromisso.
+            </p>
 
             <div className="gm-offerActions">
               <a href={TRADEMILES_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
                 Acessar TradeMiles
               </a>
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta2 va-ctaLink">
-                Falar no WhatsApp
+                Agendar videochamada
               </a>
             </div>
           </aside>
@@ -148,11 +155,11 @@ export default function GestaoDeMilhasPage() {
         <section className="gm-bottomCta">
           <h2 className="gm-bottomTitle">Quer ver isso rodando na sua operacao?</h2>
           <p className="gm-bottomText">
-            Receba orientacao para implantacao no seu dominio, com configuracao alinhada ao seu fluxo.
+            Eu faco uma videochamada exclusiva, sem compromisso, para te mostrar o produto e como ficaria no seu processo.
           </p>
           <div className="gm-bottomActions">
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
-              Tenho interesse
+              Quero ver em videochamada
             </a>
           </div>
         </section>
