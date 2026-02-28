@@ -82,6 +82,7 @@ button, input, select, textarea{ font: inherit; }
   padding: 10px 16px 12px;
   display: grid;
   gap: 10px;
+  justify-items: center;
 }
 
 .va-brandlink{
@@ -91,6 +92,7 @@ button, input, select, textarea{ font: inherit; }
   text-decoration:none;
   color: var(--text);
   width: fit-content;
+  margin: 0 auto;
 }
 
 .va-toplogo{
@@ -103,7 +105,7 @@ button, input, select, textarea{ font: inherit; }
   padding: 6px;
 }
 
-.va-brandtext{ line-height: 1.05; }
+.va-brandtext{ line-height: 1.05; text-align: center; }
 .va-brandname{ font-weight: 900; letter-spacing: -0.02em; }
 .va-brandsub{ font-size: 12px; color: var(--muted2); margin-top: 2px; }
 
@@ -111,13 +113,14 @@ button, input, select, textarea{ font: inherit; }
   display:flex;
   gap: 8px;
   flex-wrap: nowrap;
-  justify-content:flex-start;
+  justify-content:center;
   align-items: center;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding: 2px 1px 4px;
+  width: 100%;
 }
 .va-tabs::-webkit-scrollbar{ display: none; }
 

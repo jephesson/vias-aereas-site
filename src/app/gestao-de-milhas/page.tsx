@@ -1,4 +1,3 @@
-const TRADEMILES_URL = "https://www.trademiles.com.br";
 const WHATSAPP_NUMBER = "5551983474413";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Ola! Tenho interesse no Site de Gestao de Milhas. Quero agendar a videochamada exclusiva sem compromisso."
@@ -90,10 +89,7 @@ export default function GestaoDeMilhasPage() {
             </p>
 
             <div className="gm-offerActions">
-              <a href={TRADEMILES_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
-                Acessar TradeMiles
-              </a>
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta2 va-ctaLink">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
                 Agendar videochamada
               </a>
             </div>
