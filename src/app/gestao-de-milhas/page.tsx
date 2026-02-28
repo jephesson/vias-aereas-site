@@ -1,90 +1,161 @@
 const TRADEMILES_URL = "https://www.trademiles.com.br";
 const WHATSAPP_NUMBER = "5551983474413";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Olá! Tenho interesse no Site de Gestão de Milhas e quero mais informações."
+  "Ola! Tenho interesse no Site de Gestao de Milhas e quero mais informacoes."
 )}`;
+
+const RECURSOS = [
+  {
+    titulo: "Nova venda com campos por programa",
+    texto:
+      "LATAM com codigo de compra (LA), sobrenome, ida obrigatoria e volta opcional. Smiles com localizador, sobrenome, aeroporto de ida (3 letras), ida obrigatoria e volta opcional.",
+  },
+  {
+    titulo: "Sugestao inteligente de cedentes",
+    texto:
+      "Prioriza por saldo, disponibilidade de passageiros e ordem de prioridade configurada na sua operacao.",
+  },
+  {
+    titulo: "Check Localizador na sidebar",
+    texto:
+      "Consulta LATAM e Smiles com ordenacao por proximidade do voo, abertura direta do link da LATAM e status rapido.",
+  },
+  {
+    titulo: "Painel financeiro completo",
+    texto: "Caixa imediato com entradas, saidas, pendencias e projecao para tomada de decisao no mesmo painel.",
+  },
+  {
+    titulo: "Controle de pontos pendentes",
+    texto: "Visao OPEN por programa para reduzir esquecimentos e acelerar tratativas internas.",
+  },
+  {
+    titulo: "Gestao de termos e WhatsApp",
+    texto: "Fluxo de comunicacao e registro de termos integrado ao dia a dia comercial.",
+  },
+  {
+    titulo: "Controle de biometria por turnos",
+    texto: "Disponibilidade sim/nao com turnos M, T e N e pagina dedicada com lista de cedentes ativos.",
+  },
+  {
+    titulo: "Dashboard diario e mensal",
+    texto:
+      "Milheiro vendido em linha por dia e barras por mes, comparativos LATAM vs Smiles e indicadores por funcionario, cliente e dia da semana.",
+  },
+];
+
+const DIFERENCIAIS = [
+  "Personalizacao total de campos, validacoes e status.",
+  "Fluxo adaptado ao seu processo real, nao ao padrao do mercado.",
+  "Dashboard, financeiro e operacao no mesmo produto.",
+  "No seu dominio, com sua marca e com seus dados.",
+];
+
+const LIMITACOES = [
+  "Fluxos mais fechados e menos adaptaveis.",
+  "Campos e regras normalmente padronizados.",
+  "Menor controle sobre modelagem do processo.",
+  "Personalizacao mais limitada para cenarios especificos.",
+];
 
 export default function GestaoDeMilhasPage() {
   return (
     <main className="va-bg">
-      <div className="va-shell">
-        <div className="va-card">
-          <h1 className="va-title">Site de Gestão de Milhas</h1>
-          <p className="va-subtitle">
-            Transforme sua operação de milhas com uma plataforma completa, feita para o seu processo real de venda.
-            O sistema white-label organiza vendas, cedentes, financeiro, localizadores e análise de dados em um só painel.
-          </p>
+      <div className="va-shell gm-shell">
+        <section className="gm-hero">
+          <div className="gm-heroMain">
+            <div className="gm-badge">Plataforma white-label para operacao de milhas</div>
+            <h1 className="gm-title">Site de Gestao de Milhas</h1>
+            <p className="gm-subtitle">
+              Transforme sua operacao com um sistema focado no processo real de venda: vendas, cedentes, financeiro,
+              localizadores e analise de dados em um unico painel.
+            </p>
 
-          <div style={{ height: 12 }} />
+            <div className="gm-pillRow">
+              <span className="gm-pill">LATAM + Smiles</span>
+              <span className="gm-pill">Financeiro integrado</span>
+              <span className="gm-pill">Operacao personalizada</span>
+            </div>
+          </div>
 
-          <h2 className="va-h2">O que o sistema entrega na prática</h2>
-          <ul className="va-list">
-            <li>
-              <b>Nova venda com campos obrigatórios por programa:</b> LATAM com código LA, sobrenome, ida obrigatória e volta opcional.
-              Smiles com localizador, sobrenome, aeroporto de ida (3 letras), ida obrigatória e volta opcional.
-            </li>
-            <li>
-              <b>Sugestão inteligente de cedentes:</b> considera saldo, prioridade e disponibilidade de passageiros.
-            </li>
-            <li>
-              <b>Check Localizador na sidebar:</b> LATAM e Smiles com ordenação por proximidade de voo, abertura direta de link da LATAM
-              e status rápido (Confirmado, Cancelado e Alterado).
-            </li>
-            <li>
-              <b>Painel financeiro completo (caixa imediato):</b> entradas, saídas, pendências e projeção.
-            </li>
-            <li>
-              <b>Controle de pontos pendentes (OPEN):</b> separado por programa.
-            </li>
-            <li>
-              <b>Gestão de termos e comunicação:</b> integração operacional por WhatsApp.
-            </li>
-            <li>
-              <b>Controle de biometria:</b> disponibilidade (sim/não) + turnos (M, T, N) e página com lista de quem está disponível.
-            </li>
-            <li>
-              <b>Dashboard de análise diária e mensal:</b> gráficos de milheiro vendido (linha por dia e barras por mês), comparativos
-              LATAM vs Smiles, tooltip com média de milheiro e indicadores por funcionário, cliente e dia da semana.
-            </li>
-          </ul>
+          <aside className="gm-offerCard">
+            <div className="gm-offerTag">Oferta promocional</div>
+            <div className="gm-offerPrice">R$ 600,00</div>
+            <p className="gm-offerText">+ hospedagem para dominio .com.br (media de R$ 70,00 a cada 2 anos).</p>
 
-          <p className="va-text">
-            <b>Resultado:</b> mais controle, mais velocidade operacional e menos erro manual no dia a dia.
-          </p>
+            <div className="gm-offerActions">
+              <a href={TRADEMILES_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
+                Acessar TradeMiles
+              </a>
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta2 va-ctaLink">
+                Falar no WhatsApp
+              </a>
+            </div>
+          </aside>
+        </section>
 
-          <div className="va-divider" />
+        <section className="va-card gm-card">
+          <div className="gm-sectionHead">
+            <h2 className="gm-sectionTitle">O que o sistema entrega na pratica</h2>
+            <p className="gm-sectionSubtitle">
+              Recursos que reduzem erro manual, aumentam velocidade operacional e melhoram previsibilidade.
+            </p>
+          </div>
 
-          <h2 className="va-h2">Grande vantagem vs iDDAS</h2>
-          <p className="va-text">
-            A principal vantagem é personalização total com controle do seu próprio processo. Em vez de seguir um fluxo fechado, o sistema
-            é adaptado às suas regras (campos, validações, status, dashboards, financeiro e operação), no seu domínio, com seus dados e
-            sua marca.
-          </p>
+          <div className="gm-featureGrid">
+            {RECURSOS.map((item) => (
+              <article key={item.titulo} className="gm-featureCard">
+                <h3 className="gm-featureTitle">{item.titulo}</h3>
+                <p className="gm-featureText">{item.texto}</p>
+              </article>
+            ))}
+          </div>
 
-          <div className="va-divider" />
+          <div className="gm-resultBox">
+            <span className="gm-resultLabel">Resultado</span>
+            <p className="gm-resultText">Mais controle, mais velocidade operacional e menos erro manual no dia a dia.</p>
+          </div>
+        </section>
 
-          <div className="va-pricegrid">
-            <article className="va-pricecard">
-              <div className="va-pricetop">
-                <div className="va-tag">Oferta promocional</div>
-              </div>
+        <section className="va-card gm-card">
+          <div className="gm-sectionHead">
+            <h2 className="gm-sectionTitle">Vantagem frente a plataformas fechadas</h2>
+            <p className="gm-sectionSubtitle">
+              O diferencial principal e controle total do seu processo, com configuracao aderente a sua operacao.
+            </p>
+          </div>
 
-              <div className="va-price">R$ 600,00</div>
-              <p className="va-priceSub">
-                + valor da hospedagem para domínio .com.br (média de R$ 70,00 a cada 2 anos).
-              </p>
+          <div className="gm-compareGrid">
+            <article className="gm-compareCard gm-compareCard--highlight">
+              <h3 className="gm-compareTitle">TradeMiles</h3>
+              <ul className="gm-compareList">
+                {DIFERENCIAIS.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </article>
 
-              <div className="va-priceActions">
-                <a href={TRADEMILES_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
-                  Acessar TradeMiles
-                </a>
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta2 va-ctaLink">
-                  Falar no WhatsApp
-                </a>
-              </div>
+            <article className="gm-compareCard">
+              <h3 className="gm-compareTitle">Plataforma padrao de mercado</h3>
+              <ul className="gm-compareList">
+                {LIMITACOES.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </article>
           </div>
-        </div>
+        </section>
+
+        <section className="gm-bottomCta">
+          <h2 className="gm-bottomTitle">Quer ver isso rodando na sua operacao?</h2>
+          <p className="gm-bottomText">
+            Receba orientacao para implantacao no seu dominio, com configuracao alinhada ao seu fluxo.
+          </p>
+          <div className="gm-bottomActions">
+            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
+              Tenho interesse
+            </a>
+          </div>
+        </section>
       </div>
     </main>
   );
