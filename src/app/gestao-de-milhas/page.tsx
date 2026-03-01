@@ -1,88 +1,88 @@
 const WHATSAPP_NUMBER = "5551983474413";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Ola! Tenho interesse no Site de Gestao de Milhas. Quero agendar a videochamada exclusiva sem compromisso."
+  "Olá! Tenho interesse no Site de Gestão de Milhas. Quero agendar a videochamada exclusiva, sem compromisso."
 )}`;
 
 const RECURSOS = [
   {
     titulo: "Nova venda com campos por programa",
     texto:
-      "LATAM com codigo de compra (LA), sobrenome, ida obrigatoria e volta opcional. Smiles com localizador, sobrenome, aeroporto de ida (3 letras), ida obrigatoria e volta opcional.",
+      "LATAM com código de compra (LA), sobrenome, ida obrigatória e volta opcional. Smiles com localizador, sobrenome, aeroporto de ida (3 letras), ida obrigatória e volta opcional.",
   },
   {
-    titulo: "Sugestao inteligente de cedentes",
+    titulo: "Sugestão inteligente de cedentes",
     texto:
-      "Prioriza por saldo, disponibilidade de passageiros e ordem de prioridade configurada na sua operacao.",
+      "Prioriza por saldo, disponibilidade de passageiros e ordem de prioridade configurada na sua operação.",
   },
   {
-    titulo: "Check Localizador na sidebar",
+    titulo: "Check de localizador na sidebar",
     texto:
-      "Consulta LATAM e Smiles com ordenacao por proximidade do voo, abertura direta do link da LATAM e status rapido.",
+      "Consulta LATAM e Smiles com ordenação por proximidade do voo, abertura direta do link da LATAM e status rápido.",
   },
   {
     titulo: "Painel financeiro completo",
-    texto: "Caixa imediato com entradas, saidas, pendencias e projecao para tomada de decisao no mesmo painel.",
+    texto: "Caixa imediato com entradas, saídas, pendências e projeção para tomada de decisão no mesmo painel.",
   },
   {
     titulo: "Controle de pontos pendentes",
-    texto: "Visao OPEN por programa para reduzir esquecimentos e acelerar tratativas internas.",
+    texto: "Visão OPEN por programa para reduzir esquecimentos e acelerar tratativas internas.",
   },
   {
-    titulo: "Gestao de termos e WhatsApp",
-    texto: "Fluxo de comunicacao e registro de termos integrado ao dia a dia comercial.",
+    titulo: "Gestão de termos e WhatsApp",
+    texto: "Fluxo de comunicação e registro de termos integrado ao dia a dia comercial.",
   },
   {
     titulo: "Controle de biometria por turnos",
-    texto: "Disponibilidade sim/nao com turnos M, T e N e pagina dedicada com lista de cedentes ativos.",
+    texto: "Disponibilidade sim/não com turnos M, T e N e página dedicada com lista de cedentes ativos.",
   },
   {
-    titulo: "Dashboard diario e mensal",
+    titulo: "Dashboard diário e mensal",
     texto:
-      "Milheiro vendido em linha por dia e barras por mes, comparativos LATAM vs Smiles e indicadores por funcionario, cliente e dia da semana.",
+      "Milheiro vendido em linha por dia e barras por mês, comparativos LATAM vs Smiles e indicadores por funcionário, cliente e dia da semana.",
   },
 ];
 
 const DESTAQUES = [
   {
     titulo: "LATAM + Smiles",
-    texto: "Campos e validacoes dedicados para cada programa.",
+    texto: "Campos e validações dedicados para cada programa.",
   },
   {
     titulo: "Financeiro integrado",
-    texto: "Entradas, saidas, pendencias e projecao no mesmo painel.",
+    texto: "Entradas, saídas, pendências e projeção no mesmo painel.",
   },
   {
-    titulo: "Operacao personalizada",
+    titulo: "Operação personalizada",
     texto: "Fluxo adaptado ao seu processo real de venda.",
   },
 ];
 
 const DIFERENCIAIS = [
-  "Personalizacao total de campos, validacoes e status.",
-  "Fluxo adaptado ao seu processo real, nao ao padrao do mercado.",
-  "Dashboard, financeiro e operacao no mesmo produto.",
-  "No seu dominio, com sua marca e com seus dados.",
+  "Personalização total de campos, validações e status.",
+  "Fluxo adaptado ao seu processo real, não ao padrão do mercado.",
+  "Dashboard, financeiro e operação no mesmo produto.",
+  "No seu domínio, com sua marca e com seus dados.",
 ];
 
 const LIMITACOES = [
-  "Fluxos mais fechados e menos adaptaveis.",
+  "Fluxos mais fechados e menos adaptáveis.",
   "Campos e regras normalmente padronizados.",
   "Menor controle sobre modelagem do processo.",
-  "Personalizacao mais limitada para cenarios especificos.",
+  "Personalização mais limitada para cenários específicos.",
 ];
 
 const PASSOS = [
   {
-    titulo: "Diagnostico rapido",
+    titulo: "Diagnóstico rápido",
     texto: "Mapeamos seu fluxo atual para configurar campos, status e regras do jeito certo.",
   },
   {
-    titulo: "Configuracao da operacao",
+    titulo: "Configuração da operação",
     texto: "Ativamos vendas, cedentes, financeiro e localizadores com estrutura pronta para uso.",
   },
   {
     titulo: "Videochamada exclusiva",
-    texto: "Mostro o painel ao vivo, sem compromisso, para voce validar antes de decidir.",
+    texto: "Mostro o painel ao vivo, sem compromisso, para você validar antes de decidir.",
   },
 ];
 
@@ -92,11 +92,11 @@ export default function GestaoDeMilhasPage() {
       <div className="va-shell gm-shell">
         <section className="gm-hero">
           <div className="gm-heroMain">
-            <div className="gm-badge">Plataforma white-label para operacao de milhas</div>
-            <h1 className="gm-title">Site de Gestao de Milhas</h1>
+            <div className="gm-badge">Plataforma white-label para operação de milhas</div>
+            <h1 className="gm-title">Site de Gestão de Milhas</h1>
             <p className="gm-subtitle">
-              Transforme sua operacao com um sistema focado no processo real de venda: vendas, cedentes, financeiro,
-              localizadores e analise de dados em um unico painel.
+              Transforme sua operação com um sistema focado no processo real de venda: vendas, cedentes, financeiro,
+              localizadores e análise de dados em um único painel.
             </p>
 
             <div className="gm-highlightGrid">
@@ -116,12 +116,12 @@ export default function GestaoDeMilhasPage() {
             </div>
             <p className="gm-offerOldPrice">De R$ 1.299,90</p>
             <div className="gm-offerPrice">Por R$ 599,90</div>
-            <p className="gm-offerText">+ hospedagem para dominio .com.br (media de R$ 70,00 a cada 2 anos).</p>
+            <p className="gm-offerText">+ hospedagem para domínio .com.br (média de R$ 70,00 a cada 2 anos).</p>
             <p className="gm-offerCallout">
-              Inclui <b>videochamada exclusiva</b> para mostrar o produto, sem compromisso.
+              Inclui <b>videochamada exclusiva</b> para apresentar o produto, sem compromisso.
             </p>
             <p className="gm-offerMini">
-              Atendimento 1:1 para tirar duvidas e apresentar o painel com foco no seu processo.
+              Atendimento 1:1 para tirar dúvidas e apresentar o painel com foco no seu processo.
             </p>
 
             <div className="gm-offerActions">
@@ -134,7 +134,7 @@ export default function GestaoDeMilhasPage() {
 
         <section className="va-card gm-card">
           <div className="gm-sectionHead">
-            <h2 className="gm-sectionTitle">O que o sistema entrega na pratica</h2>
+            <h2 className="gm-sectionTitle">O que o sistema entrega na prática</h2>
             <p className="gm-sectionSubtitle">
               Recursos que reduzem erro manual, aumentam velocidade operacional e melhoram previsibilidade.
             </p>
@@ -157,9 +157,9 @@ export default function GestaoDeMilhasPage() {
 
         <section className="va-card gm-card">
           <div className="gm-sectionHead">
-            <h2 className="gm-sectionTitle">Vantagem frente a plataformas fechadas</h2>
+            <h2 className="gm-sectionTitle">Vantagens em relação a plataformas fechadas</h2>
             <p className="gm-sectionSubtitle">
-              O diferencial principal e controle total do seu processo, com configuracao aderente a sua operacao.
+              O principal diferencial é o controle total do seu processo, com configuração aderente à sua operação.
             </p>
           </div>
 
@@ -174,7 +174,7 @@ export default function GestaoDeMilhasPage() {
             </article>
 
             <article className="gm-compareCard gm-compareCard--baseline">
-              <h3 className="gm-compareTitle">Plataforma padrao de mercado</h3>
+              <h3 className="gm-compareTitle">Plataforma padrão de mercado</h3>
               <ul className="gm-compareList">
                 {LIMITACOES.map((item) => (
                   <li key={item}>{item}</li>
@@ -186,8 +186,8 @@ export default function GestaoDeMilhasPage() {
 
         <section className="va-card gm-card gm-processCard">
           <div className="gm-sectionHead">
-            <h2 className="gm-sectionTitle">Como funciona na pratica</h2>
-            <p className="gm-sectionSubtitle">Processo simples para voce avaliar com seguranca e sem compromisso.</p>
+            <h2 className="gm-sectionTitle">Como funciona na prática</h2>
+            <p className="gm-sectionSubtitle">Processo simples para você avaliar com segurança e sem compromisso.</p>
           </div>
 
           <div className="gm-processGrid">
@@ -202,9 +202,9 @@ export default function GestaoDeMilhasPage() {
         </section>
 
         <section className="gm-bottomCta">
-          <h2 className="gm-bottomTitle">Quer ver isso rodando na sua operacao?</h2>
+          <h2 className="gm-bottomTitle">Quer ver isso rodando na sua operação?</h2>
           <p className="gm-bottomText">
-            Eu faco uma videochamada exclusiva, sem compromisso, para te mostrar o produto e como ficaria no seu processo.
+            Eu faço uma videochamada exclusiva, sem compromisso, para apresentar o produto e mostrar como ele se adapta ao seu processo.
           </p>
           <div className="gm-bottomActions">
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
