@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { resolveIndicacaoFromSearch } from "@/lib/indicacoes";
 
 const WHATSAPP_NUMBER = "5553999760707"; // 55 + 53 + 999760707
 const CNPJ = "63.817.773/0001-85";
@@ -21,7 +23,18 @@ function isAfterOrEqual(a?: string, b?: string) {
 }
 
 export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <CotacaoPage />
+    </Suspense>
+  );
+}
+
+function CotacaoPage() {
+  const searchParams = useSearchParams();
   const minToday = useMemo(() => todayISO(), []);
+  const search = searchParams.toString();
+  const indicacao = useMemo(() => resolveIndicacaoFromSearch(search ? `?${search}` : ""), [search]);
 
   const [tripType, setTripType] = useState<TripType>("ida_volta");
   const [origem, setOrigem] = useState("");
@@ -75,6 +88,8 @@ export default function Page() {
       "✈️ *Solicitação de cotação — Vias Aéreas*",
       "⏱️ *Prazo:* retornamos com a cotação em até 2 horas.",
       "",
+      indicacao ? `🤝 *Indicação:* ${indicacao}` : null,
+      indicacao ? "" : null,
       `🧭 *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${tripType === "ida_volta" ? "Ida e volta" : "Só ida"}`,
       `📅 *Ida:* ${dataIda} (${turnoIda})`,
@@ -127,6 +142,13 @@ export default function Page() {
                 <br />
                 <b>Retornamos com a cotação em até 2 horas.</b>
               </p>
+
+              {indicacao ? (
+                <div className="va-referralCard">
+                  <span>Indicado por</span>
+                  <b>{indicacao}</b>
+                </div>
+              ) : null}
             </div>
           </div>
         </header>

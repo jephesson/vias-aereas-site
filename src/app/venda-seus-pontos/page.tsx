@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { resolveIndicacaoFromSearch } from "@/lib/indicacoes";
 
 const WHATSAPP_NUMBER = "5553999760707"; // 55 + 53 + 999760707
 const CNPJ = "63.817.773/0001-85";
@@ -30,6 +32,17 @@ function onlyDigits(s: string) {
 }
 
 export default function Page() {
+  return (
+    <Suspense fallback={null}>
+      <VendaSeusPontosPage />
+    </Suspense>
+  );
+}
+
+function VendaSeusPontosPage() {
+  const searchParams = useSearchParams();
+  const search = searchParams.toString();
+  const indicacao = useMemo(() => resolveIndicacaoFromSearch(search ? `?${search}` : ""), [search]);
   const [program, setProgram] = useState<Program>("SMILES");
   const [pontos, setPontos] = useState<string>(""); // string p/ input
   const [nome, setNome] = useState<string>("");
@@ -59,6 +72,8 @@ export default function Page() {
     const linhas = [
       "💰 *Simulação — Venda de Pontos (Vias Aéreas)*",
       "",
+      indicacao ? `🤝 *Indicação:* ${indicacao}` : null,
+      indicacao ? "" : null,
       `👤 *Nome:* ${nome.trim()}`,
       `🏷️ *Programa:* ${PROGRAM_LABEL[program]}`,
       `✨ *Pontos:* ${pontosNum.toLocaleString("pt-BR")}`,
@@ -101,6 +116,13 @@ export default function Page() {
                 <br />
                 Ao aceitar, você envia os dados pelo WhatsApp para finalizar conosco.
               </p>
+
+              {indicacao ? (
+                <div className="va-referralCard">
+                  <span>Indicado por</span>
+                  <b>{indicacao}</b>
+                </div>
+              ) : null}
             </div>
           </div>
         </header>
