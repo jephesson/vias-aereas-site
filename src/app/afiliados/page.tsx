@@ -47,6 +47,18 @@ export default function SegurosPage() {
           </p>
 
           <div style={{ height: 14 }} />
+          <div className="va-priceActions">
+            <a
+              href="https://trademiles.com.br/afiliado/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="va-cta va-ctaLink"
+            >
+              Acessar login de afiliados
+            </a>
+          </div>
+
+          <div style={{ height: 14 }} />
 
           <section className="va-pricegrid" aria-label="Lista de seguros">
             {SEGUROS.map((seguro) => {
