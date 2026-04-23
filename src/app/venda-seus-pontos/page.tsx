@@ -7,20 +7,22 @@ import { resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 const WHATSAPP_NUMBER = "5551983474413"; // 55 + 51 + 983474413
 const CNPJ = "63.817.773/0001-85";
 
-type Program = "SMILES" | "ESFERA" | "LIVELO" | "LATAM";
+type Program = "SMILES" | "ESFERA" | "LIVELO" | "LATAM" | "C6";
 
 const PROGRAM_LABEL: Record<Program, string> = {
   SMILES: "Smiles",
   ESFERA: "Esfera",
   LIVELO: "Livelo",
   LATAM: "LATAM Pass",
+  C6: "C6 Átomos",
 };
 
 const MILHEIRO_REAIS: Record<Program, number> = {
-  SMILES: 12,
-  ESFERA: 25,
-  LIVELO: 25,
-  LATAM: 22,
+  SMILES: 10,
+  ESFERA: 22,
+  LIVELO: 22,
+  LATAM: 20,
+  C6: 22,
 };
 
 function formatBRL(v: number) {
@@ -136,7 +138,7 @@ function VendaSeusPontosPage() {
               <h1 className="va-title">Venda seus pontos</h1>
 
               <p className="va-subtitle">
-                Selecione o programa, informe a quantidade de pontos e veja a simulação.
+                Selecione o programa, informe a quantidade de pontos e veja a simulação atualizada.
                 <br />
                 Ao aceitar, você envia os dados pelo WhatsApp para finalizar conosco.
               </p>
@@ -152,11 +154,35 @@ function VendaSeusPontosPage() {
         </header>
 
         <section className="va-card">
+          <section
+            className="va-section"
+            style={{
+              background: "linear-gradient(135deg, rgba(59,130,246,.10), rgba(14,165,233,.08))",
+              border: "1px solid rgba(59,130,246,.16)",
+              borderRadius: 16,
+            }}
+          >
+            <div className="va-label">Como funciona a venda de pontos</div>
+            <div style={{ display: "grid", gap: 8, color: "var(--muted)" }}>
+              <p className="va-text" style={{ margin: 0 }}>
+                Você escolhe o programa (<b>LATAM Pass, Smiles, Livelo, Esfera ou C6 Átomos</b>), informa a quantidade
+                de pontos e recebe uma estimativa com o milheiro atual.
+              </p>
+              <p className="va-text" style={{ margin: 0 }}>
+                Se aprovar, seguimos no WhatsApp com os próximos passos, validação da conta e suporte durante o processo
+                de emissão.
+              </p>
+              <p className="va-text" style={{ margin: 0 }}>
+                O pagamento é realizado em até <b>24h após o início das emissões</b>, conforme análise operacional.
+              </p>
+            </div>
+          </section>
+
           {/* Programa */}
           <section className="va-section">
             <div className="va-label">Programa</div>
             <div className="va-row" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {(["SMILES", "LATAM", "LIVELO", "ESFERA"] as Program[]).map((p) => {
+              {(["SMILES", "LATAM", "LIVELO", "ESFERA", "C6"] as Program[]).map((p) => {
                 const on = program === p;
                 return (
                   <button
@@ -181,6 +207,10 @@ function VendaSeusPontosPage() {
             <div style={{ marginTop: 10, color: "var(--muted)" }}>
               Milheiro para simulação: <b>{formatBRL(milheiro)}</b>
             </div>
+              <div style={{ marginTop: 10, fontSize: 13, color: "var(--muted)" }}>
+                Tabela atual: Smiles <b>R$ 10,00</b> • LATAM Pass <b>R$ 20,00</b> • Livelo <b>R$ 22,00</b> • Esfera{" "}
+                <b>R$ 22,00</b> • C6 Átomos <b>R$ 22,00</b>.
+              </div>
           </section>
 
           {/* Pontos */}
