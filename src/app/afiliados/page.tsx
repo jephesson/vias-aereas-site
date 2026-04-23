@@ -16,7 +16,15 @@ export default function AfiliadosPage() {
               rel="noopener noreferrer"
               className="va-cta va-ctaLink"
             >
-              Acessar portal do afiliado (login/cadastro)
+              Acessar login de afiliados
+            </a>
+            <a
+              href="https://www.trademiles.com.br/afiliado/cadastro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="va-cta va-ctaLink"
+            >
+              Quero me cadastrar como afiliado
             </a>
           </div>
 
