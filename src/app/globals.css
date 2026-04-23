@@ -145,6 +145,13 @@ button, input, select, textarea{ font: inherit; }
   transform: translateY(-1px);
 }
 
+.va-tab--disabled{
+  opacity: .45;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(.15);
+}
+
 /* TAB ATIVA */
 .va-tab--active,
 .va-tab[aria-current="page"]{

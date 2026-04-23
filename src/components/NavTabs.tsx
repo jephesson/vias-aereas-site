@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type Tab = { href: string; label: string; match?: "exact" | "prefix" };
+type Tab = {
+  href: string;
+  label: string;
+  match?: "exact" | "prefix";
+  disabled?: boolean;
+};
 
 const tabs: Tab[] = [
   { href: "/", label: "Cotação", match: "exact" },
@@ -14,7 +19,7 @@ const tabs: Tab[] = [
   // ✅ NOVO: Venda seus pontos
   { href: "/venda-seus-pontos", label: "Venda seus pontos", match: "prefix" },
 
-  { href: "https://trademiles.com.br/afiliado/login", label: "Afiliados" },
+  { href: "https://trademiles.com.br/afiliado/login", label: "Afiliados", disabled: true },
   { href: "/sobre", label: "Sobre", match: "prefix" },
 ];
 
@@ -31,6 +36,19 @@ export default function NavTabs() {
   return (
     <nav className="va-tabs" aria-label="Menu">
       {tabs.map((t) => {
+        if (t.disabled) {
+          return (
+            <span
+              key={t.href}
+              className="va-tab va-tab--disabled"
+              aria-disabled="true"
+              title="Acesso por convite"
+            >
+              {t.label}
+            </span>
+          );
+        }
+
         const active = isActive(pathname, t);
         return (
           <Link
