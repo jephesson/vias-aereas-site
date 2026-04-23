@@ -108,8 +108,11 @@ function VendaSeusPontosPage() {
       "",
       "⚠️ *Avisos importantes:*",
       "• Esta simulação *não garante* a finalização do negócio.",
-      "• Para intermediação, será necessário fornecer os dados do programa e ter disponibilidade para envio de *SMS/códigos* durante as emissões.",
-      "• O pagamento ocorre em até *24h após o início das emissões*.",
+      "• Para intermediação, é necessário compartilhar as credenciais do programa de fidelidade, pois as passagens são emitidas diretamente no programa.",
+      "• Também será necessário ter disponibilidade para validações de segurança (como *SMS/códigos*) durante as emissões.",
+      "• O pagamento ocorre em até *48h após a aprovação* da operação.",
+      "• O compartilhamento é tratado com sigilo e utilizado exclusivamente para o processo de emissão aprovado.",
+      "• Nunca solicitamos transferências bancárias para liberar pagamento da venda de pontos.",
       "• A negociação e finalização acontecem *somente via WhatsApp*.",
       "",
       "✅ *Quero seguir com a venda. Pode me orientar nos próximos passos.*",
@@ -129,7 +132,7 @@ function VendaSeusPontosPage() {
     <main className="va-bg">
       <div className="va-shell">
         <header className="va-header">
-          <div className="va-brand">
+          <div className="va-brand vs-hero">
             <div>
               <div className="va-pill">
                 <span className="va-dot" /> Simulador rápido
@@ -153,27 +156,21 @@ function VendaSeusPontosPage() {
           </div>
         </header>
 
-        <section className="va-card">
-          <section
-            className="va-section"
-            style={{
-              background: "linear-gradient(135deg, rgba(59,130,246,.10), rgba(14,165,233,.08))",
-              border: "1px solid rgba(59,130,246,.16)",
-              borderRadius: 16,
-            }}
-          >
+        <section className="va-card vs-card">
+          <section className="va-section vs-infoCard">
             <div className="va-label">Como funciona a venda de pontos</div>
-            <div style={{ display: "grid", gap: 8, color: "var(--muted)" }}>
-              <p className="va-text" style={{ margin: 0 }}>
+            <div className="vs-infoText">
+              <p className="va-text">
                 Você escolhe o programa (<b>LATAM Pass, Smiles, Livelo, Esfera ou C6 Átomos</b>), informa a quantidade
                 de pontos e recebe uma estimativa com o milheiro atual.
               </p>
-              <p className="va-text" style={{ margin: 0 }}>
-                Se aprovar, seguimos no WhatsApp com os próximos passos, validação da conta e suporte durante o processo
-                de emissão.
+              <p className="va-text">
+                Se aprovar, seguimos no WhatsApp com os próximos passos. Para concluir a operação, é necessário
+                compartilhar as credenciais do programa de fidelidade, pois as passagens são emitidas diretamente no
+                programa.
               </p>
-              <p className="va-text" style={{ margin: 0 }}>
-                O pagamento é realizado em até <b>24h após o início das emissões</b>, conforme análise operacional.
+              <p className="va-text">
+                O pagamento é realizado em até <b>48h após a aprovação</b>, conforme análise operacional.
               </p>
             </div>
           </section>
@@ -181,7 +178,7 @@ function VendaSeusPontosPage() {
           {/* Programa */}
           <section className="va-section">
             <div className="va-label">Programa</div>
-            <div className="va-row" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div className="va-row vs-programRow">
               {(["SMILES", "LATAM", "LIVELO", "ESFERA", "C6"] as Program[]).map((p) => {
                 const on = program === p;
                 return (
@@ -189,14 +186,7 @@ function VendaSeusPontosPage() {
                     key={p}
                     type="button"
                     onClick={() => setProgram(p)}
-                    className={`va-chip ${on ? "va-chip--on" : ""}`}
-                    style={{
-                      borderRadius: 999,
-                      padding: "10px 14px",
-                      border: "1px solid rgba(0,0,0,.10)",
-                      background: on ? "rgba(59,130,246,.12)" : "white",
-                      fontWeight: 800,
-                    }}
+                    className={`va-chip vs-programChip ${on ? "va-chip--on" : ""}`}
                   >
                     {PROGRAM_LABEL[p]}
                   </button>
@@ -204,13 +194,13 @@ function VendaSeusPontosPage() {
               })}
             </div>
 
-            <div style={{ marginTop: 10, color: "var(--muted)" }}>
+            <div className="vs-milheiroNow">
               Milheiro para simulação: <b>{formatBRL(milheiro)}</b>
             </div>
-              <div style={{ marginTop: 10, fontSize: 13, color: "var(--muted)" }}>
-                Tabela atual: Smiles <b>R$ 10,00</b> • LATAM Pass <b>R$ 20,00</b> • Livelo <b>R$ 22,00</b> • Esfera{" "}
-                <b>R$ 22,00</b> • C6 Átomos <b>R$ 22,00</b>.
-              </div>
+            <div className="vs-rateTable">
+              Tabela atual: Smiles <b>R$ 10,00</b> • LATAM Pass <b>R$ 20,00</b> • Livelo <b>R$ 22,00</b> • Esfera{" "}
+              <b>R$ 22,00</b> • C6 Átomos <b>R$ 22,00</b>.
+            </div>
           </section>
 
           {/* Pontos */}
@@ -222,17 +212,10 @@ function VendaSeusPontosPage() {
               onChange={(e) => setPontos(e.target.value)}
               placeholder="Ex: 100000"
               inputMode="numeric"
-              style={{
-                padding: "10px 12px",
-                borderRadius: 12,
-                border: "1px solid rgba(0,0,0,.12)",
-                outline: "none",
-                width: "100%",
-              }}
             />
 
             {!pontosOk ? (
-              <div style={{ marginTop: 8, fontSize: 12, color: "rgba(249,115,22,.95)" }}>
+              <div className="vs-warning">
                 Informe pelo menos <b>1.000</b> pontos para simular.
               </div>
             ) : null}
@@ -242,63 +225,46 @@ function VendaSeusPontosPage() {
           <section className="va-section">
             <div className="va-label">Simulação</div>
 
-            <div className="va-box" style={{ display: "grid", gap: 8 }}>
-              <div style={{ fontWeight: 900, fontSize: 18 }}>
+            <div className="va-box vs-resultBox">
+              <div className="vs-resultTitle">
                 Valor estimado: {formatBRL(valorEstimado)}
               </div>
-              <div style={{ color: "var(--muted)" }}>
+              <div className="vs-resultCalc">
                 {pontosNum.toLocaleString("pt-BR")} pontos ÷ 1.000 × {formatBRL(milheiro)} (milheiro)
               </div>
 
-              <div
-                style={{
-                  marginTop: 8,
-                  padding: 12,
-                  borderRadius: 12,
-                  border: "1px solid rgba(0,0,0,.08)",
-                  background: "rgba(0,0,0,.02)",
-                  color: "var(--muted)",
-                  lineHeight: 1.45,
-                  fontSize: 13,
-                }}
-              >
+              <div className="vs-securityBox">
                 <b>Atenção:</b> esta simulação <b>não garante</b> a finalização do negócio. Para intermediação,
-                será necessário fornecer os dados do programa e ter disponibilidade para envio de <b>SMS/códigos</b>{" "}
-                durante as emissões. Pagamento em até <b>24h após o início das emissões</b>. A negociação é finalizada
-                <b> somente via WhatsApp</b>.
+                será necessário compartilhar as credenciais do programa de fidelidade e ter disponibilidade para envio
+                de <b> SMS/códigos</b> durante as emissões. O uso dos dados é restrito ao processo aprovado, com
+                confidencialidade. Pagamento em até <b>48h após a aprovação</b>. A negociação é finalizada
+                <b> somente via WhatsApp</b>, sem cobrança antecipada para liberar pagamento.
               </div>
             </div>
           </section>
 
           {/* Aceite + Nome */}
           <section className="va-section">
-            <label className="va-check" style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <label className="va-check vs-check">
               <input type="checkbox" checked={aceito} onChange={(e) => setAceito(e.target.checked)} />
               <span>
                 Li e entendi os avisos acima e quero seguir com a negociação via WhatsApp.
               </span>
             </label>
 
-            <div style={{ marginTop: 12 }}>
+            <div className="vs-nameWrap">
               <div className="va-label">Seu nome</div>
               <input
                 className="va-input"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 placeholder="Digite seu nome"
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: 12,
-                  border: "1px solid rgba(0,0,0,.12)",
-                  outline: "none",
-                  width: "100%",
-                }}
               />
             </div>
           </section>
 
           {/* CTA */}
-          <div className="va-footer" style={{ display: "grid", gap: 10 }}>
+          <div className="va-footer vs-footer">
             <div className="va-note">
               Ao clicar, abriremos o WhatsApp com a mensagem pronta.
             </div>
@@ -308,21 +274,13 @@ function VendaSeusPontosPage() {
               onClick={handleWhatsApp}
               disabled={!canSubmit}
               className={`va-cta ${canSubmit ? "" : "va-cta--off"}`}
-              style={{
-                padding: "12px 14px",
-                borderRadius: 14,
-                border: "1px solid rgba(0,0,0,.10)",
-                fontWeight: 900,
-                cursor: canSubmit ? "pointer" : "not-allowed",
-                opacity: canSubmit ? 1 : 0.55,
-              }}
             >
               Enviar para WhatsApp e finalizar
             </button>
           </div>
         </section>
 
-        <footer className="va-copy" style={{ marginTop: 16 }}>
+        <footer className="va-copy">
           © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}
         </footer>
       </div>

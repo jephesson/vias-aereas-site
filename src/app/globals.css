@@ -1337,3 +1337,104 @@ button, input, select, textarea{ font: inherit; }
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/* =========================
+  Venda seus pontos
+  ========================= */
+.vs-hero{
+  padding: 10px 2px 0;
+}
+
+.vs-card{
+  display: grid;
+  gap: 16px;
+}
+
+.vs-infoCard{
+  background: linear-gradient(145deg, rgba(59,130,246,.11), rgba(14,165,233,.08));
+  border: 1px solid rgba(59,130,246,.18);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.vs-infoText{
+  display: grid;
+  gap: 8px;
+}
+
+.vs-infoText .va-text{
+  margin: 0;
+  color: rgba(11,27,58,.78);
+}
+
+.vs-programRow{
+  gap: 8px;
+}
+
+.vs-programChip{
+  border-radius: 999px;
+  font-weight: 800;
+  padding: 10px 14px;
+  background: rgba(255,255,255,.86);
+}
+
+.vs-milheiroNow{
+  margin-top: 6px;
+  color: rgba(11,27,58,.76);
+  font-size: 15px;
+}
+
+.vs-rateTable{
+  margin-top: 8px;
+  font-size: 13px;
+  color: rgba(11,27,58,.65);
+  line-height: 1.45;
+}
+
+.vs-warning{
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(249,115,22,.95);
+}
+
+.vs-resultBox{
+  display: grid;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.72));
+}
+
+.vs-resultTitle{
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.vs-resultCalc{
+  color: rgba(11,27,58,.68);
+  font-size: 14px;
+}
+
+.vs-securityBox{
+  margin-top: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(30,64,175,.14);
+  background: linear-gradient(135deg, rgba(30,64,175,.06), rgba(14,165,233,.04));
+  color: rgba(11,27,58,.74);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.vs-check{
+  align-items: flex-start;
+}
+
+.vs-nameWrap{
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.vs-footer{
+  gap: 12px;
+}
