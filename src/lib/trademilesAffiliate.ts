@@ -24,6 +24,25 @@ export type ResolvedAffiliate = {
 const TRADEMILES_REFERRAL_ENDPOINT =
   "https://tradmiles-final.vercel.app/api/afiliado/referral";
 
+const LEGACY_REF_NAME_MAP: Record<string, string> = {
+  "isadora-zelaquett": "Isadora Zelaquett",
+};
+
+export function resolveAffiliateNameFallback(ref: string) {
+  const normalizedRef = ref.trim().toLowerCase();
+  if (!normalizedRef) return "";
+
+  if (LEGACY_REF_NAME_MAP[normalizedRef]) {
+    return LEGACY_REF_NAME_MAP[normalizedRef];
+  }
+
+  return normalizedRef
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 export async function resolveTradeMilesAffiliate(
   ref: string
 ): Promise<ResolvedAffiliate | null> {

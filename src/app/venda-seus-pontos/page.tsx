@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
+import { resolveAffiliateNameFallback, resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
 const WHATSAPP_NUMBER = "5551983474413"; // 55 + 51 + 983474413
 const CNPJ = "63.817.773/0001-85";
@@ -44,6 +44,7 @@ export default function Page() {
 function VendaSeusPontosPage() {
   const searchParams = useSearchParams();
   const ref = searchParams.get("ref")?.trim() ?? "";
+  const affiliateFallbackName = useMemo(() => resolveAffiliateNameFallback(ref), [ref]);
   const [affiliateName, setAffiliateName] = useState("");
 
   useEffect(() => {
@@ -57,18 +58,18 @@ function VendaSeusPontosPage() {
 
       const affiliate = await resolveTradeMilesAffiliate(ref);
       if (cancelled) return;
-      setAffiliateName(affiliate?.name ?? "");
+      setAffiliateName(affiliate?.name || affiliateFallbackName);
     }
 
     resolveAffiliate().catch(() => {
       if (cancelled) return;
-      setAffiliateName("");
+      setAffiliateName(affiliateFallbackName);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [ref]);
+  }, [ref, affiliateFallbackName]);
   const [program, setProgram] = useState<Program>("SMILES");
   const [pontos, setPontos] = useState<string>(""); // string p/ input
   const [nome, setNome] = useState<string>("");

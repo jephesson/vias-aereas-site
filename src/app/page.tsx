@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
+import { resolveAffiliateNameFallback, resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
 const WHATSAPP_NUMBER = "5551983474413"; // 55 + 51 + 983474413
 const CNPJ = "63.817.773/0001-85";
@@ -31,6 +31,7 @@ type LeadPayload = {
   };
   observacoes: string;
   affiliateId: string | null;
+  affiliateRef: string | null;
 };
 
 function todayISO() {
@@ -58,6 +59,7 @@ function CotacaoPage() {
   const searchParams = useSearchParams();
   const minToday = useMemo(() => todayISO(), []);
   const ref = searchParams.get("ref")?.trim() ?? "";
+  const affiliateFallbackName = useMemo(() => resolveAffiliateNameFallback(ref), [ref]);
   const [affiliateId, setAffiliateId] = useState<string | null>(null);
   const [affiliateName, setAffiliateName] = useState("");
 
@@ -74,20 +76,20 @@ function CotacaoPage() {
       const affiliate = await resolveTradeMilesAffiliate(ref);
       if (cancelled) return;
       setAffiliateId(affiliate?.id ?? null);
-      setAffiliateName(affiliate?.name ?? "");
+      setAffiliateName(affiliate?.name || affiliateFallbackName);
     }
 
     resolveAffiliate()
       .catch(() => {
         if (cancelled) return;
         setAffiliateId(null);
-        setAffiliateName("");
+        setAffiliateName(affiliateFallbackName);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [ref]);
+  }, [ref, affiliateFallbackName]);
 
   const [tripType, setTripType] = useState<TripType>("ida_volta");
   const [origem, setOrigem] = useState("");
@@ -184,6 +186,7 @@ function CotacaoPage() {
       },
       observacoes: obs.trim(),
       affiliateId,
+      affiliateRef: ref || null,
     };
   }
 
