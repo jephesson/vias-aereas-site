@@ -141,8 +141,6 @@ function CotacaoPage() {
       "✈️ *Solicitação de cotação — Vias Aéreas*",
       "⏱️ *Prazo:* retornamos com a cotação em até 2 horas.",
       "",
-      affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
-      affiliateName ? "" : null,
       `🧭 *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${tripType === "ida_volta" ? "Ida e volta" : "Só ida"}`,
       `📅 *Ida:* ${dataIda} (${turnoIda})`,
@@ -153,6 +151,8 @@ function CotacaoPage() {
       `👤 *Passageiros:* ${adultos} adulto(s), ${criancas} criança(s), ${bebes} bebê(s) — *Total:* ${totalPax}`,
       "",
       `📞 *Contato:* ${phone}`,
+      affiliateName ? "" : null,
+      affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
       obs.trim() ? "" : null,
       obs.trim() ? `📝 *Observações:* ${obs.trim()}` : null,
     ].filter(Boolean);
