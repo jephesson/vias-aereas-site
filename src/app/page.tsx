@@ -1,13 +1,37 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { resolveIndicacaoFromSearch } from "@/lib/indicacoes";
+import { resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
-const WHATSAPP_NUMBER = "5553999760707"; // 55 + 53 + 999760707
+const WHATSAPP_NUMBER = "5551983474413"; // 55 + 51 + 983474413
 const CNPJ = "63.817.773/0001-85";
 
 type TripType = "ida" | "ida_volta";
+type LeadPayload = {
+  origem: string;
+  destino: string;
+  tipoViagem: TripType;
+  dataIda: string;
+  dataVolta: string | null;
+  turnoIda: string;
+  turnoVolta: string | null;
+  datasFlexiveis: boolean;
+  bagagem: string;
+  passageiros: {
+    adultos: number;
+    criancas: number;
+    bebes: number;
+    total: number;
+  };
+  contato: {
+    ddi: string;
+    ddd: string;
+    numero: string;
+  };
+  observacoes: string;
+  affiliateId: string | null;
+};
 
 function todayISO() {
   const d = new Date();
@@ -33,8 +57,37 @@ export default function Page() {
 function CotacaoPage() {
   const searchParams = useSearchParams();
   const minToday = useMemo(() => todayISO(), []);
-  const search = searchParams.toString();
-  const indicacao = useMemo(() => resolveIndicacaoFromSearch(search ? `?${search}` : ""), [search]);
+  const ref = searchParams.get("ref")?.trim() ?? "";
+  const [affiliateId, setAffiliateId] = useState<string | null>(null);
+  const [affiliateName, setAffiliateName] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resolveAffiliate() {
+      if (!ref) {
+        setAffiliateId(null);
+        setAffiliateName("");
+        return;
+      }
+
+      const affiliate = await resolveTradeMilesAffiliate(ref);
+      if (cancelled) return;
+      setAffiliateId(affiliate?.id ?? null);
+      setAffiliateName(affiliate?.name ?? "");
+    }
+
+    resolveAffiliate()
+      .catch(() => {
+        if (cancelled) return;
+        setAffiliateId(null);
+        setAffiliateName("");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ref]);
 
   const [tripType, setTripType] = useState<TripType>("ida_volta");
   const [origem, setOrigem] = useState("");
@@ -88,8 +141,8 @@ function CotacaoPage() {
       "✈️ *Solicitação de cotação — Vias Aéreas*",
       "⏱️ *Prazo:* retornamos com a cotação em até 2 horas.",
       "",
-      indicacao ? `🤝 *Indicação:* ${indicacao}` : null,
-      indicacao ? "" : null,
+      affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
+      affiliateName ? "" : null,
       `🧭 *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${tripType === "ida_volta" ? "Ida e volta" : "Só ida"}`,
       `📅 *Ida:* ${dataIda} (${turnoIda})`,
@@ -107,9 +160,51 @@ function CotacaoPage() {
     return linhas.join("\n");
   }
 
+  function buildLeadPayload(): LeadPayload {
+    return {
+      origem: origem.trim(),
+      destino: destino.trim(),
+      tipoViagem: tripType,
+      dataIda,
+      dataVolta: tripType === "ida_volta" ? dataVolta : null,
+      turnoIda,
+      turnoVolta: tripType === "ida_volta" ? turnoVolta : null,
+      datasFlexiveis: flexivel,
+      bagagem,
+      passageiros: {
+        adultos,
+        criancas,
+        bebes,
+        total: totalPax,
+      },
+      contato: {
+        ddi: ddi.trim() || "+55",
+        ddd: ddd.trim(),
+        numero: numero.trim(),
+      },
+      observacoes: obs.trim(),
+      affiliateId,
+    };
+  }
+
+  async function sendLeadToBackend(payload: LeadPayload) {
+    try {
+      await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch {
+      // Fluxo principal não pode quebrar por erro de integração.
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) return;
+
+    const payload = buildLeadPayload();
+    void sendLeadToBackend(payload);
 
     const msg = buildMessage();
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
@@ -143,10 +238,10 @@ function CotacaoPage() {
                 <b>Retornamos com a cotação em até 2 horas.</b>
               </p>
 
-              {indicacao ? (
+              {affiliateName ? (
                 <div className="va-referralCard">
-                  <span>Indicado por</span>
-                  <b>{indicacao}</b>
+                  <span>Indicação de</span>
+                  <b>{affiliateName}</b>
                 </div>
               ) : null}
             </div>

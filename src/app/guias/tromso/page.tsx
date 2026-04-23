@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export const metadata = {
   title: "Tromsø • Noruega | Vias Aéreas",
@@ -363,9 +364,9 @@ export default function TromsoPage() {
             <div style={{ marginTop: 8 }}>
               Eu posso montar um roteiro em sequência (dia 1 a dia 5), estimar
               custos e comparar opções de passagem com dinheiro ou milhas.{" "}
-              <a href="/" style={{ fontWeight: 800 }}>
+              <Link href="/" style={{ fontWeight: 800 }}>
                 Clique aqui para solicitar uma cotação.
-              </a>
+              </Link>
             </div>
           </div>
         </div>

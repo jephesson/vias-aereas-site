@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
-const WHATSAPP_NUMBER = "5553999760707";
+const WHATSAPP_NUMBER = "5551983474413";
 const CNPJ = "63.817.773/0001-85";
 const BUSSOLA_LOGO = "/logo-bussola-aerea.png";
 
@@ -98,20 +98,18 @@ export default function Page() {
 
   // ✅ cupom
   const [cupom, setCupom] = useState("");
-  const [promoUsed, setPromoUsed] = useState(false);
+  const [promoUsed, setPromoUsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(PROMO_STORAGE_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
 
   // ✅ toast
   const [toast, setToast] = useState<ToastState>(null);
   const toastTimer = useRef<number | null>(null);
-
-  useEffect(() => {
-    try {
-      const used = localStorage.getItem(PROMO_STORAGE_KEY) === "1";
-      setPromoUsed(used);
-    } catch {
-      // ignore
-    }
-  }, []);
 
   function showToast(next: ToastState, ms = 3500) {
     setToast(next);

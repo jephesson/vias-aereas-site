@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { resolveIndicacaoFromSearch } from "@/lib/indicacoes";
+import { resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
-const WHATSAPP_NUMBER = "5553999760707"; // 55 + 53 + 999760707
+const WHATSAPP_NUMBER = "5551983474413"; // 55 + 51 + 983474413
 const CNPJ = "63.817.773/0001-85";
 
 type Program = "SMILES" | "ESFERA" | "LIVELO" | "LATAM";
@@ -41,8 +41,32 @@ export default function Page() {
 
 function VendaSeusPontosPage() {
   const searchParams = useSearchParams();
-  const search = searchParams.toString();
-  const indicacao = useMemo(() => resolveIndicacaoFromSearch(search ? `?${search}` : ""), [search]);
+  const ref = searchParams.get("ref")?.trim() ?? "";
+  const [affiliateName, setAffiliateName] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resolveAffiliate() {
+      if (!ref) {
+        setAffiliateName("");
+        return;
+      }
+
+      const affiliate = await resolveTradeMilesAffiliate(ref);
+      if (cancelled) return;
+      setAffiliateName(affiliate?.name ?? "");
+    }
+
+    resolveAffiliate().catch(() => {
+      if (cancelled) return;
+      setAffiliateName("");
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ref]);
   const [program, setProgram] = useState<Program>("SMILES");
   const [pontos, setPontos] = useState<string>(""); // string p/ input
   const [nome, setNome] = useState<string>("");
@@ -72,8 +96,8 @@ function VendaSeusPontosPage() {
     const linhas = [
       "💰 *Simulação — Venda de Pontos (Vias Aéreas)*",
       "",
-      indicacao ? `🤝 *Indicação:* ${indicacao}` : null,
-      indicacao ? "" : null,
+      affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
+      affiliateName ? "" : null,
       `👤 *Nome:* ${nome.trim()}`,
       `🏷️ *Programa:* ${PROGRAM_LABEL[program]}`,
       `✨ *Pontos:* ${pontosNum.toLocaleString("pt-BR")}`,
@@ -117,10 +141,10 @@ function VendaSeusPontosPage() {
                 Ao aceitar, você envia os dados pelo WhatsApp para finalizar conosco.
               </p>
 
-              {indicacao ? (
+              {affiliateName ? (
                 <div className="va-referralCard">
-                  <span>Indicado por</span>
-                  <b>{indicacao}</b>
+                  <span>Indicação de</span>
+                  <b>{affiliateName}</b>
                 </div>
               ) : null}
             </div>
