@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type Guia = {
@@ -28,70 +29,53 @@ export default function GuiasClient({ guias }: { guias: Guia[] }) {
   }, [guias, q, pais]);
 
   return (
-    <>
-      <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-        <div className="va-box" style={{ display: "grid", gap: 10 }}>
-          <div style={{ display: "grid", gap: 6 }}>
-            <div style={{ fontWeight: 800 }}>Pesquisar</div>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Ex: Tromsø, Noruega, aurora..."
-              style={{
-                padding: "10px 12px",
-                borderRadius: 12,
-                border: "1px solid rgba(0,0,0,.12)",
-                outline: "none",
-              }}
-            />
-          </div>
-
-          <div style={{ display: "grid", gap: 6 }}>
-            <div style={{ fontWeight: 800 }}>Filtrar por país</div>
-            <select
-              value={pais}
-              onChange={(e) => setPais(e.target.value)}
-              style={{
-                padding: "10px 12px",
-                borderRadius: 12,
-                border: "1px solid rgba(0,0,0,.12)",
-                outline: "none",
-              }}
-            >
-              {paises.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
+    <div className="va-stack va-guides">
+      <div className="va-grid2">
+        <div className="va-stack">
+          <label className="va-label" htmlFor="guia-busca">
+            Pesquisar
+          </label>
+          <input
+            id="guia-busca"
+            className="va-input"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Ex: Tromsø, Noruega, aurora..."
+          />
         </div>
 
-        <div style={{ display: "grid", gap: 12 }}>
-          {filtrados.map((g) => (
-            <a
-              key={g.slug}
-              href={`/guias/${g.slug}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div className="va-box">
-                <div style={{ fontWeight: 900, fontSize: 18 }}>
-                  {g.cidade} • {g.pais}
-                </div>
-                <div style={{ color: "var(--muted)", marginTop: 6 }}>
-                  {g.resumo}
-                </div>
-              </div>
-            </a>
-          ))}
-
-          {filtrados.length === 0 && (
-            <div className="va-box" style={{ color: "var(--muted)" }}>
-              Nenhum guia encontrado.
-            </div>
-          )}
+        <div className="va-stack">
+          <label className="va-label" htmlFor="guia-pais">
+            Filtrar por país
+          </label>
+          <select
+            id="guia-pais"
+            className="va-input"
+            value={pais}
+            onChange={(e) => setPais(e.target.value)}
+          >
+            {paises.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
-    </>
+
+      <div className="va-stack">
+        {filtrados.map((g) => (
+          <Link key={g.slug} href={`/guias/${g.slug}`} className="va-guideLink">
+            <span className="va-guideKicker">{g.pais}</span>
+            <span className="va-guideTitle">{g.cidade}</span>
+            <span className="va-guideText">{g.resumo}</span>
+          </Link>
+        ))}
+
+        {filtrados.length === 0 && (
+          <div className="va-box va-guideEmpty">Nenhum guia encontrado.</div>
+        )}
+      </div>
+    </div>
   );
 }

@@ -218,37 +218,24 @@ function CotacaoPage() {
     <main className="va-bg">
       <div className="va-shell">
         <header className="va-header">
-          <div className="va-brand">
-            <img
-              src="/logo-vias-aereas.png"
-              alt="Vias Aéreas"
-              className="va-logo"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
-            />
-
-            <div>
-              <div className="va-pill">
-                <span className="va-dot" /> Cotação rápida via WhatsApp
-              </div>
-
-              <h1 className="va-title">Solicitar cotação de passagem</h1>
-
-              <p className="va-subtitle">
-                Preencha os dados e clique em <b>Enviar no WhatsApp</b>. A mensagem vai prontinha.
-                <br />
-                <b>Retornamos com a cotação em até 2 horas.</b>
-              </p>
-
-              {affiliateName ? (
-                <div className="va-referralCard">
-                  <span>Indicação de</span>
-                  <b>{affiliateName}</b>
-                </div>
-              ) : null}
-            </div>
+          <div className="va-pill">
+            <span className="va-dot" /> Cotação rápida via WhatsApp
           </div>
+
+          <h1 className="va-title">Solicitar cotação de passagem</h1>
+
+          <p className="va-subtitle">
+            Preencha os dados e clique em <b>Enviar no WhatsApp</b>. A mensagem vai prontinha.
+            <br />
+            <b>Retornamos com a cotação em até 2 horas.</b>
+          </p>
+
+          {affiliateName ? (
+            <div className="va-referralCard">
+              <span>Indicação de</span>
+              <b>{affiliateName}</b>
+            </div>
+          ) : null}
         </header>
 
         <form onSubmit={handleSubmit} className="va-card">

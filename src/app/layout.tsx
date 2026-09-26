@@ -1,6 +1,12 @@
 import "./globals.css";
 import Link from "next/link";
-import NavTabs from "@/components/NavTabs"; // ajuste o caminho se o seu arquivo estiver em outro lugar
+import { Plus_Jakarta_Sans } from "next/font/google";
+import NavTabs from "@/components/NavTabs";
+
+const sans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "Vias Aéreas",
@@ -13,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-br">
-      <body>
+    <html lang="pt-BR">
+      <body className={sans.className}>
         <header className="va-topnav">
           <div className="va-topnav-inner">
             <Link className="va-brandlink" href="/">
