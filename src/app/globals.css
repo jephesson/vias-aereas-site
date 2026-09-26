@@ -1,11 +1,11 @@
 :root {
-  --bg: #f4f7fb;
+  --bg: #eef3f8;
   --card: #ffffff;
   --text: #10233f;
-  --muted: rgba(16, 35, 63, 0.68);
-  --muted2: rgba(16, 35, 63, 0.52);
-  --line: rgba(16, 35, 63, 0.1);
-  --navy: #12315c;
+  --muted: rgba(16, 35, 63, 0.72);
+  --muted2: rgba(16, 35, 63, 0.56);
+  --line: rgba(16, 35, 63, 0.12);
+  --navy: #0c2348;
   --blue: #1d4e89;
   --orange: #e4570e;
   --orange-deep: #c4470a;
@@ -59,39 +59,36 @@ button, input, select, textarea { font: inherit; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.92);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--line);
+  background: var(--navy);
+  border-bottom: 0;
 }
 
 .va-topnav-inner {
-  max-width: 1120px;
+  max-width: 1180px;
   margin: 0 auto;
-  padding: 14px 20px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
 }
 
 .va-brandlink {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-decoration: none;
-  color: var(--text);
+  color: #fff;
   min-width: 0;
 }
 
 .va-toplogo {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
-  border-radius: 12px;
-  border: 1px solid var(--line);
+  border-radius: 10px;
   background: #fff;
-  padding: 5px;
+  padding: 4px;
   flex: 0 0 auto;
 }
 
@@ -99,21 +96,21 @@ button, input, select, textarea { font: inherit; }
 .va-brandname {
   font-weight: 750;
   letter-spacing: -0.03em;
-  font-size: 16px;
+  font-size: 15px;
 }
 .va-brandsub {
   margin-top: 2px;
-  font-size: 12px;
-  color: var(--muted2);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .va-menuBtn {
   display: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -126,7 +123,7 @@ button, input, select, textarea { font: inherit; }
   display: block;
   width: 18px;
   height: 1.5px;
-  background: var(--text);
+  background: #fff;
   border-radius: 2px;
   position: relative;
   transition: transform 0.18s ease, opacity 0.18s ease;
@@ -156,26 +153,26 @@ button, input, select, textarea { font: inherit; }
 
 .va-tab {
   text-decoration: none;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.72);
   padding: 8px 10px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 0;
   background: transparent;
-  font-weight: 650;
-  font-size: 14px;
+  font-weight: 700;
+  font-size: 13.5px;
   white-space: nowrap;
   transition: background 0.16s ease, color 0.16s ease;
 }
 
 .va-tab:hover {
-  color: var(--text);
-  background: rgba(16, 35, 63, 0.04);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .va-tab--active,
 .va-tab[aria-current="page"] {
-  color: var(--navy);
-  background: rgba(18, 49, 92, 0.07);
+  color: #fff;
+  background: rgba(228, 87, 14, 0.95);
 }
 
 .va-tab--disabled {
@@ -205,17 +202,17 @@ button, input, select, textarea { font: inherit; }
   .va-tabs {
     display: none;
     position: absolute;
-    top: calc(100% + 14px);
-    right: 12px;
-    left: 12px;
+    top: calc(100% + 8px);
+    right: 10px;
+    left: 10px;
     flex-direction: column;
     align-items: stretch;
-    gap: 4px;
+    gap: 2px;
     padding: 8px;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
+    background: #102a52;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
   }
 
   .va-tabs--open { display: flex; }
@@ -228,12 +225,12 @@ button, input, select, textarea { font: inherit; }
 
 /* Layout */
 .va-bg {
-  min-height: calc(100vh - 72px);
-  padding: 36px 20px 56px;
+  min-height: calc(100vh - 64px);
+  padding: 16px 16px 28px;
 }
 
 .va-shell {
-  max-width: 760px;
+  max-width: 1040px;
   margin: 0 auto;
 }
 
@@ -297,7 +294,7 @@ button, input, select, textarea { font: inherit; }
 .va-heroContent { display: grid; gap: 10px; }
 
 @media (max-width: 640px) {
-  .va-bg { padding: 24px 16px 40px; }
+  .va-bg { padding: 12px 12px 24px; }
   .va-logoCard { aspect-ratio: 16 / 6; max-height: 180px; }
   .va-brand { flex-direction: column; }
 }
@@ -326,9 +323,9 @@ button, input, select, textarea { font: inherit; }
 
 .va-title {
   margin: 0;
-  font-size: clamp(32px, 5vw, 44px);
-  line-height: 1.05;
-  letter-spacing: -0.045em;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
   font-weight: 750;
 }
 
@@ -359,14 +356,14 @@ button, input, select, textarea { font: inherit; }
 .va-referralCard b { font-size: 14px; }
 
 .va-card {
-  border-radius: var(--radius-lg);
+  border-radius: 16px;
   border: 1px solid var(--line);
   background: var(--card);
   box-shadow: var(--shadow);
-  padding: 22px;
+  padding: 16px;
 }
 
-.va-section { display: grid; gap: 10px; margin-bottom: 18px; }
+.va-section { display: grid; gap: 8px; margin-bottom: 12px; }
 
 .va-label {
   font-size: 13px;
@@ -485,7 +482,7 @@ textarea.va-input {
 .va-cta:hover { background: var(--orange-deep); }
 
 .va-cta--off {
-  opacity: 0.42;
+  background: #c65a2e;
   cursor: not-allowed;
   box-shadow: none;
 }
@@ -1235,3 +1232,121 @@ textarea.va-input {
 .vs-check { align-items: flex-start; }
 .vs-nameWrap { display: grid; gap: 6px; }
 .vs-footer { gap: 12px; }
+
+/* Home de venda */
+.va-home {
+  background:
+    radial-gradient(900px 420px at 0% 0%, rgba(228, 87, 14, 0.22), transparent 55%),
+    var(--navy);
+  padding: 18px 16px 20px;
+}
+
+.va-home-grid {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.va-pitch {
+  color: #fff;
+  padding: 6px 4px 0;
+}
+
+.va-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffb088;
+}
+
+.va-pitch h1 {
+  margin: 8px 0 8px;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  font-weight: 750;
+}
+
+.va-pitch p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.45;
+  font-size: 15px;
+}
+
+.va-points {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.va-points li {
+  position: relative;
+  padding-left: 18px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.va-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--orange);
+}
+
+.va-pitch .va-referralCard {
+  margin-top: 14px;
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.va-pitch .va-referralCard span { color: rgba(255, 255, 255, 0.65); }
+
+.va-quote .va-box {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.va-quote .va-boxTitle { margin-bottom: 6px; }
+
+.va-quote textarea.va-input { min-height: 72px; }
+
+.va-quote .va-footer {
+  display: grid;
+  gap: 8px;
+  margin-top: 2px;
+  padding-top: 12px;
+}
+
+.va-quote .va-cta {
+  width: 100%;
+  min-height: 52px;
+  font-size: 16px;
+}
+
+.va-home-copy {
+  max-width: 1180px;
+  margin: 12px auto 0;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: left;
+}
+
+@media (max-width: 900px) {
+  .va-home { padding: 12px 12px 16px; }
+  .va-home-grid { grid-template-columns: 1fr; gap: 12px; }
+  .va-pitch h1 { font-size: 28px; }
+  .va-home-copy { text-align: center; }
+}

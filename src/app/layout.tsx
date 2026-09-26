@@ -31,7 +31,7 @@ export default function RootLayout({
               />
               <div className="va-brandtext">
                 <div className="va-brandname">Vias Aéreas</div>
-                <div className="va-brandsub">Cotações • Viagens • Conteúdo</div>
+                <div className="va-brandsub">Passagens em dinheiro e milhas</div>
               </div>
             </Link>
 

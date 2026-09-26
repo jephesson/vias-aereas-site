@@ -215,30 +215,28 @@ function CotacaoPage() {
   }
 
   return (
-    <main className="va-bg">
-      <div className="va-shell">
-        <header className="va-header">
-          <div className="va-pill">
-            <span className="va-dot" /> Cotação rápida via WhatsApp
-          </div>
-
-          <h1 className="va-title">Solicitar cotação de passagem</h1>
-
-          <p className="va-subtitle">
-            Preencha os dados e clique em <b>Enviar no WhatsApp</b>. A mensagem vai prontinha.
-            <br />
-            <b>Retornamos com a cotação em até 2 horas.</b>
+    <main className="va-home">
+      <div className="va-home-grid">
+        <section className="va-pitch">
+          <p className="va-kicker">Cotação pelo WhatsApp</p>
+          <h1>A melhor passagem, em dinheiro ou milhas, em até 2 horas.</h1>
+          <p>
+            Manda o trecho. A gente compara as opções e devolve a cotação pronta, sem cadastro.
           </p>
-
+          <ul className="va-points">
+            <li>Resposta em até 2 horas</li>
+            <li>Tarifa em dinheiro e emissão com milhas</li>
+            <li>Mensagem pronta para enviar agora</li>
+          </ul>
           {affiliateName ? (
             <div className="va-referralCard">
               <span>Indicação de</span>
               <b>{affiliateName}</b>
             </div>
           ) : null}
-        </header>
+        </section>
 
-        <form onSubmit={handleSubmit} className="va-card">
+        <form onSubmit={handleSubmit} className="va-card va-quote">
           {/* Tipo */}
           <section className="va-section">
             <div className="va-label">Tipo de viagem</div>
@@ -387,25 +385,23 @@ function CotacaoPage() {
               value={obs}
               onChange={(e) => setObs(e.target.value)}
               placeholder="Ex: voos diretos, horários preferidos, mala extra, etc."
-              rows={4}
+              rows={2}
             />
           </section>
 
           <div className="va-footer">
-            <div className="va-note">
-              Ao enviar, abrirá o WhatsApp com a mensagem pronta. <b>Cotação em até 2h.</b>
-            </div>
-
             <button type="submit" disabled={!canSubmit} className={`va-cta ${canSubmit ? "" : "va-cta--off"}`}>
               Enviar cotação no WhatsApp
             </button>
+            <div className="va-note">
+              Abre o WhatsApp com a mensagem pronta. Cotação em até 2 horas.
+            </div>
           </div>
         </form>
-
-        <footer className="va-copy">
-          © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}
-        </footer>
       </div>
+      <footer className="va-copy va-home-copy">
+        © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}
+      </footer>
     </main>
   );
 }
