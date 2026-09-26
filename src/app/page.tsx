@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import AirportInput from "@/components/AirportInput";
 import { resolveAffiliateNameFallback, resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
 const WHATSAPP_NUMBER = "5551983474413"; // 55 + 51 + 983474413
@@ -266,8 +267,18 @@ function CotacaoPage() {
           <section className="va-section">
             <div className="va-label">Trecho</div>
             <div className="va-grid2">
-              <input className="va-input" value={origem} onChange={(e) => setOrigem(e.target.value)} placeholder="Origem (ex: Curitiba)" />
-              <input className="va-input" value={destino} onChange={(e) => setDestino(e.target.value)} placeholder="Destino (ex: São Paulo)" />
+              <AirportInput
+                label="Origem"
+                value={origem}
+                onChange={setOrigem}
+                placeholder="Origem (SAO, GRU ou Curitiba)"
+              />
+              <AirportInput
+                label="Destino"
+                value={destino}
+                onChange={setDestino}
+                placeholder="Destino (SSA, GIG ou Lisboa)"
+              />
             </div>
           </section>
 

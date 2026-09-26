@@ -1,0 +1,8 @@
+Airport and multi-airport city data is derived from airportsdata
+(https://github.com/mborsetti/airportsdata), which includes data from
+https://github.com/mwgg/Airports.
+
+MIT License
+
+Copyright (c) 2020- Mike Borsetti
+Copyright (c) 2014 mwgg
