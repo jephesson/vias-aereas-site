@@ -1375,19 +1375,101 @@ textarea.va-input {
   box-shadow: none;
 }
 
-.bk-rail input[type="date"] {
-  font-variant-numeric: tabular-nums;
+.bk-date-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
 }
 
-.bk-rail input[type="date"]::-webkit-datetime-edit,
-.bk-rail input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-  padding: 0;
-  min-width: 0;
+.bk-date-btn b { font-weight: 500; }
+.bk-date-btn b.is-empty { color: rgba(16, 35, 63, 0.38); font-weight: 450; }
+
+.bk-date-btn svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: var(--navy);
+  stroke-width: 1.8;
+  stroke-linecap: round;
 }
 
-.bk-rail input[type="date"]::-webkit-calendar-picker-indicator {
-  margin: 0 0 0 6px;
+.bk-cal {
+  position: absolute;
+  z-index: 35;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 292px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 16px 40px rgba(12, 35, 72, 0.16);
 }
+
+.bk-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.bk-cal-head strong {
+  font-size: 15px;
+  font-weight: 750;
+  text-transform: capitalize;
+}
+
+.bk-cal-head button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: #f4f7fb;
+  color: var(--navy);
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bk-cal-head button:disabled { opacity: 0.35; cursor: default; }
+
+.bk-cal-week,
+.bk-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.bk-cal-week span {
+  padding: 4px 0;
+  color: var(--muted2);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.bk-cal-grid button {
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--navy);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.bk-cal-grid button:hover:not(:disabled) { background: #f4f7fb; }
+.bk-cal-grid button.is-on { background: var(--navy); color: #fff; }
+.bk-cal-grid button:disabled { color: #c5ceda; cursor: default; }
 
 .bk-rail .va-input:focus { box-shadow: none; }
 
@@ -1465,24 +1547,6 @@ textarea.va-input {
 .bk-search-btn:hover { background: var(--orange-deep); }
 .bk-search-btn:disabled { background: #c65a2e; cursor: default; }
 .bk-cell.is-off { opacity: 0.45; }
-
-.bk-call {
-  margin: 14px 0 0;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: #fff4ec;
-  border: 1px solid rgba(228, 87, 14, 0.35);
-  color: var(--navy);
-  font-size: 15px;
-  line-height: 1.45;
-}
-
-.bk-call strong {
-  display: block;
-  margin-bottom: 2px;
-  color: var(--orange-deep);
-  font-size: 16px;
-}
 
 .bk-steps {
   display: grid;

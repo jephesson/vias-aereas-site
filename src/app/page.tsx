@@ -315,31 +315,22 @@ function CotacaoPage() {
               </label>
             </div>
             <div className="bk-when">
-            <label className="bk-cell">
-              <span>Ida</span>
-              <input
-                className="va-input"
-                type="date"
-                min={minToday}
-                value={dataIda}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  setDataIda(value);
-                  if (dataVolta && value && !isAfterOrEqual(dataVolta, value)) setDataVolta("");
-                }}
-              />
-            </label>
-            <label className={`bk-cell ${tripType === "ida" ? "is-off" : ""}`}>
-              <span>Volta</span>
-              <input
-                className="va-input"
-                type="date"
-                min={dataIda || minToday}
-                value={dataVolta}
-                disabled={tripType === "ida"}
-                onChange={(event) => setDataVolta(event.target.value)}
-              />
-            </label>
+            <DateField
+              label="Ida"
+              value={dataIda}
+              min={minToday}
+              onChange={(value) => {
+                setDataIda(value);
+                if (dataVolta && value && !isAfterOrEqual(dataVolta, value)) setDataVolta("");
+              }}
+            />
+            <DateField
+              label="Volta"
+              value={dataVolta}
+              min={dataIda || minToday}
+              disabled={tripType === "ida"}
+              onChange={setDataVolta}
+            />
             <div className="bk-pax bk-cell" ref={paxRef}>
               <span>Passageiros</span>
               <button type="button" className="va-input bk-pax-btn" onClick={() => setPaxOpen((open) => !open)}>
@@ -365,10 +356,6 @@ function CotacaoPage() {
             </p>
           ) : null}
         </form>
-
-        <p className="bk-call">
-          <strong>Desconto exclusivo de até 30%.</strong> Escolha o voo e fale com a gente no WhatsApp. A mensagem já vai com os dados da passagem.
-        </p>
 
         {searched ? null : (
           <section className="bk-steps" aria-label="Como funciona">
@@ -558,6 +545,148 @@ function LegView({ title, date, leg }: { title: string; date: string; leg: Fligh
       </span>
       <span className="bk-airline">{leg.airline}</span>
     </span>
+  );
+}
+
+const WEEKDAYS = ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"];
+const MONTHS = [
+  "janeiro",
+  "fevereiro",
+  "março",
+  "abril",
+  "maio",
+  "junho",
+  "julho",
+  "agosto",
+  "setembro",
+  "outubro",
+  "novembro",
+  "dezembro",
+];
+
+function toISO(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function parseISO(iso: string) {
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, (month || 1) - 1, day || 1);
+}
+
+function DateField({
+  label,
+  value,
+  min,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  min: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(event: PointerEvent) {
+      if (!boxRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (disabled) setOpen(false);
+  }, [disabled]);
+
+  return (
+    <div className={`bk-cell bk-date ${disabled ? "is-off" : ""}`} ref={boxRef}>
+      <span>{label}</span>
+      <button
+        type="button"
+        className="va-input bk-date-btn"
+        disabled={disabled}
+        aria-label={label}
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+      >
+        <b className={value ? "" : "is-empty"}>{value ? formatDate(value) : "dd/mm/aaaa"}</b>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M3 10h18M8 3v4M16 3v4" />
+        </svg>
+      </button>
+      {open && !disabled ? (
+        <Calendar
+          min={min}
+          value={value}
+          onPick={(next) => {
+            onChange(next);
+            setOpen(false);
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+function Calendar({ min, value, onPick }: { min: string; value: string; onPick: (iso: string) => void }) {
+  const initial = parseISO(value || min);
+  const [cursor, setCursor] = useState(() => new Date(initial.getFullYear(), initial.getMonth(), 1));
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const firstWeekday = (new Date(year, month, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const days = [
+    ...Array.from({ length: firstWeekday }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+  ];
+  const minMonth = parseISO(min);
+  const canPrev = year > minMonth.getFullYear() || (year === minMonth.getFullYear() && month > minMonth.getMonth());
+
+  return (
+    <div className="bk-cal" role="dialog" aria-label={`Calendário de ${MONTHS[month]}`}>
+      <div className="bk-cal-head">
+        <button type="button" aria-label="Mês anterior" disabled={!canPrev} onClick={() => setCursor(new Date(year, month - 1, 1))}>
+          ‹
+        </button>
+        <strong>
+          {MONTHS[month]} {year}
+        </strong>
+        <button type="button" aria-label="Próximo mês" onClick={() => setCursor(new Date(year, month + 1, 1))}>
+          ›
+        </button>
+      </div>
+      <div className="bk-cal-week">
+        {WEEKDAYS.map((day) => (
+          <span key={day}>{day}</span>
+        ))}
+      </div>
+      <div className="bk-cal-grid">
+        {days.map((day, index) => {
+          if (!day) return <span key={`empty-${index}`} />;
+          const iso = toISO(new Date(year, month, day));
+          return (
+            <button key={iso} type="button" disabled={iso < min} className={iso === value ? "is-on" : ""} onClick={() => onPick(iso)}>
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
