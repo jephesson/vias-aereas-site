@@ -11,18 +11,24 @@ const data = airportData as AirportFile;
 const airportCodes = new Set(data.airports.map((row) => row[0]));
 const cityCovers = new Map(data.cities.map((row) => [row[0], row[3]]));
 
+export type FlightLeg = {
+  airline: string;
+  departTime: string;
+  departWhen: string;
+  arriveTime: string;
+  arriveWhen: string;
+  duration: string;
+  stopsLabel: string;
+  fromLabel: string;
+  toLabel: string;
+};
+
 export type FlightOffer = {
   id: string;
   priceLabel: string;
   priceNumber: number;
-  airline: string;
-  returnAirline: string | null;
-  stopsLabel: string;
-  duration: string;
-  departure: string;
-  arrival: string;
-  returnDeparture: string | null;
-  returnArrival: string | null;
+  outbound: FlightLeg;
+  inbound: FlightLeg | null;
   buyLink: string | null;
 };
 
@@ -86,6 +92,85 @@ function money(amount: number) {
   return amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+const WEEKDAYS: Record<string, string> = {
+  sun: "dom",
+  mon: "seg",
+  tue: "ter",
+  wed: "qua",
+  thu: "qui",
+  fri: "sex",
+  sat: "sáb",
+};
+
+const MONTHS: Record<string, string> = {
+  jan: "jan",
+  feb: "fev",
+  mar: "mar",
+  apr: "abr",
+  may: "mai",
+  jun: "jun",
+  jul: "jul",
+  aug: "ago",
+  sep: "set",
+  oct: "out",
+  nov: "nov",
+  dec: "dez",
+};
+
+export function prettyDuration(value: string) {
+  return value
+    .replace(/(\d+)\s*hrs?/gi, "$1h")
+    .replace(/(\d+)\s*mins?/gi, "$1min")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function prettyWhen(raw: string) {
+  const match = raw.match(/^([A-Za-z]{3}),\s+([A-Za-z]{3})\s+(\d{1,2})$/);
+  if (!match) return raw;
+  const weekday = WEEKDAYS[match[1].toLowerCase()] ?? match[1].toLowerCase();
+  const month = MONTHS[match[2].toLowerCase()] ?? match[2].toLowerCase();
+  return `${weekday}, ${match[3]} ${month}`;
+}
+
+export function parseSchedule(description: string) {
+  const match = description.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)\s+on\s+(.+)$/i);
+  if (!match) return { time: description, when: "" };
+  let hour = Number(match[1]);
+  const minute = match[2];
+  const period = match[3].toUpperCase();
+  if (period === "PM" && hour < 12) hour += 12;
+  if (period === "AM" && hour === 12) hour = 0;
+  return {
+    time: `${String(hour).padStart(2, "0")}:${minute}`,
+    when: prettyWhen(match[4].trim()),
+  };
+}
+
+function legFrom(
+  airline: string,
+  depart: string,
+  arrive: string,
+  duration: string,
+  stops: number,
+  fromLabel: string,
+  toLabel: string,
+): FlightLeg {
+  const departure = parseSchedule(depart);
+  const arrival = parseSchedule(arrive);
+  return {
+    airline: airline || "Companhia não informada",
+    departTime: departure.time,
+    departWhen: departure.when,
+    arriveTime: arrival.time,
+    arriveWhen: arrival.when,
+    duration: prettyDuration(duration),
+    stopsLabel: stopsLabel(stops),
+    fromLabel,
+    toLabel,
+  };
+}
+
 function normalizeRow(row: Record<string, unknown>, roundTrip: boolean): FlightOffer | null {
   const priceNumber = roundTrip
     ? asNumber(row.total_price_as_number)
@@ -93,25 +178,37 @@ function normalizeRow(row: Record<string, unknown>, roundTrip: boolean): FlightO
   if (priceNumber == null) return null;
 
   const priceText = asString(roundTrip ? row.total_price : row.price);
-  const airline = asString(roundTrip ? row.departure_flight_airline : row.airline) || "Companhia não informada";
-  const returnAirline = roundTrip ? asString(row.return_flight_airline) || null : null;
-  const stops = roundTrip ? asNumber(row.total_stops) ?? 0 : asNumber(row.stops) ?? 0;
-  const duration = roundTrip
-    ? asString(row.departure_flight_duration)
-    : asString(row.duration);
+  const fromLabel = asString(row.from_airport);
+  const toLabel = asString(row.to_airport);
+
+  const outbound = legFrom(
+    asString(roundTrip ? row.departure_flight_airline : row.airline),
+    asString(roundTrip ? row.departure_flight_departure_description : row.departure_description),
+    asString(roundTrip ? row.departure_flight_arrival_description : row.arrival_description),
+    asString(roundTrip ? row.departure_flight_duration : row.duration),
+    roundTrip ? asNumber(row.departure_flight_stops) ?? 0 : asNumber(row.stops) ?? 0,
+    fromLabel,
+    toLabel,
+  );
+
+  const inbound = roundTrip
+    ? legFrom(
+        asString(row.return_flight_airline),
+        asString(row.return_flight_departure_description),
+        asString(row.return_flight_arrival_description),
+        asString(row.return_flight_duration),
+        asNumber(row.return_flight_stops) ?? 0,
+        toLabel,
+        fromLabel,
+      )
+    : null;
 
   return {
     id: "",
     priceLabel: priceText || money(priceNumber),
     priceNumber,
-    airline,
-    returnAirline,
-    stopsLabel: stopsLabel(stops),
-    duration,
-    departure: asString(roundTrip ? row.departure_flight_departure_description : row.departure_description),
-    arrival: asString(roundTrip ? row.departure_flight_arrival_description : row.arrival_description),
-    returnDeparture: roundTrip ? asString(row.return_flight_departure_description) || null : null,
-    returnArrival: roundTrip ? asString(row.return_flight_arrival_description) || null : null,
+    outbound,
+    inbound,
     buyLink: asString(row.buy_link) || null,
   };
 }
@@ -182,7 +279,7 @@ export async function searchGoogleFlights(query: FlightQuery) {
         currency: "brl",
         seat_type: 1,
         passengers,
-        limit: 3,
+        limit: 8,
         sort_type: "Overall",
       };
 
@@ -216,12 +313,12 @@ export async function searchGoogleFlights(query: FlightQuery) {
     .flat()
     .sort((a, b) => a.priceNumber - b.priceNumber)
     .filter((offer) => {
-      const key = `${offer.airline}|${offer.priceNumber}|${offer.departure}|${offer.returnDeparture ?? ""}`;
+      const key = `${offer.outbound.airline}|${offer.priceNumber}|${offer.outbound.departTime}|${offer.inbound?.departTime ?? ""}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     })
-    .slice(0, 5)
+    .slice(0, 8)
     .map((offer, index) => ({ ...offer, id: String(index + 1) }));
 
   return offers;
