@@ -1335,18 +1335,23 @@ textarea.va-input {
 
 .bk-types button.is-on { background: var(--navy); color: #fff; }
 
-.bk-rail {
+.bk-rail { display: grid; gap: 10px; }
+
+.bk-route,
+.bk-when {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) 44px minmax(0, 1.3fr) 168px 168px minmax(128px, 0.8fr) auto;
   align-items: stretch;
   border: 1px solid rgba(12, 35, 72, 0.1);
   border-radius: 16px;
   background: #f7f9fc;
 }
 
-.bk-cell { position: relative; display: grid; gap: 2px; min-width: 0; padding: 8px 14px 10px; }
-.bk-cell + .bk-cell,
-.bk-swap + .bk-cell { border-left: 1px solid rgba(12, 35, 72, 0.08); }
+.bk-route { grid-template-columns: minmax(240px, 1fr) 52px minmax(240px, 1fr); }
+.bk-when { grid-template-columns: minmax(190px, 1fr) minmax(190px, 1fr) minmax(190px, 1fr) auto; }
+
+.bk-cell { position: relative; display: grid; gap: 4px; min-width: 0; padding: 10px 16px 12px; }
+.bk-route .bk-cell + .bk-cell,
+.bk-when .bk-cell + .bk-cell { border-left: 1px solid rgba(12, 35, 72, 0.08); }
 
 .bk-cell > span,
 .bk-pax > span {
@@ -1401,11 +1406,7 @@ textarea.va-input {
   box-shadow: 0 6px 16px rgba(12, 35, 72, 0.08);
 }
 
-.bk-pax-btn {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.bk-pax-btn { white-space: nowrap; }
 
 .bk-pax { position: relative; }
 
@@ -1464,6 +1465,24 @@ textarea.va-input {
 .bk-search-btn:hover { background: var(--orange-deep); }
 .bk-search-btn:disabled { background: #c65a2e; cursor: default; }
 .bk-cell.is-off { opacity: 0.45; }
+
+.bk-call {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #fff4ec;
+  border: 1px solid rgba(228, 87, 14, 0.35);
+  color: var(--navy);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.bk-call strong {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--orange-deep);
+  font-size: 16px;
+}
 
 .bk-steps {
   display: grid;
@@ -1648,12 +1667,9 @@ textarea.va-input {
   .bk-hero,
   .bk-proof,
   .bk-steps { grid-template-columns: 1fr 1fr; }
-  .bk-rail { grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr); }
-  .bk-rail .bk-cell:nth-of-type(n + 3),
-  .bk-search-btn { grid-column: 1 / -1; }
-  .bk-cell + .bk-cell,
-  .bk-swap + .bk-cell { border-left: 0; border-top: 1px solid rgba(12, 35, 72, 0.08); }
-  .bk-swap + .bk-cell { border-top: 0; border-left: 1px solid rgba(12, 35, 72, 0.08); }
+  .bk-route { grid-template-columns: minmax(0, 1fr) 52px minmax(0, 1fr); }
+  .bk-when { grid-template-columns: 1fr 1fr; }
+  .bk-when .bk-search-btn { grid-column: 1 / -1; }
 }
 
 @media (max-width: 720px) {
@@ -1661,10 +1677,14 @@ textarea.va-input {
   .bk-wrap { padding: 0 12px; }
   .bk-hero,
   .bk-proof,
-  .bk-rail,
+  .bk-route,
+  .bk-when,
   .bk-steps,
   .bk-leg-row,
   .bk-flight { grid-template-columns: 1fr; }
+  .bk-route .bk-cell + .bk-cell,
+  .bk-when .bk-cell + .bk-cell { border-left: 0; border-top: 1px solid rgba(12, 35, 72, 0.08); }
+  .bk-search .va-airport-list { width: min(420px, calc(100vw - 48px)); }
   .bk-fare,
   .bk-combo { justify-items: start; }
   .bk-chosen,
@@ -1676,20 +1696,23 @@ textarea.va-input {
 
 .va-airport { position: relative; }
 
+.bk-search { overflow: visible; }
+.bk-route .bk-cell:last-child .va-airport-list { left: auto; right: 0; }
+
 .va-airport-list {
   position: absolute;
-  z-index: 30;
-  top: calc(100% + 4px);
+  z-index: 40;
+  top: calc(100% + 6px);
   left: 0;
-  right: 0;
+  width: max(100%, 420px);
   margin: 0;
-  padding: 4px;
+  padding: 6px;
   list-style: none;
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 16px 40px rgba(12, 35, 72, 0.16);
-  max-height: 280px;
+  max-height: 320px;
   overflow: auto;
 }
 
@@ -1720,10 +1743,12 @@ textarea.va-input {
 .va-airport-copy { display: grid; gap: 1px; min-width: 0; }
 .va-airport-title {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: baseline;
   font-weight: 700;
   font-size: 14px;
+  line-height: 1.3;
 }
 .va-airport-kind {
   font-size: 10px;

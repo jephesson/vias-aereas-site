@@ -175,7 +175,7 @@ function CotacaoPage() {
 
   function buildOfferMessage(offer: FlightOffer) {
     const linhas = [
-      "Olá! Quero o desconto exclusivo de até 30% nesta passagem que escolhi no Google Flights.",
+      "Olá! Quero o desconto exclusivo de até 30% nesta passagem.",
       "",
       `🧭 *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${tripType === "ida_volta" ? "Ida e volta" : "Só ida"}`,
@@ -183,16 +183,15 @@ function CotacaoPage() {
       "",
       legLines("Ida", dataIda, offer.outbound),
       offer.inbound ? legLines("Volta", dataVolta, offer.inbound) : null,
-      `💰 *Preço total no Google Flights:* ${offer.priceLabel}`,
+      `💰 *Preço na companhia:* ${offer.priceLabel}`,
       affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
-      offer.buyLink ? `🔗 *Google Flights:* ${offer.buyLink}` : null,
     ].filter(Boolean);
 
     return linhas.join("\n");
   }
 
   function openWhatsapp(offer: FlightOffer) {
-    const observacoes = [`Google Flights: ${offer.priceLabel}`, `Companhia: ${offer.outbound.airline}`].join(" | ");
+    const observacoes = [`Preço na companhia: ${offer.priceLabel}`, `Companhia: ${offer.outbound.airline}`].join(" | ");
     void fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -244,12 +243,12 @@ function CotacaoPage() {
       });
       const data = (await response.json()) as { offers?: FlightOffer[]; error?: string };
       if (!response.ok) {
-        setSearchError(data.error || "Não foi possível consultar o Google Flights.");
+        setSearchError(data.error || "Não foi possível consultar os voos.");
         return;
       }
       setOffers(data.offers ?? []);
     } catch {
-      setSearchError("Não foi possível consultar o Google Flights.");
+      setSearchError("Não foi possível consultar os voos.");
     } finally {
       setSearching(false);
     }
@@ -261,18 +260,18 @@ function CotacaoPage() {
         <div className="bk-stage-inner">
           <div className="bk-hero">
             <div>
-              <p className="bk-kicker">Preço do Google Flights</p>
+              <p className="bk-kicker">Preço da companhia</p>
               <h1>Encontre o voo. Pague menos.</h1>
-              <p className="bk-lead">Você escolhe horário e companhia. No WhatsApp, a Vias Aéreas busca um desconto exclusivo de até 30%.</p>
+              <p className="bk-lead">O valor é o da companhia aérea, encontrado na internet. Fale com a gente e pegue um desconto exclusivo de até 30%.</p>
             </div>
             <ul className="bk-proof">
               <li>
-                <b>Ao vivo</b>
-                <span>Valor do Google Flights</span>
+                <b>Na CIA</b>
+                <span>Preço da companhia aérea</span>
               </li>
               <li>
                 <b>Até 30%</b>
-                <span>Desconto exclusivo</span>
+                <span>Desconto exclusivo no WhatsApp</span>
               </li>
               <li>
                 <b>Pronto</b>
@@ -302,17 +301,20 @@ function CotacaoPage() {
           </div>
 
           <div className="bk-rail">
-            <label className="bk-cell">
-              <span>Origem</span>
-              <AirportInput label="Origem" value={origem} onChange={setOrigem} onPick={setFromPlace} placeholder="SAO, GRU ou cidade" />
-            </label>
-            <button type="button" className="bk-swap" onClick={swapRoute} aria-label="Inverter origem e destino">
-              ⇄
-            </button>
-            <label className="bk-cell">
-              <span>Destino</span>
-              <AirportInput label="Destino" value={destino} onChange={setDestino} onPick={setToPlace} placeholder="SSA, GIG ou cidade" />
-            </label>
+            <div className="bk-route">
+              <label className="bk-cell">
+                <span>Origem</span>
+                <AirportInput label="Origem" value={origem} onChange={setOrigem} onPick={setFromPlace} placeholder="SAO, GRU ou cidade" />
+              </label>
+              <button type="button" className="bk-swap" onClick={swapRoute} aria-label="Inverter origem e destino">
+                ⇄
+              </button>
+              <label className="bk-cell">
+                <span>Destino</span>
+                <AirportInput label="Destino" value={destino} onChange={setDestino} onPick={setToPlace} placeholder="SSA, GIG ou cidade" />
+              </label>
+            </div>
+            <div className="bk-when">
             <label className="bk-cell">
               <span>Ida</span>
               <input
@@ -354,6 +356,7 @@ function CotacaoPage() {
             <button type="submit" className="bk-search-btn" disabled={!canSearch || searching}>
               {searching ? "Buscando..." : "Buscar voos"}
             </button>
+            </div>
           </div>
           {dateError ? <p className="bk-error">{dateError}</p> : null}
           {affiliateName ? (
@@ -363,12 +366,16 @@ function CotacaoPage() {
           ) : null}
         </form>
 
+        <p className="bk-call">
+          <strong>Desconto exclusivo de até 30%.</strong> Escolha o voo e fale com a gente no WhatsApp. A mensagem já vai com os dados da passagem.
+        </p>
+
         {searched ? null : (
           <section className="bk-steps" aria-label="Como funciona">
             <article>
               <span>01</span>
               <h2>Veja os voos</h2>
-              <p>Horário, companhia e preço total, direto do Google Flights.</p>
+              <p>Horário, companhia e o preço encontrado na internet.</p>
             </article>
             <article>
               <span>02</span>
@@ -377,15 +384,15 @@ function CotacaoPage() {
             </article>
             <article>
               <span>03</span>
-              <h2>Chame no WhatsApp</h2>
-              <p>A mensagem já leva os dados da passagem para o desconto de até 30%.</p>
+              <h2>Fale com a gente</h2>
+              <p>Chame no WhatsApp e garanta o desconto exclusivo de até 30%.</p>
             </article>
           </section>
         )}
 
         {searched ? (
           <section className="bk-results" aria-live="polite">
-            {searching ? <p className="bk-status">Consultando os voos e horários no Google Flights...</p> : null}
+            {searching ? <p className="bk-status">Consultando os voos e horários...</p> : null}
             {searchError ? <p className="bk-status">{searchError}</p> : null}
             {!searching && !searchError && offers.length === 0 ? (
               <p className="bk-status">Nenhum voo encontrado para esse trecho e data.</p>
@@ -410,7 +417,7 @@ function CotacaoPage() {
                   <div className="bk-combo">
                     <p>Ida e volta juntas</p>
                     <strong>{selected.priceLabel}</strong>
-                    <span>Preço total no Google Flights</span>
+                    <span>Preço total na companhia</span>
                   </div>
                 ) : null}
                 <div className="bk-results-head">
@@ -488,7 +495,7 @@ function CotacaoPage() {
               <p className="bk-bar-price">
                 Preço total <strong>{selected.priceLabel}</strong>
               </p>
-              <p className="bk-bar-deal">Chame a gente no WhatsApp para conseguir um desconto exclusivo de até 30%.</p>
+              <p className="bk-bar-deal">Chame a gente no WhatsApp e pegue um desconto exclusivo de até 30%.</p>
             </div>
             <button type="button" className="bk-search-btn" onClick={() => openWhatsapp(selected)}>
               Quero o desconto

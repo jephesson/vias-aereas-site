@@ -256,7 +256,7 @@ async function postFlights(path: string, body: Record<string, unknown>) {
     const message =
       payload && typeof payload === "object" && "detail" in payload
         ? JSON.stringify((payload as { detail: unknown }).detail)
-        : "Não foi possível consultar o Google Flights.";
+        : "Não foi possível consultar os voos.";
     const error = new Error(message);
     throw error;
   }

@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : "";
     if (message === "missing_key") {
       return NextResponse.json(
-        { error: "A consulta ao Google Flights ainda não está configurada." },
+        { error: "A consulta de voos ainda não está configurada." },
         { status: 503 },
       );
     }
@@ -62,12 +62,12 @@ export async function POST(request: Request) {
     }
     if (message === "search_incomplete") {
       return NextResponse.json(
-        { error: "O Google Flights não respondeu agora. Tente de novo em instantes." },
+        { error: "A busca não respondeu agora. Tente de novo em instantes." },
         { status: 503 },
       );
     }
     return NextResponse.json(
-      { error: "Não foi possível consultar o Google Flights." },
+      { error: "Não foi possível consultar os voos." },
       { status: 502 },
     );
   }
