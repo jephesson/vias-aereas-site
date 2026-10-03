@@ -305,10 +305,10 @@ function CotacaoPage() {
             <label className="bk-cell">
               <span>Origem</span>
               <AirportInput label="Origem" value={origem} onChange={setOrigem} onPick={setFromPlace} placeholder="SAO, GRU ou cidade" />
-              <button type="button" className="bk-swap" onClick={swapRoute} aria-label="Inverter origem e destino">
-                ⇄
-              </button>
             </label>
+            <button type="button" className="bk-swap" onClick={swapRoute} aria-label="Inverter origem e destino">
+              ⇄
+            </button>
             <label className="bk-cell">
               <span>Destino</span>
               <AirportInput label="Destino" value={destino} onChange={setDestino} onPick={setToPlace} placeholder="SSA, GIG ou cidade" />
