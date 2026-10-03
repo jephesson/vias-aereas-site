@@ -98,6 +98,8 @@ function CotacaoPage() {
   const [returnOffers, setReturnOffers] = useState<FlightOffer[]>([]);
   const [outboundId, setOutboundId] = useState("");
   const [returnId, setReturnId] = useState("");
+  const [outboundOpen, setOutboundOpen] = useState(true);
+  const [returnOpen, setReturnOpen] = useState(true);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [searched, setSearched] = useState(false);
@@ -112,7 +114,9 @@ function CotacaoPage() {
   const totalPax = adultos + criancas + bebes;
   const selectedOutbound = outboundOffers.find((offer) => offer.id === outboundId) ?? null;
   const selectedReturn = returnOffers.find((offer) => offer.id === returnId) ?? null;
-  const quoteReady = Boolean(selectedOutbound && (tripType === "ida" || selectedReturn));
+  const quoteReady = Boolean(
+    selectedOutbound && !outboundOpen && (tripType === "ida" || (selectedReturn && !returnOpen)),
+  );
   const totalNumber = (selectedOutbound?.priceNumber ?? 0) + (selectedReturn?.priceNumber ?? 0);
   const totalLabel = formatMoney(totalNumber);
 
@@ -197,6 +201,8 @@ function CotacaoPage() {
     setReturnOffers([]);
     setOutboundId("");
     setReturnId("");
+    setOutboundOpen(true);
+    setReturnOpen(true);
     setPaxOpen(false);
 
     try {
@@ -358,55 +364,43 @@ function CotacaoPage() {
             {!searching && !searchError && outboundOffers.length === 0 && returnOffers.length === 0 ? (
               <p className="bk-status">Nenhum voo encontrado para esse trecho e data.</p>
             ) : null}
-            {quoteReady && selectedOutbound ? (
-              <article className="bk-trip">
-                <div className="bk-trip-legs">
-                  <div className="bk-trip-line">
-                    <LegView title="Ida" date={dataIda} leg={selectedOutbound.outbound} />
-                    <span className="bk-fare">
-                      <span>Ida</span>
-                      <strong>{selectedOutbound.priceLabel}</strong>
-                    </span>
-                  </div>
-                  {selectedReturn ? (
-                    <div className="bk-trip-line">
-                      <LegView title="Volta" date={dataVolta} leg={selectedReturn.outbound} />
-                      <span className="bk-fare">
-                        <span>Volta</span>
-                        <strong>{selectedReturn.priceLabel}</strong>
-                      </span>
-                    </div>
-                  ) : null}
-                </div>
-                <p className="bk-trip-total">
-                  <span>{selectedReturn ? "Ida + volta" : "Total"}</span>
-                  <strong>{totalLabel}</strong>
-                </p>
-              </article>
-            ) : null}
             {outboundOffers.length > 0 ? (
               <FlightChoices
-                title="Escolha a ida"
+                title={outboundId && !outboundOpen ? "Ida escolhida" : "Escolha a ida"}
                 hint={`${outboundOffers.length === 1 ? "1 voo" : `${outboundOffers.length} voos`} · preço só da ida`}
                 flights={outboundOffers}
                 selectedId={outboundId}
+                open={outboundOpen || !outboundId}
                 date={dataIda}
                 direction="Ida"
-                onSelect={setOutboundId}
+                onSelect={(id) => {
+                  setOutboundId(id);
+                  setOutboundOpen(false);
+                  requestAnimationFrame(() => {
+                    document.getElementById("escolha-volta")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  });
+                }}
+                onChange={() => setOutboundOpen(true)}
               />
             ) : null}
-            {tripType === "ida_volta" && returnOffers.length > 0 ? (
+            {tripType === "ida_volta" && selectedOutbound && !outboundOpen && returnOffers.length > 0 ? (
               <FlightChoices
-                title="Escolha a volta"
+                id="escolha-volta"
+                title={returnId && !returnOpen ? "Volta escolhida" : "Escolha a volta"}
                 hint={`${returnOffers.length === 1 ? "1 voo" : `${returnOffers.length} voos`} · preço só da volta`}
                 flights={returnOffers}
                 selectedId={returnId}
+                open={returnOpen || !returnId}
                 date={dataVolta}
                 direction="Volta"
-                onSelect={setReturnId}
+                onSelect={(id) => {
+                  setReturnId(id);
+                  setReturnOpen(false);
+                }}
+                onChange={() => setReturnOpen(true)}
               />
             ) : null}
-            {tripType === "ida_volta" && !searching && !searchError && outboundOffers.length > 0 && returnOffers.length === 0 ? (
+            {tripType === "ida_volta" && selectedOutbound && !outboundOpen && !searching && !searchError && returnOffers.length === 0 ? (
               <p className="bk-status">Nenhum voo de volta encontrado para essa data.</p>
             ) : null}
           </section>
@@ -452,44 +446,58 @@ function legLines(title: string, date: string, leg: FlightLeg) {
 }
 
 function FlightChoices({
+  id,
   title,
   hint,
   flights,
   selectedId,
+  open,
   date,
   direction,
   onSelect,
+  onChange,
 }: {
+  id?: string;
   title: string;
   hint: string;
   flights: FlightOffer[];
   selectedId: string;
+  open: boolean;
   date: string;
   direction: "Ida" | "Volta";
   onSelect: (id: string) => void;
+  onChange: () => void;
 }) {
+  const visible = open ? flights : flights.filter((offer) => offer.id === selectedId);
+
   return (
-    <div className="bk-choice">
+    <div className="bk-choice" id={id}>
       <div className="bk-results-head">
         <h2>{title}</h2>
-        <p>{hint}</p>
+        {open ? <p>{hint}</p> : null}
       </div>
       <div className="bk-list">
-        {flights.map((offer) => (
-          <button
-            key={offer.id}
-            type="button"
-            className={`bk-flight ${selectedId === offer.id ? "is-on" : ""}`}
-            aria-pressed={selectedId === offer.id}
-            onClick={() => onSelect(offer.id)}
-          >
-            <LegView title={direction} date={date} leg={offer.outbound} />
-            <span className="bk-fare">
-              <span>{direction}</span>
-              <strong>{offer.priceLabel}</strong>
-            </span>
-          </button>
-        ))}
+        {visible.map((offer) => {
+          const chosen = selectedId === offer.id;
+          return (
+            <article key={offer.id} className={`bk-flight ${chosen ? "is-on" : ""}`}>
+              <LegView title={direction} date={date} leg={offer.outbound} />
+              <span className="bk-fare">
+                <span>{direction}</span>
+                <strong>{offer.priceLabel}</strong>
+                {chosen && !open ? (
+                  <button type="button" className="bk-pick is-change" onClick={onChange}>
+                    Alterar voo
+                  </button>
+                ) : (
+                  <button type="button" className="bk-pick" onClick={() => onSelect(offer.id)}>
+                    Selecionar
+                  </button>
+                )}
+              </span>
+            </article>
+          );
+        })}
       </div>
     </div>
   );

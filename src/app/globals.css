@@ -1669,7 +1669,6 @@ textarea.va-input {
   border-radius: 16px;
   background: #fff;
   color: inherit;
-  cursor: pointer;
 }
 
 .bk-flight.is-on {
@@ -1743,6 +1742,29 @@ textarea.va-input {
 .bk-fare { display: grid; justify-items: end; gap: 2px; }
 .bk-fare span { color: var(--muted2); font-size: 12px; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; }
 .bk-fare strong { font-size: 22px; letter-spacing: -0.04em; }
+
+.bk-pick {
+  margin-top: 8px;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: var(--orange);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bk-pick:hover { background: var(--orange-deep); }
+
+.bk-pick.is-change {
+  background: #f4f7fb;
+  color: var(--navy);
+}
+
+.bk-pick.is-change:hover { background: #e7edf5; }
 
 .bk-bar {
   position: sticky;
