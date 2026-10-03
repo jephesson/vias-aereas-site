@@ -1508,21 +1508,29 @@ textarea.va-input {
 .bk-steps p { margin: 6px 0 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
 
 .bk-chosen,
-.bk-combo {
+.bk-trip {
+  margin-bottom: 12px;
+  padding: 6px 16px 14px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid rgba(12, 35, 72, 0.16);
+}
+
+.bk-chosen {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 12px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: #fff;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
-.bk-chosen { border: 1px solid rgba(12, 35, 72, 0.16); }
 .bk-chosen .bk-leg,
-.bk-flight .bk-leg { min-width: 0; flex: 1; }
-.bk-chosen button {
+.bk-flight .bk-leg,
+.bk-trip .bk-leg { min-width: 0; flex: 1; }
+
+.bk-chosen button,
+.bk-trip-actions button {
   border: 0;
   background: #f4f7fb;
   color: var(--navy);
@@ -1534,15 +1542,14 @@ textarea.va-input {
   white-space: nowrap;
 }
 
-.bk-combo {
-  background: var(--navy);
-  color: #fff;
+.bk-trip-legs .bk-leg { display: grid; gap: 4px; padding: 14px 0; }
+.bk-trip-legs .bk-leg + .bk-leg { border-top: 1px solid rgba(12, 35, 72, 0.08); }
+
+.bk-trip-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
-.bk-combo p,
-.bk-combo span { margin: 0; }
-.bk-combo p { font-size: 13px; color: rgba(255, 255, 255, 0.7); }
-.bk-combo strong { font-size: 28px; letter-spacing: -0.04em; }
-.bk-combo span { color: rgba(255, 255, 255, 0.7); font-size: 13px; }
 
 .bk-error { margin: 10px 0 0; color: var(--orange-deep); font-weight: 700; font-size: 13px; }
 .bk-ref { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
@@ -1566,7 +1573,7 @@ textarea.va-input {
 .bk-flight {
   width: 100%;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 14px;
   align-items: center;
   text-align: left;
@@ -1604,6 +1611,22 @@ textarea.va-input {
   color: var(--muted);
   font-size: 13px;
 }
+
+.bk-dir {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bk-dir.is-ida { background: var(--navy); }
+.bk-dir.is-volta { background: var(--orange); }
 
 .bk-leg-row {
   display: grid;
@@ -1685,10 +1708,10 @@ textarea.va-input {
   .bk-route .bk-cell + .bk-cell,
   .bk-when .bk-cell + .bk-cell { border-left: 0; border-top: 1px solid rgba(12, 35, 72, 0.08); }
   .bk-search .va-airport-list { width: min(420px, calc(100vw - 48px)); }
-  .bk-fare,
-  .bk-combo { justify-items: start; }
-  .bk-chosen,
-  .bk-combo { align-items: stretch; flex-direction: column; }
+  .bk-fare { justify-items: start; }
+  .bk-chosen { align-items: stretch; flex-direction: column; }
+  .bk-trip-actions { justify-content: stretch; }
+  .bk-trip-actions button { flex: 1; }
   .bk-bar { padding: 0 12px; }
   .bk-bar-inner { align-items: stretch; flex-direction: column; }
   .bk-bar .bk-search-btn { width: 100%; margin: 0; }

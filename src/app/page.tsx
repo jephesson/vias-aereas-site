@@ -398,10 +398,13 @@ function CotacaoPage() {
               <p className="bk-status">Nenhum voo encontrado para esse trecho e data.</p>
             ) : null}
             {offers.length > 0 ? (
-              <>
-                {chosenOutbound ? (
-                  <div className="bk-chosen">
-                    <LegView title="Ida escolhida" date={dataIda} leg={chosenOutbound.leg} />
+              selected?.inbound ? (
+                <article className="bk-trip">
+                  <div className="bk-trip-legs">
+                    <LegView title="Ida" date={dataIda} leg={selected.outbound} />
+                    <LegView title="Volta" date={dataVolta} leg={selected.inbound} />
+                  </div>
+                  <div className="bk-trip-actions">
                     <button
                       type="button"
                       onClick={() => {
@@ -411,78 +414,85 @@ function CotacaoPage() {
                     >
                       Trocar ida
                     </button>
+                    <button type="button" onClick={() => setSelectedId("")}>
+                      Trocar volta
+                    </button>
                   </div>
-                ) : null}
-                {selected?.inbound ? (
-                  <div className="bk-combo">
-                    <p>Ida e volta juntas</p>
-                    <strong>{selected.priceLabel}</strong>
-                    <span>Preço total na companhia</span>
+                </article>
+              ) : (
+                <>
+                  {chosenOutbound ? (
+                    <div className="bk-chosen">
+                      <LegView title="Ida" date={dataIda} leg={chosenOutbound.leg} />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOutboundKey("");
+                          setSelectedId("");
+                        }}
+                      >
+                        Trocar ida
+                      </button>
+                    </div>
+                  ) : null}
+                  <div className="bk-results-head">
+                    <h2>{pickingReturn ? "Escolha a volta" : "Escolha a ida"}</h2>
+                    <p>
+                      {pickingReturn
+                        ? `${returnOptions.length === 1 ? "1 volta" : `${returnOptions.length} voltas`} para essa ida`
+                        : `${outboundChoices.length === 1 ? "1 voo de ida" : `${outboundChoices.length} voos de ida`}`}
+                    </p>
                   </div>
-                ) : null}
-                <div className="bk-results-head">
-                  <h2>{pickingReturn ? "Escolha a volta" : "Escolha a ida"}</h2>
-                  <p>
+                  <div className="bk-list">
                     {pickingReturn
-                      ? `${returnOptions.length === 1 ? "1 volta" : `${returnOptions.length} voltas`} para a ida selecionada`
-                      : `${outboundChoices.length === 1 ? "1 voo de ida" : `${outboundChoices.length} voos de ida`}`}
-                  </p>
-                </div>
-                <div className="bk-list">
-                  {pickingReturn
-                    ? returnOptions.map((offer) => (
-                        <button
-                          key={offer.id}
-                          type="button"
-                          className={`bk-flight ${selectedId === offer.id ? "is-on" : ""}`}
-                          aria-pressed={selectedId === offer.id}
-                          onClick={() => setSelectedId(offer.id)}
-                        >
-                          <span className="bk-radio" aria-hidden="true" />
-                          <LegView title="Volta" date={dataVolta} leg={offer.inbound ?? offer.outbound} />
-                          <span className="bk-fare">
-                            <span>Total</span>
-                            <strong>{offer.priceLabel}</strong>
-                          </span>
-                        </button>
-                      ))
-                    : tripType === "ida_volta"
-                      ? outboundChoices.map((choice) => (
-                          <button
-                            key={choice.key}
-                            type="button"
-                            className="bk-flight"
-                            onClick={() => {
-                              setOutboundKey(choice.key);
-                              setSelectedId("");
-                            }}
-                          >
-                            <span className="bk-radio" aria-hidden="true" />
-                            <LegView title="Ida" date={dataIda} leg={choice.leg} />
-                            <span className="bk-fare">
-                              <span>{choice.options.length > 1 ? "A partir de" : "Total"}</span>
-                              <strong>{choice.fromLabel}</strong>
-                            </span>
-                          </button>
-                        ))
-                      : offers.map((offer) => (
+                      ? returnOptions.map((offer) => (
                           <button
                             key={offer.id}
                             type="button"
-                            className={`bk-flight ${selectedId === offer.id ? "is-on" : ""}`}
-                            aria-pressed={selectedId === offer.id}
+                            className="bk-flight"
                             onClick={() => setSelectedId(offer.id)}
                           >
-                            <span className="bk-radio" aria-hidden="true" />
-                            <LegView title="Ida" date={dataIda} leg={offer.outbound} />
+                            <LegView title="Volta" date={dataVolta} leg={offer.inbound ?? offer.outbound} />
                             <span className="bk-fare">
-                              <span>Total</span>
                               <strong>{offer.priceLabel}</strong>
                             </span>
                           </button>
-                        ))}
-                </div>
-              </>
+                        ))
+                      : tripType === "ida_volta"
+                        ? outboundChoices.map((choice) => (
+                            <button
+                              key={choice.key}
+                              type="button"
+                              className="bk-flight"
+                              onClick={() => {
+                                setOutboundKey(choice.key);
+                                setSelectedId("");
+                              }}
+                            >
+                              <LegView title="Ida" date={dataIda} leg={choice.leg} />
+                              <span className="bk-fare">
+                                <span>{choice.options.length > 1 ? "A partir de" : ""}</span>
+                                <strong>{choice.fromLabel}</strong>
+                              </span>
+                            </button>
+                          ))
+                        : offers.map((offer) => (
+                            <button
+                              key={offer.id}
+                              type="button"
+                              className={`bk-flight ${selectedId === offer.id ? "is-on" : ""}`}
+                              aria-pressed={selectedId === offer.id}
+                              onClick={() => setSelectedId(offer.id)}
+                            >
+                              <LegView title="Ida" date={dataIda} leg={offer.outbound} />
+                              <span className="bk-fare">
+                                <strong>{offer.priceLabel}</strong>
+                              </span>
+                            </button>
+                          ))}
+                  </div>
+                </>
+              )
             ) : null}
           </section>
         ) : null}
@@ -526,8 +536,8 @@ function LegView({ title, date, leg }: { title: string; date: string; leg: Fligh
   return (
     <span className="bk-leg">
       <span className="bk-leg-kicker">
-        {title} · {formatDate(date)}
-        {leg.departWhen ? ` · ${leg.departWhen}` : ""}
+        <span className={`bk-dir ${title === "Volta" ? "is-volta" : "is-ida"}`}>{title}</span>
+        {leg.departWhen || formatDate(date)}
       </span>
       <span className="bk-leg-row">
         <span className="bk-time">
