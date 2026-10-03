@@ -31,6 +31,10 @@ function formatDate(iso: string) {
   return `${day}/${month}/${year}`;
 }
 
+function legKey(leg: FlightLeg) {
+  return [leg.airline, leg.departTime, leg.arriveTime, leg.fromLabel, leg.toLabel, leg.duration, leg.stopsLabel].join("|");
+}
+
 function airportCode(label: string) {
   const match = label.match(/\(([A-Z]{3})\)/);
   return match?.[1] ?? label;
@@ -91,6 +95,7 @@ function CotacaoPage() {
   const [fromPlace, setFromPlace] = useState<Place | null>(null);
   const [toPlace, setToPlace] = useState<Place | null>(null);
   const [offers, setOffers] = useState<FlightOffer[]>([]);
+  const [outboundKey, setOutboundKey] = useState("");
   const [selectedId, setSelectedId] = useState("");
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
@@ -104,7 +109,45 @@ function CotacaoPage() {
   const [bebes, setBebes] = useState(0);
 
   const totalPax = adultos + criancas + bebes;
+  const outboundChoices = useMemo(() => {
+    const groups = new Map<
+      string,
+      { key: string; leg: FlightLeg; fromPrice: number; fromLabel: string; options: FlightOffer[] }
+    >();
+
+    for (const offer of offers) {
+      const key = legKey(offer.outbound);
+      const current = groups.get(key);
+      if (!current) {
+        groups.set(key, {
+          key,
+          leg: offer.outbound,
+          fromPrice: offer.priceNumber,
+          fromLabel: offer.priceLabel,
+          options: [offer],
+        });
+        continue;
+      }
+      current.options.push(offer);
+      if (offer.priceNumber < current.fromPrice) {
+        current.fromPrice = offer.priceNumber;
+        current.fromLabel = offer.priceLabel;
+      }
+    }
+
+    return [...groups.values()].sort(
+      (a, b) => a.fromPrice - b.fromPrice || a.leg.departTime.localeCompare(b.leg.departTime),
+    );
+  }, [offers]);
+  const chosenOutbound = outboundChoices.find((item) => item.key === outboundKey) ?? null;
+  const returnOptions = useMemo(() => {
+    if (!chosenOutbound) return [];
+    return [...chosenOutbound.options].sort((a, b) =>
+      (a.inbound?.departTime ?? "").localeCompare(b.inbound?.departTime ?? ""),
+    );
+  }, [chosenOutbound]);
   const selected = offers.find((offer) => offer.id === selectedId) ?? null;
+  const pickingReturn = tripType === "ida_volta" && Boolean(chosenOutbound);
 
   const dateError = useMemo(() => {
     if (tripType === "ida_volta" && dataIda && dataVolta && !isAfterOrEqual(dataVolta, dataIda)) {
@@ -114,6 +157,13 @@ function CotacaoPage() {
   }, [tripType, dataIda, dataVolta]);
 
   const canSearch = Boolean(fromPlace && toPlace && dataIda && (tripType === "ida" || dataVolta) && !dateError && totalPax > 0);
+
+  function swapRoute() {
+    setOrigem(destino);
+    setDestino(origem);
+    setFromPlace(toPlace);
+    setToPlace(fromPlace);
+  }
 
   useEffect(() => {
     function onPointerDown(event: PointerEvent) {
@@ -173,6 +223,7 @@ function CotacaoPage() {
     setSearchError("");
     setSearched(true);
     setOffers([]);
+    setOutboundKey("");
     setSelectedId("");
     setPaxOpen(false);
 
@@ -206,12 +257,33 @@ function CotacaoPage() {
 
   return (
     <main className="bk">
-      <div className="bk-wrap">
-        <header className="bk-intro">
-          <p className="bk-kicker">Google Flights</p>
-          <h1>Escolha o voo. A gente busca o desconto.</h1>
-        </header>
+      <section className="bk-stage">
+        <div className="bk-stage-inner">
+          <div className="bk-hero">
+            <div>
+              <p className="bk-kicker">Preço do Google Flights</p>
+              <h1>Encontre o voo. Pague menos.</h1>
+              <p className="bk-lead">Você escolhe horário e companhia. No WhatsApp, a Vias Aéreas busca um desconto exclusivo de até 30%.</p>
+            </div>
+            <ul className="bk-proof">
+              <li>
+                <b>Ao vivo</b>
+                <span>Valor do Google Flights</span>
+              </li>
+              <li>
+                <b>Até 30%</b>
+                <span>Desconto exclusivo</span>
+              </li>
+              <li>
+                <b>Pronto</b>
+                <span>Mensagem com o voo escolhido</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
+      <div className="bk-wrap">
         <form className="bk-search" onSubmit={handleSubmit}>
           <div className="bk-types">
             <button type="button" className={tripType === "ida_volta" ? "is-on" : ""} onClick={() => setTripType("ida_volta")}>
@@ -229,16 +301,19 @@ function CotacaoPage() {
             </button>
           </div>
 
-          <div className="bk-fields">
-            <label>
+          <div className="bk-rail">
+            <label className="bk-cell">
               <span>Origem</span>
               <AirportInput label="Origem" value={origem} onChange={setOrigem} onPick={setFromPlace} placeholder="SAO, GRU ou cidade" />
+              <button type="button" className="bk-swap" onClick={swapRoute} aria-label="Inverter origem e destino">
+                ⇄
+              </button>
             </label>
-            <label>
+            <label className="bk-cell">
               <span>Destino</span>
               <AirportInput label="Destino" value={destino} onChange={setDestino} onPick={setToPlace} placeholder="SSA, GIG ou cidade" />
             </label>
-            <label>
+            <label className="bk-cell">
               <span>Ida</span>
               <input
                 className="va-input"
@@ -252,7 +327,7 @@ function CotacaoPage() {
                 }}
               />
             </label>
-            <label className={tripType === "ida" ? "is-off" : ""}>
+            <label className={`bk-cell ${tripType === "ida" ? "is-off" : ""}`}>
               <span>Volta</span>
               <input
                 className="va-input"
@@ -263,7 +338,7 @@ function CotacaoPage() {
                 onChange={(event) => setDataVolta(event.target.value)}
               />
             </label>
-            <div className="bk-pax" ref={paxRef}>
+            <div className="bk-pax bk-cell" ref={paxRef}>
               <span>Passageiros</span>
               <button type="button" className="va-input bk-pax-btn" onClick={() => setPaxOpen((open) => !open)}>
                 {paxLabel(adultos, criancas, bebes)}
@@ -288,6 +363,26 @@ function CotacaoPage() {
           ) : null}
         </form>
 
+        {searched ? null : (
+          <section className="bk-steps" aria-label="Como funciona">
+            <article>
+              <span>01</span>
+              <h2>Veja os voos</h2>
+              <p>Horário, companhia e preço total, direto do Google Flights.</p>
+            </article>
+            <article>
+              <span>02</span>
+              <h2>Escolha o seu</h2>
+              <p>Compare as opções e selecione a ida e a volta que fazem sentido.</p>
+            </article>
+            <article>
+              <span>03</span>
+              <h2>Chame no WhatsApp</h2>
+              <p>A mensagem já leva os dados da passagem para o desconto de até 30%.</p>
+            </article>
+          </section>
+        )}
+
         {searched ? (
           <section className="bk-results" aria-live="polite">
             {searching ? <p className="bk-status">Consultando os voos e horários no Google Flights...</p> : null}
@@ -297,30 +392,88 @@ function CotacaoPage() {
             ) : null}
             {offers.length > 0 ? (
               <>
+                {chosenOutbound ? (
+                  <div className="bk-chosen">
+                    <LegView title="Ida escolhida" date={dataIda} leg={chosenOutbound.leg} />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOutboundKey("");
+                        setSelectedId("");
+                      }}
+                    >
+                      Trocar ida
+                    </button>
+                  </div>
+                ) : null}
+                {selected?.inbound ? (
+                  <div className="bk-combo">
+                    <p>Ida e volta juntas</p>
+                    <strong>{selected.priceLabel}</strong>
+                    <span>Preço total no Google Flights</span>
+                  </div>
+                ) : null}
                 <div className="bk-results-head">
-                  <h2>Escolha o voo</h2>
-                  <p>{offers.length === 1 ? "1 opção" : `${offers.length} opções`} · preço total do Google Flights</p>
+                  <h2>{pickingReturn ? "Escolha a volta" : "Escolha a ida"}</h2>
+                  <p>
+                    {pickingReturn
+                      ? `${returnOptions.length === 1 ? "1 volta" : `${returnOptions.length} voltas`} para a ida selecionada`
+                      : `${outboundChoices.length === 1 ? "1 voo de ida" : `${outboundChoices.length} voos de ida`}`}
+                  </p>
                 </div>
                 <div className="bk-list">
-                  {offers.map((offer) => (
-                    <button
-                      key={offer.id}
-                      type="button"
-                      className={`bk-flight ${selectedId === offer.id ? "is-on" : ""}`}
-                      aria-pressed={selectedId === offer.id}
-                      onClick={() => setSelectedId(offer.id)}
-                    >
-                      <span className="bk-radio" aria-hidden="true" />
-                      <span className="bk-legs">
-                        <LegView title="Ida" date={dataIda} leg={offer.outbound} />
-                        {offer.inbound ? <LegView title="Volta" date={dataVolta} leg={offer.inbound} /> : null}
-                      </span>
-                      <span className="bk-fare">
-                        <span>Total</span>
-                        <strong>{offer.priceLabel}</strong>
-                      </span>
-                    </button>
-                  ))}
+                  {pickingReturn
+                    ? returnOptions.map((offer) => (
+                        <button
+                          key={offer.id}
+                          type="button"
+                          className={`bk-flight ${selectedId === offer.id ? "is-on" : ""}`}
+                          aria-pressed={selectedId === offer.id}
+                          onClick={() => setSelectedId(offer.id)}
+                        >
+                          <span className="bk-radio" aria-hidden="true" />
+                          <LegView title="Volta" date={dataVolta} leg={offer.inbound ?? offer.outbound} />
+                          <span className="bk-fare">
+                            <span>Total</span>
+                            <strong>{offer.priceLabel}</strong>
+                          </span>
+                        </button>
+                      ))
+                    : tripType === "ida_volta"
+                      ? outboundChoices.map((choice) => (
+                          <button
+                            key={choice.key}
+                            type="button"
+                            className="bk-flight"
+                            onClick={() => {
+                              setOutboundKey(choice.key);
+                              setSelectedId("");
+                            }}
+                          >
+                            <span className="bk-radio" aria-hidden="true" />
+                            <LegView title="Ida" date={dataIda} leg={choice.leg} />
+                            <span className="bk-fare">
+                              <span>{choice.options.length > 1 ? "A partir de" : "Total"}</span>
+                              <strong>{choice.fromLabel}</strong>
+                            </span>
+                          </button>
+                        ))
+                      : offers.map((offer) => (
+                          <button
+                            key={offer.id}
+                            type="button"
+                            className={`bk-flight ${selectedId === offer.id ? "is-on" : ""}`}
+                            aria-pressed={selectedId === offer.id}
+                            onClick={() => setSelectedId(offer.id)}
+                          >
+                            <span className="bk-radio" aria-hidden="true" />
+                            <LegView title="Ida" date={dataIda} leg={offer.outbound} />
+                            <span className="bk-fare">
+                              <span>Total</span>
+                              <strong>{offer.priceLabel}</strong>
+                            </span>
+                          </button>
+                        ))}
                 </div>
               </>
             ) : null}

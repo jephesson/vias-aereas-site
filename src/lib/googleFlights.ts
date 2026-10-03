@@ -147,6 +147,14 @@ export function parseSchedule(description: string) {
   };
 }
 
+function prettyAirline(value: string) {
+  const parts = value.split(/Operated by/i);
+  const main = parts[0].replace(/([a-z])([A-Z])/g, "$1 $2").trim();
+  const operated = parts[1]?.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
+  if (!main) return value;
+  return operated ? `${main} · operado por ${operated}` : main;
+}
+
 function legFrom(
   airline: string,
   depart: string,
@@ -159,7 +167,7 @@ function legFrom(
   const departure = parseSchedule(depart);
   const arrival = parseSchedule(arrive);
   return {
-    airline: airline || "Companhia não informada",
+    airline: prettyAirline(airline) || "Companhia não informada",
     departTime: departure.time,
     departWhen: departure.when,
     arriveTime: arrival.time,
