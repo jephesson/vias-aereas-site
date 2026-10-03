@@ -6,11 +6,12 @@ import { loadPlaces, searchPlaces, type Place } from "@/data/airports";
 type AirportInputProps = {
   value: string;
   onChange: (value: string) => void;
+  onPick?: (place: Place | null) => void;
   placeholder: string;
   label: string;
 };
 
-export default function AirportInput({ value, onChange, placeholder, label }: AirportInputProps) {
+export default function AirportInput({ value, onChange, onPick, placeholder, label }: AirportInputProps) {
   const listId = useId();
   const boxRef = useRef<HTMLDivElement>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -46,6 +47,7 @@ export default function AirportInput({ value, onChange, placeholder, label }: Ai
 
   function choose(place: Place) {
     onChange(place.label);
+    onPick?.(place);
     setOpen(false);
   }
 
@@ -82,6 +84,7 @@ export default function AirportInput({ value, onChange, placeholder, label }: Ai
         placeholder={placeholder}
         onChange={(event) => {
           onChange(event.target.value);
+          onPick?.(null);
           setOpen(true);
         }}
         onFocus={() => {

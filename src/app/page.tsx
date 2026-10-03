@@ -3,9 +3,11 @@
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import AirportInput from "@/components/AirportInput";
+import type { Place } from "@/data/airports";
+import type { FlightOffer } from "@/lib/googleFlights";
 import { resolveAffiliateNameFallback, resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
-const WHATSAPP_NUMBER = "5551983474413"; // 55 + 51 + 983474413
+const WHATSAPP_NUMBER = "5551992926814"; // 51 99292-6814
 const CNPJ = "63.817.773/0001-85";
 
 type TripType = "ida" | "ida_volta";
@@ -95,6 +97,12 @@ function CotacaoPage() {
   const [tripType, setTripType] = useState<TripType>("ida_volta");
   const [origem, setOrigem] = useState("");
   const [destino, setDestino] = useState("");
+  const [fromPlace, setFromPlace] = useState<Place | null>(null);
+  const [toPlace, setToPlace] = useState<Place | null>(null);
+  const [offers, setOffers] = useState<FlightOffer[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState("");
+  const [searched, setSearched] = useState(false);
 
   const [dataIda, setDataIda] = useState("");
   const [dataVolta, setDataVolta] = useState("");
@@ -123,41 +131,46 @@ function CotacaoPage() {
     return "";
   }, [tripType, dataIda, dataVolta]);
 
-  const canSubmit = useMemo(() => {
-    if (!origem.trim() || !destino.trim()) return false;
+  const canSearch = useMemo(() => {
+    if (!fromPlace || !toPlace) return false;
     if (!dataIda) return false;
     if (tripType === "ida_volta" && !dataVolta) return false;
     if (dateError) return false;
-
-    if (!ddd.trim() || ddd.replace(/\D/g, "").length < 2) return false;
-    if (!numero.trim() || numero.replace(/\D/g, "").length < 8) return false;
-
     if (totalPax <= 0) return false;
     return true;
-  }, [origem, destino, dataIda, dataVolta, tripType, ddd, numero, totalPax, dateError]);
+  }, [fromPlace, toPlace, dataIda, dataVolta, tripType, totalPax, dateError]);
 
-  function buildMessage() {
+  function contactLine() {
+    if (!ddd.trim() || !numero.trim()) return null;
     const cleanDDI = (ddi || "+55").replace(/\s/g, "");
-    const phone = `${cleanDDI} (${ddd}) ${numero}`;
+    return `${cleanDDI} (${ddd}) ${numero}`;
+  }
+
+  function buildOfferMessage(offer: FlightOffer) {
+    const phone = contactLine();
+    const airline =
+      offer.returnAirline && offer.returnAirline !== offer.airline
+        ? `${offer.airline} (ida) · ${offer.returnAirline} (volta)`
+        : offer.airline;
 
     const linhas = [
-      "✈️ *Solicitação de cotação — Vias Aéreas*",
-      "⏱️ *Prazo:* retornamos com a cotação em até 2 horas.",
+      "Olá! Quero o desconto exclusivo de até 30% nesta passagem que encontrei no Google Flights.",
       "",
       `🧭 *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${tripType === "ida_volta" ? "Ida e volta" : "Só ida"}`,
-      `📅 *Ida:* ${dataIda} (${turnoIda})`,
-      tripType === "ida_volta" ? `📅 *Volta:* ${dataVolta} (${turnoVolta})` : null,
-      `🔁 *Datas flexíveis:* ${flexivel ? "Sim" : "Não"}`,
+      `📅 *Ida:* ${dataIda}${offer.departure ? ` — ${offer.departure}` : ""} (${turnoIda})`,
+      tripType === "ida_volta" ? `📅 *Volta:* ${dataVolta}${offer.returnDeparture ? ` — ${offer.returnDeparture}` : ""} (${turnoVolta})` : null,
+      `✈️ *Companhia:* ${airline}`,
+      `💰 *Valor no Google Flights:* ${offer.priceLabel}`,
+      offer.duration ? `⏱️ *Duração:* ${offer.duration}` : null,
+      `🛑 *Paradas:* ${offer.stopsLabel}`,
       `🧳 *Bagagem:* ${bagagem}`,
-      "",
-      `👤 *Passageiros:* ${adultos} adulto(s), ${criancas} criança(s), ${bebes} bebê(s) — *Total:* ${totalPax}`,
-      "",
-      `📞 *Contato:* ${phone}`,
-      affiliateName ? "" : null,
+      `👤 *Passageiros:* ${adultos} adulto(s), ${criancas} criança(s), ${bebes} bebê(s)`,
+      `🔁 *Datas flexíveis:* ${flexivel ? "Sim" : "Não"}`,
+      phone ? `📞 *Meu contato:* ${phone}` : null,
       affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
-      obs.trim() ? "" : null,
       obs.trim() ? `📝 *Observações:* ${obs.trim()}` : null,
+      offer.buyLink ? `🔗 *Google Flights:* ${offer.buyLink}` : null,
     ].filter(Boolean);
 
     return linhas.join("\n");
@@ -203,15 +216,59 @@ function CotacaoPage() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (!canSearch || !fromPlace || !toPlace || searching) return;
 
+    setSearching(true);
+    setSearchError("");
+    setSearched(true);
+    setOffers([]);
+
+    try {
+      const response = await fetch("/api/flights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromCode: fromPlace.code,
+          toCode: toPlace.code,
+          tripType,
+          departureDate: dataIda,
+          returnDate: tripType === "ida_volta" ? dataVolta : null,
+          adults: adultos,
+          children: criancas,
+          infants: bebes,
+          turnoIda,
+          turnoVolta: tripType === "ida_volta" ? turnoVolta : null,
+        }),
+      });
+      const data = (await response.json()) as { offers?: FlightOffer[]; error?: string };
+      if (!response.ok) {
+        setSearchError(data.error || "Não foi possível consultar o Google Flights.");
+        return;
+      }
+      setOffers(data.offers ?? []);
+    } catch {
+      setSearchError("Não foi possível consultar o Google Flights.");
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  function openWhatsapp(offer: FlightOffer) {
     const payload = buildLeadPayload();
-    void sendLeadToBackend(payload);
+    void sendLeadToBackend({
+      ...payload,
+      observacoes: [
+        payload.observacoes,
+        `Google Flights: ${offer.priceLabel}`,
+        `Companhia: ${offer.airline}`,
+      ]
+        .filter(Boolean)
+        .join(" | "),
+    });
 
-    const msg = buildMessage();
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildOfferMessage(offer))}`;
     window.open(url, "_blank");
   }
 
@@ -219,15 +276,15 @@ function CotacaoPage() {
     <main className="va-home">
       <div className="va-home-grid">
         <section className="va-pitch">
-          <p className="va-kicker">Cotação pelo WhatsApp</p>
-          <h1>A melhor passagem, em dinheiro ou milhas, em até 2 horas.</h1>
+          <p className="va-kicker">Preço do Google Flights</p>
+          <h1>Pesquise a passagem e chame a gente para pagar menos.</h1>
           <p>
-            Manda o trecho. A gente compara as opções e devolve a cotação pronta, sem cadastro.
+            O valor que aparece é o do Google Flights. No WhatsApp, a Vias Aéreas busca um desconto exclusivo de até 30%.
           </p>
           <ul className="va-points">
-            <li>Resposta em até 2 horas</li>
-            <li>Tarifa em dinheiro e emissão com milhas</li>
-            <li>Mensagem pronta para enviar agora</li>
+            <li>Preço ao vivo do Google Flights</li>
+            <li>Desconto exclusivo de até 30%</li>
+            <li>Mensagem pronta com os dados da passagem</li>
           </ul>
           {affiliateName ? (
             <div className="va-referralCard">
@@ -271,12 +328,14 @@ function CotacaoPage() {
                 label="Origem"
                 value={origem}
                 onChange={setOrigem}
+                onPick={setFromPlace}
                 placeholder="Origem (SAO, GRU ou Curitiba)"
               />
               <AirportInput
                 label="Destino"
                 value={destino}
                 onChange={setDestino}
+                onPick={setToPlace}
                 placeholder="Destino (SSA, GIG ou Lisboa)"
               />
             </div>
@@ -401,15 +460,51 @@ function CotacaoPage() {
           </section>
 
           <div className="va-footer">
-            <button type="submit" disabled={!canSubmit} className={`va-cta ${canSubmit ? "" : "va-cta--off"}`}>
-              Enviar cotação no WhatsApp
+            <button type="submit" disabled={!canSearch || searching} className={`va-cta ${canSearch && !searching ? "" : "va-cta--off"}`}>
+              {searching ? "Buscando no Google Flights..." : "Ver preço no Google Flights"}
             </button>
             <div className="va-note">
-              Abre o WhatsApp com a mensagem pronta. Cotação em até 2 horas.
+              Escolha origem e destino na lista. O resultado mostra o valor do Google Flights.
             </div>
           </div>
         </form>
       </div>
+
+      {searched ? (
+        <section className="va-results" aria-live="polite">
+          {searching ? <p className="va-results-status">Consultando o Google Flights...</p> : null}
+          {searchError ? <p className="va-results-status">{searchError}</p> : null}
+          {!searching && !searchError && offers.length === 0 ? (
+            <p className="va-results-status">Nenhuma passagem encontrada para esse trecho e data.</p>
+          ) : null}
+          {offers.map((offer) => (
+            <article key={offer.id} className="va-offer">
+              <div>
+                <p className="va-offer-kicker">Valor no Google Flights</p>
+                <p className="va-offer-price">{offer.priceLabel}</p>
+                <p className="va-offer-airline">{offer.airline}</p>
+                <p className="va-offer-meta">
+                  {offer.stopsLabel}
+                  {offer.duration ? ` · ${offer.duration}` : ""}
+                  {offer.departure ? ` · ${offer.departure}` : ""}
+                </p>
+                {offer.returnAirline || offer.returnDeparture ? (
+                  <p className="va-offer-meta">
+                    Volta: {offer.returnAirline || offer.airline}
+                    {offer.returnDeparture ? ` · ${offer.returnDeparture}` : ""}
+                  </p>
+                ) : null}
+                <p className="va-offer-deal">
+                  Chame a gente no WhatsApp para conseguir um desconto exclusivo de até 30%.
+                </p>
+              </div>
+              <button type="button" className="va-cta" onClick={() => openWhatsapp(offer)}>
+                Quero o desconto no WhatsApp
+              </button>
+            </article>
+          ))}
+        </section>
+      ) : null}
       <footer className="va-copy va-home-copy">
         © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}
       </footer>
