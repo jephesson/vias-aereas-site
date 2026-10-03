@@ -1606,8 +1606,31 @@ textarea.va-input {
   white-space: nowrap;
 }
 
-.bk-trip-legs .bk-leg { display: grid; gap: 4px; padding: 14px 0; }
-.bk-trip-legs .bk-leg + .bk-leg { border-top: 1px solid rgba(12, 35, 72, 0.08); }
+.bk-trip-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.bk-trip-line + .bk-trip-line { border-top: 1px solid rgba(12, 35, 72, 0.08); }
+
+.bk-trip-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid rgba(12, 35, 72, 0.08);
+  color: var(--navy);
+  font-weight: 750;
+}
+
+.bk-trip-total strong { font-size: 28px; letter-spacing: -0.04em; }
+
+.bk-choice + .bk-choice { margin-top: 22px; }
 
 .bk-trip-actions {
   display: flex;
@@ -1670,10 +1693,15 @@ textarea.va-input {
 
 .bk-leg { display: grid; gap: 4px; }
 
-.bk-leg-kicker,
-.bk-airline {
+.bk-leg-kicker {
   color: var(--muted);
   font-size: 13px;
+}
+
+.bk-airline {
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 750;
 }
 
 .bk-dir {
@@ -1773,6 +1801,7 @@ textarea.va-input {
   .bk-when .bk-cell + .bk-cell { border-left: 0; border-top: 1px solid rgba(12, 35, 72, 0.08); }
   .bk-search .va-airport-list { width: min(420px, calc(100vw - 48px)); }
   .bk-fare { justify-items: start; }
+  .bk-trip-line { grid-template-columns: 1fr; }
   .bk-chosen { align-items: stretch; flex-direction: column; }
   .bk-trip-actions { justify-content: stretch; }
   .bk-trip-actions button { flex: 1; }

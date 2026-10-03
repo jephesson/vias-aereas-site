@@ -44,8 +44,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const offers = await searchGoogleFlights(query);
-    return NextResponse.json({ offers });
+    const result = await searchGoogleFlights(query);
+    return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
     if (message === "missing_key") {

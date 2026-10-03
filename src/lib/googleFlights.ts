@@ -45,14 +45,6 @@ export type FlightQuery = {
   turnoVolta: string | null;
 };
 
-const TURNOS: Record<string, [number, number] | null> = {
-  Indiferente: null,
-  Manhã: [5, 11],
-  Tarde: [12, 17],
-  Noite: [18, 23],
-  Madrugada: [0, 4],
-};
-
 export function resolveAirportCodes(code: string) {
   const clean = code.trim().toUpperCase();
   if (!/^[A-Z]{3}$/.test(clean)) return [];
@@ -67,11 +59,6 @@ function passengersOf(query: FlightQuery) {
     ...Array.from({ length: query.children }, () => 2),
     ...Array.from({ length: query.infants }, () => 3),
   ];
-}
-
-function turnoHours(turno: string | null) {
-  if (!turno) return null;
-  return TURNOS[turno] ?? null;
 }
 
 function stopsLabel(stops: number) {
@@ -264,70 +251,62 @@ async function postFlights(path: string, body: Record<string, unknown>) {
   return Array.isArray(payload) ? payload : [];
 }
 
-export async function searchGoogleFlights(query: FlightQuery) {
-  const fromCodes = resolveAirportCodes(query.fromCode);
-  const toCodes = resolveAirportCodes(query.toCode);
+async function searchLeg(fromCode: string, toCode: string, date: string, query: FlightQuery) {
+  const fromCodes = resolveAirportCodes(fromCode);
+  const toCodes = resolveAirportCodes(toCode);
   if (!fromCodes.length || !toCodes.length) {
     throw new Error("invalid_airport");
   }
 
-  const roundTrip = query.tripType === "ida_volta";
-  const path = roundTrip ? "/api/google_flights/roundtrip/v1" : "/api/google_flights/oneway/v1";
-  const ida = turnoHours(query.turnoIda);
-  const volta = turnoHours(query.turnoVolta);
   const passengers = passengersOf(query);
-  const pairs = fromCodes.flatMap((from) => toCodes.map((to) => [from, to] as const)).slice(0, 6);
-
+  const pairs = fromCodes.flatMap((from) => toCodes.map((to) => [from, to] as const)).slice(0, 4);
   const batches = await Promise.all(
     pairs.map(async ([from, to]) => {
-      const body: Record<string, unknown> = {
+      const rows = await postFlights("/api/google_flights/oneway/v1", {
         from_airport: from,
         to_airport: to,
-        departure_date: query.departureDate,
+        departure_date: date,
         currency: "brl",
         seat_type: 1,
         passengers,
-        limit: 8,
+        limit: 12,
         sort_type: "Overall",
-      };
-
-      if (roundTrip && query.returnDate) body.return_date = query.returnDate;
-
-      if (ida) {
-        if (roundTrip) {
-          body.departure_departure_time_min = ida[0];
-          body.departure_departure_time_max = ida[1];
-        } else {
-          body.departure_time_min = ida[0];
-          body.departure_time_max = ida[1];
-        }
-      }
-
-      if (roundTrip && volta) {
-        body.return_departure_time_min = volta[0];
-        body.return_departure_time_max = volta[1];
-      }
-
-      const rows = await postFlights(path, body);
+      });
       return rows
         .filter((row): row is Record<string, unknown> => Boolean(row) && typeof row === "object")
-        .map((row) => normalizeRow(row, roundTrip))
+        .map((row) => normalizeRow(row, false))
         .filter((row): row is FlightOffer => Boolean(row));
     }),
   );
 
   const seen = new Set<string>();
-  const offers = batches
+  return batches
     .flat()
-    .sort((a, b) => a.priceNumber - b.priceNumber)
+    .sort((a, b) => a.priceNumber - b.priceNumber || a.outbound.departTime.localeCompare(b.outbound.departTime))
     .filter((offer) => {
-      const key = `${offer.outbound.airline}|${offer.priceNumber}|${offer.outbound.departTime}|${offer.inbound?.departTime ?? ""}`;
+      const key = `${offer.outbound.airline}|${offer.priceNumber}|${offer.outbound.departTime}|${offer.outbound.arriveTime}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     })
-    .slice(0, 8)
-    .map((offer, index) => ({ ...offer, id: String(index + 1) }));
+    .slice(0, 12);
+}
 
-  return offers;
+export async function searchGoogleFlights(query: FlightQuery) {
+  if (query.tripType === "ida_volta" && query.returnDate) {
+    const [outbound, inbound] = await Promise.all([
+      searchLeg(query.fromCode, query.toCode, query.departureDate, query),
+      searchLeg(query.toCode, query.fromCode, query.returnDate, query),
+    ]);
+    return {
+      outbound: outbound.map((offer, index) => ({ ...offer, id: `ida-${index + 1}` })),
+      inbound: inbound.map((offer, index) => ({ ...offer, id: `volta-${index + 1}` })),
+    };
+  }
+
+  const outbound = await searchLeg(query.fromCode, query.toCode, query.departureDate, query);
+  return {
+    outbound: outbound.map((offer, index) => ({ ...offer, id: `ida-${index + 1}` })),
+    inbound: [] as FlightOffer[],
+  };
 }
