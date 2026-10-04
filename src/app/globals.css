@@ -902,62 +902,6 @@ textarea.va-input {
   line-height: 1.45;
 }
 
-.gm-offerCard {
-  display: grid;
-  align-content: start;
-  gap: 8px;
-  border-radius: 20px;
-  background: var(--navy);
-  color: #fff;
-  padding: 20px;
-}
-
-.gm-offerTagRow { display: flex; flex-wrap: wrap; gap: 8px; }
-
-.gm-offerTag {
-  width: fit-content;
-  font-size: 12px;
-  font-weight: 750;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  padding: 6px 10px;
-}
-
-.gm-offerTag--urgent { background: var(--orange); }
-
-.gm-offerOldPrice {
-  margin: 8px 0 0;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.62);
-  text-decoration: line-through;
-}
-
-.gm-offerPrice {
-  margin: 0;
-  font-size: clamp(36px, 4vw, 48px);
-  font-weight: 750;
-  letter-spacing: -0.05em;
-  line-height: 1;
-}
-
-.gm-offerText,
-.gm-offerMini {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.78);
-  line-height: 1.45;
-}
-
-.gm-offerCallout {
-  margin: 4px 0 0;
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  line-height: 1.45;
-}
-
-.gm-offerActions { margin-top: 8px; }
-.gm-offerActions .va-cta { width: 100%; }
-
 .gm-card {
   display: grid;
   gap: 16px;
@@ -1159,11 +1103,7 @@ textarea.va-input {
 .gm-bottomActions .va-cta:hover { background: #f4f7fb; }
 
 @media (min-width: 860px) {
-  .gm-hero {
-    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
-    align-items: stretch;
-    padding: 28px;
-  }
+  .gm-hero { padding: 28px; }
 
   .gm-highlightGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .gm-featureGrid,

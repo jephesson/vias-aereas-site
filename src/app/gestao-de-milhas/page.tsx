@@ -108,28 +108,6 @@ export default function GestaoDeMilhasPage() {
               ))}
             </div>
           </div>
-
-          <aside className="gm-offerCard">
-            <div className="gm-offerTagRow">
-              <div className="gm-offerTag">Oferta promocional</div>
-              <div className="gm-offerTag gm-offerTag--urgent">Tempo limitado</div>
-            </div>
-            <p className="gm-offerOldPrice">De R$ 1.299,90</p>
-            <div className="gm-offerPrice">Por R$ 599,90</div>
-            <p className="gm-offerText">+ hospedagem para domínio .com.br (média de R$ 70,00 a cada 2 anos).</p>
-            <p className="gm-offerCallout">
-              Inclui <b>videochamada exclusiva</b> para apresentar o produto, sem compromisso.
-            </p>
-            <p className="gm-offerMini">
-              Atendimento 1:1 para tirar dúvidas e apresentar o painel com foco no seu processo.
-            </p>
-
-            <div className="gm-offerActions">
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="va-cta va-ctaLink">
-                Agendar videochamada
-              </a>
-            </div>
-          </aside>
         </section>
 
         <section className="va-card gm-card">
