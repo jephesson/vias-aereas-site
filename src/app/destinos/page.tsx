@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function DestinosPage() {
   return (
-    <main className="bk-list">
+    <main className="bk-catalog">
       <div className="bk-wrap">
         <h1>Todos os destinos</h1>
         <p>Passagens em dinheiro e milhas para estes destinos, com saída pelos aeroportos de cada cidade.</p>

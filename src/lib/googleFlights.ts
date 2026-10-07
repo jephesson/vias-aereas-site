@@ -135,11 +135,29 @@ export function parseSchedule(description: string) {
 }
 
 function prettyAirline(value: string) {
+  const tidy = (text: string) => text.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\s+/g, " ").trim();
   const parts = value.split(/Operated by/i);
-  const main = parts[0].replace(/([a-z])([A-Z])/g, "$1 $2").trim();
-  const operated = parts[1]?.replace(/([a-z])([A-Z])/g, "$1 $2").trim();
-  if (!main) return value;
-  return operated ? `${main} · operado por ${operated}` : main;
+  const main = tidy(parts[0] ?? "");
+  const seen = new Set<string>();
+  const operated = (parts[1] ?? "")
+    .split(",")
+    .map((part) => tidy(part))
+    .filter((name) => {
+      const key = name.toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  if (!main) return value.trim();
+  const compact = (text: string) => text.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const mainKey = compact(main);
+  const others = operated.filter((name) => {
+    const key = compact(name);
+    return key && !mainKey.includes(key) && !key.includes(mainKey);
+  });
+  if (others.length > 0) return `${main} · operado por ${others.join(", ")}`;
+  const fuller = [...operated].sort((a, b) => b.length - a.length)[0];
+  return fuller && fuller.length > main.length ? fuller : main;
 }
 
 function legFrom(

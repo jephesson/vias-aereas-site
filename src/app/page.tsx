@@ -574,7 +574,6 @@ function FlightChoices({
             <article key={offer.id} className={`bk-flight ${chosen ? "is-on" : ""}`}>
               <LegView title={direction} date={date} leg={offer.outbound} />
               <span className="bk-fare">
-                <span>{direction}</span>
                 <strong>{offer.priceLabel}</strong>
                 {chosen && !open ? (
                   <button type="button" className="bk-pick is-change" onClick={onChange}>

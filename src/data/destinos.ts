@@ -7,7 +7,7 @@ export type Destino = {
   destaque?: boolean;
 };
 
-const pasta = "/vias_aereas_destinos_com_aeroporto";
+const pasta = "/vias_aereas_destinos_HD";
 
 export const destinos: Destino[] = [
   { slug: "paris", nome: "Paris", imagem: `${pasta}/Paris.png`, categoria: "Internacional", localizacao: "França", destaque: true },
