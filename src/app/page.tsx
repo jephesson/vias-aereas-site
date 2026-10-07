@@ -266,7 +266,7 @@ function CotacaoPage() {
         <h1 className="va-sr">Encontre o voo. Pague menos.</h1>
         <img
           className="bk-hero-image"
-          src="/hero-por-do-sol.jpg"
+          src="/hero-banner.jpg"
           alt="Vias Aéreas. Encontre o voo. Pague menos. Até 30% de desconto exclusivo, atendimento especializado, rápido, seguro e gratuito."
           fetchPriority="high"
         />
