@@ -75,24 +75,21 @@ function H2({ children }: { children: React.ReactNode }) {
 
 export default function TromsoPage() {
   return (
-    <main className="va-bg">
-      <div className="va-shell">
-        <div className="va-card">
-          <a
-            href="/guias"
-            style={{ textDecoration: "none", color: "var(--muted)" }}
-          >
-            ← Voltar
+    <main className="so">
+      <section className="so-hero">
+        <div className="so-wrap">
+          <a className="so-back" href="/guias">
+            ← Voltar aos guias
           </a>
-
-          <h1 className="va-title" style={{ marginTop: 10 }}>
-            Tromsø • Noruega
-          </h1>
-
-          <p className="va-subtitle">
-            Um encontro real com o Ártico: neve pela primeira vez, cultura nórdica,
-            perrengues honestos, custos e a aurora boreal.
+          <p className="so-kicker">Noruega</p>
+          <h1>Tromsø</h1>
+          <p className="so-lead">
+            Um encontro real com o Ártico: neve pela primeira vez, cultura nórdica, perrengues honestos, custos e a aurora boreal.
           </p>
+        </div>
+      </section>
+      <div className="so-wrap so-body">
+        <article className="so-guide">
 
           <Photo
             src="/guias/tromso/centro.jpeg"
@@ -369,7 +366,7 @@ export default function TromsoPage() {
               </Link>
             </div>
           </div>
-        </div>
+        </article>
       </div>
     </main>
   );

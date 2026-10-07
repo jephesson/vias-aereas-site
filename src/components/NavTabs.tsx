@@ -15,7 +15,6 @@ const tabs: Tab[] = [
   { href: "/", label: "Cotação", match: "exact" },
   { href: "/guias", label: "Guias de Viagem", match: "prefix" },
   { href: "/venda-seus-pontos", label: "Venda seus pontos", match: "prefix" },
-  { href: "/afiliados", label: "Afiliados", match: "prefix" },
   { href: "/sobre", label: "Sobre", match: "prefix" },
 ];
 

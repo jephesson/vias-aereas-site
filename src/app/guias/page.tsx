@@ -14,16 +14,16 @@ const guias = [
 
 export default function GuiasPage() {
   return (
-    <main className="va-bg">
-      <div className="va-shell">
-        <div className="va-card">
-          <h1 className="va-title">Guias de Viagem</h1>
-          <p className="va-subtitle">
-            Seleciona uma cidade e veja dicas reais, custos e roteiro — do jeito que eu vivi.
-          </p>
-
-          <GuiasClient guias={guias} />
+    <main className="so">
+      <section className="so-hero">
+        <div className="so-wrap">
+          <p className="so-kicker">Roteiros</p>
+          <h1>Guias de Viagem</h1>
+          <p className="so-lead">Seleciona uma cidade e veja dicas reais, custos e roteiro — do jeito que a gente viveu.</p>
         </div>
+      </section>
+      <div className="so-wrap so-body">
+        <GuiasClient guias={guias} />
       </div>
     </main>
   );

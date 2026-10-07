@@ -865,23 +865,27 @@ textarea.va-input {
   padding: 0;
 }
 
-.va-guides { margin-top: 18px; }
+.va-guides { margin-top: 0; }
+.va-guides > .va-grid2 {
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 10px 28px rgba(12, 35, 72, 0.08);
+}
 
 .va-guideLink {
   display: grid;
   gap: 4px;
   text-decoration: none;
-  border: 1px solid var(--line);
-  background: #f8fafc;
-  border-radius: var(--radius-md);
-  padding: 16px;
-  transition: border-color 0.16s ease, transform 0.12s ease;
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px 18px;
+  color: var(--navy);
+  box-shadow: 0 10px 28px rgba(12, 35, 72, 0.08);
+  transition: transform 0.16s ease;
 }
 
-.va-guideLink:hover {
-  border-color: rgba(18, 49, 92, 0.28);
-  transform: translateY(-1px);
-}
+.va-guideLink:hover { transform: translateY(-2px); }
 
 .va-guideKicker {
   font-size: 12px;
@@ -1927,6 +1931,46 @@ textarea.va-input {
 
 .so-foot strong { color: var(--navy); }
 .so-foot a { color: var(--navy); font-weight: 750; }
+
+.so-back {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.so-back:hover { color: #fff; }
+
+.so-guide {
+  background: #fff;
+  border-radius: 18px;
+  padding: 6px 22px 22px;
+  box-shadow: 0 10px 28px rgba(12, 35, 72, 0.08);
+}
+
+.so-guide h2 {
+  margin: 28px 0 0;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.so-hero .va-referralCard {
+  margin-top: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.so-hero .va-referralCard span,
+.so-hero .va-referralCard b { color: #fff; }
+
+.va-card {
+  border-radius: 18px;
+  border: 0;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(12, 35, 72, 0.08);
+  padding: 18px;
+}
 
 @media (min-width: 800px) {
   .so-team { grid-template-columns: 1fr 1fr; }

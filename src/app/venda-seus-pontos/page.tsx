@@ -130,33 +130,24 @@ function VendaSeusPontosPage() {
   }
 
   return (
-    <main className="va-bg">
-      <div className="va-shell">
-        <header className="va-header">
-          <div className="va-brand vs-hero">
-            <div>
-              <div className="va-pill">
-                <span className="va-dot" /> Simulador rápido
-              </div>
-
-              <h1 className="va-title">Venda seus pontos</h1>
-
-              <p className="va-subtitle">
-                Selecione o programa, informe a quantidade de pontos e veja a simulação atualizada.
-                <br />
-                Ao aceitar, você envia os dados pelo WhatsApp para finalizar conosco.
-              </p>
-
-              {affiliateName ? (
-                <div className="va-referralCard">
-                  <span>Indicação de</span>
-                  <b>{affiliateName}</b>
-                </div>
-              ) : null}
+    <main className="so">
+      <section className="so-hero">
+        <div className="so-wrap">
+          <p className="so-kicker">Milhas</p>
+          <h1>Venda seus pontos</h1>
+          <p className="so-lead">
+            Selecione o programa, informe a quantidade de pontos e veja a simulação. Se fizer sentido, a gente segue no WhatsApp.
+          </p>
+          {affiliateName ? (
+            <div className="va-referralCard">
+              <span>Indicação de</span>
+              <b>{affiliateName}</b>
             </div>
-          </div>
-        </header>
+          ) : null}
+        </div>
+      </section>
 
+      <div className="so-wrap so-body">
         <section className="va-card vs-card">
           <section className="va-section vs-infoCard">
             <div className="va-label">Como funciona a venda de pontos</div>
@@ -281,8 +272,9 @@ function VendaSeusPontosPage() {
           </div>
         </section>
 
-        <footer className="va-copy">
-          © {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}
+        <footer className="so-foot">
+          <strong>Vias Aéreas</strong>
+          <span>CNPJ: {CNPJ}</span>
         </footer>
       </div>
     </main>
