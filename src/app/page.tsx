@@ -4,9 +4,9 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import AirportInput from "@/components/AirportInput";
-import DestinoCard from "@/components/DestinoCard";
+import DestinosFaixa from "@/components/DestinosFaixa";
 import type { Place } from "@/data/airports";
-import { destinosDestaque } from "@/data/destinos";
+import { destinos, destinosDestaque } from "@/data/destinos";
 import type { FlightLeg, FlightOffer } from "@/lib/googleFlights";
 import { resolveAffiliateNameFallback, resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
@@ -444,11 +444,7 @@ function CotacaoPage() {
               Ver todos os destinos →
             </Link>
           </div>
-          <div className="bk-destinos-grid">
-            {destinosDestaque.map((destino) => (
-              <DestinoCard key={destino.slug} destino={destino} />
-            ))}
-          </div>
+          <DestinosFaixa destinos={[...destinosDestaque, ...destinos.filter((destino) => !destino.destaque)]} />
         </section>
       </div>
 

@@ -1549,35 +1549,76 @@ textarea.va-input {
   gap: 14px;
 }
 
+.bk-faixa {
+  --vis: 5;
+  --gap: 14px;
+  width: 100%;
+  container-type: inline-size;
+  overflow: hidden;
+}
+
+.bk-faixa-track {
+  display: flex;
+  gap: var(--gap);
+  transform: translateX(calc(var(--i, 0) * -1 * ((100cqi - (var(--vis) - 1) * var(--gap)) / var(--vis) + var(--gap))));
+  transition: transform 0.7s cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+.bk-faixa-track.is-instant { transition: none; }
+
+.bk-faixa-track > .bk-destino {
+  flex: 0 0 calc((100cqi - (var(--vis) - 1) * var(--gap)) / var(--vis));
+  width: calc((100cqi - (var(--vis) - 1) * var(--gap)) / var(--vis));
+}
+
 .bk-destino {
-  display: block;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  border-radius: 22px;
+  background: #fff;
+  border-radius: 18px;
   overflow: hidden;
   color: var(--navy);
   text-decoration: none;
+  box-shadow: 0 10px 28px rgba(12, 35, 72, 0.08);
 }
 
 .bk-destino:hover { transform: translateY(-2px); }
 
-.bk-destino img {
+.bk-destino-photo {
+  position: relative;
   display: block;
-  width: 100%;
-  height: auto;
-  transition: transform 0.25s ease;
+  aspect-ratio: 5 / 3;
+  overflow: hidden;
+  background: #d7e0ec;
 }
 
-.bk-destino:hover img { transform: scale(1.03); }
+.bk-destino-photo img {
+  object-fit: cover;
+  object-position: center 18%;
+}
 
 .bk-destino-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 12px 14px 14px;
+  height: 68px;
+  padding: 12px 14px;
+  background: #fff;
+}
+
+.bk-destino-meta > span:first-child {
+  min-width: 0;
 }
 
 .bk-destino-meta strong { display: block; font-size: 16px; }
+.bk-destino-meta strong,
+.bk-destino-meta em {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .bk-destino-meta em {
   display: block;
   margin-top: 2px;
@@ -1621,6 +1662,7 @@ textarea.va-input {
   .bk-steps { grid-template-columns: 1fr 1fr; }
   .bk-beneficios ul { grid-template-columns: 1fr 1fr; }
   .bk-destinos-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bk-faixa { --vis: 3; }
   .bk-route { grid-template-columns: minmax(0, 1fr) 52px minmax(0, 1fr); }
   .bk-when { grid-template-columns: 1fr 1fr; }
   .bk-when .bk-search-btn { grid-column: 1 / -1; }
@@ -1632,6 +1674,7 @@ textarea.va-input {
   .bk-search { margin-top: -28px; }
   .bk-beneficios ul,
   .bk-destinos-grid { grid-template-columns: 1fr 1fr; }
+  .bk-faixa { --vis: 2; }
   .bk-destinos-head { align-items: stretch; flex-direction: column; }
   .bk-route,
   .bk-when,

@@ -14,7 +14,7 @@ export default function DestinosPage() {
         <p>Passagens em dinheiro e milhas para estes destinos, com saída pelos aeroportos de cada cidade.</p>
         <div className="bk-destinos-grid">
           {destinos.map((destino) => (
-            <DestinoCard key={destino.slug} destino={destino} />
+            <DestinoCard key={destino.slug} destino={destino} anchor />
           ))}
         </div>
       </div>
