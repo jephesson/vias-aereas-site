@@ -1,17 +1,10 @@
 import "./globals.css";
 import Link from "next/link";
-import { Caveat, Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import NavTabs from "@/components/NavTabs";
 
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  display: "swap",
-});
-
-const script = Caveat({
-  subsets: ["latin"],
-  weight: "600",
-  variable: "--font-script",
   display: "swap",
 });
 
@@ -27,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={`${sans.className} ${script.variable}`}>
+      <body className={sans.className}>
         <header className="va-topnav">
           <div className="va-topnav-inner">
             <Link className="va-brandlink" href="/">

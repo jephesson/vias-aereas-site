@@ -914,87 +914,35 @@ textarea.va-input {
 }
 
 .bk-stage {
-  background:
-    linear-gradient(90deg, #071833 0%, rgba(7, 24, 51, 0.94) 36%, rgba(7, 24, 51, 0.55) 58%, rgba(7, 24, 51, 0.08) 100%),
-    url("/hero-por-do-sol.jpg") right center / cover no-repeat;
-  color: #fff;
-  padding: 42px 20px 108px;
+  position: relative;
+  background: #071833;
+  padding: 0;
 }
 
-.bk-stage-inner,
+.bk-banner {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bk-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .bk-wrap { max-width: 1080px; margin: 0 auto; }
-
-.bk-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  align-items: start;
-  min-height: 250px;
-}
-
-.bk-kicker {
-  margin: 0;
-  color: #ffb088;
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.bk-stage h1 {
-  margin: 8px 0 0;
-  max-width: 12ch;
-  font-size: clamp(40px, 5vw, 64px);
-  line-height: 0.94;
-  letter-spacing: -0.05em;
-  font-weight: 750;
-}
-
-.bk-stage h1 span { display: block; color: #f0b429; }
-
-.bk-lead {
-  max-width: 520px;
-  margin: 14px 0 0;
-  color: rgba(255, 255, 255, 0.86);
-  line-height: 1.45;
-}
-
-.bk-script {
-  margin: 18px 0 0;
-  font-family: var(--font-script), cursive;
-  font-size: clamp(34px, 4vw, 52px);
-  line-height: 0.9;
-  text-align: right;
-  color: #fff;
-  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-.bk-proof {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px 22px;
-  margin: 22px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.bk-proof li {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0;
-  background: transparent;
-}
-
-.bk-proof b,
-.bk-proof span { display: block; }
-.bk-proof b { font-size: 18px; letter-spacing: -0.03em; }
-.bk-proof span { margin-top: 2px; color: rgba(255, 255, 255, 0.68); font-size: 12px; line-height: 1.3; }
 
 .bk-wrap { padding: 0 20px; }
 
 .bk-search {
-  margin-top: -46px;
+  margin-top: -64px;
   padding: 14px;
   border-radius: 22px;
   background: #fff;
@@ -1485,97 +1433,11 @@ textarea.va-input {
   padding: 0 20px;
 }
 
-.bk-trust {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
-  background: #fff;
-  border: 1px solid rgba(12, 35, 72, 0.06);
-  border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(12, 35, 72, 0.06);
-}
-
-.bk-trust-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 0 0 auto;
-}
-
-.bk-trust-icon {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  color: var(--orange);
-  flex: 0 0 auto;
-}
-
-.bk-trust-icon svg { width: 28px; height: 28px; }
-
-.bk-trust-item strong {
+.bk-partners {
   display: block;
-  color: var(--navy);
-  font-size: 14px;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  width: 100%;
+  height: auto;
 }
-
-.bk-trust-item span {
-  display: block;
-  margin-top: 2px;
-  max-width: 18ch;
-  color: #7b8798;
-  font-size: 12px;
-  line-height: 1.25;
-}
-
-.bk-trust-div {
-  width: 1px;
-  align-self: stretch;
-  background: rgba(12, 35, 72, 0.1);
-  flex: 0 0 auto;
-}
-
-.bk-trust-note {
-  margin: 0;
-  max-width: 18ch;
-  color: #7b8798;
-  font-size: 13px;
-  line-height: 1.3;
-  flex: 0 0 auto;
-}
-
-.bk-airlines {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-left: auto;
-  flex: 0 0 auto;
-}
-
-.al {
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.al-latam {
-  font-size: 18px;
-  background: linear-gradient(90deg, #e10600 0%, #1a1a6b 70%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.al-gol { font-size: 20px; font-style: italic; color: #ff7020; }
-.al-azul { font-size: 20px; color: #009cde; font-weight: 750; }
-.al-smiles { font-size: 18px; color: #f26a21; font-weight: 750; letter-spacing: -0.03em; }
-.al-iberia { font-size: 13px; color: #d71920; letter-spacing: 0.06em; }
-.al-tap { font-size: 18px; color: #5fad3a; letter-spacing: 0.02em; }
-.al-af { font-size: 11px; color: #051039; letter-spacing: 0.02em; }
 
 .bk-copy {
   margin: 16px 0 0;
@@ -1585,23 +1447,15 @@ textarea.va-input {
 }
 
 @media (max-width: 980px) {
-  .bk-hero { grid-template-columns: 1fr; }
-  .bk-script { display: none; }
   .bk-steps { grid-template-columns: 1fr 1fr; }
-  .bk-trust { flex-wrap: wrap; }
-  .bk-airlines { margin-left: 0; flex-wrap: wrap; }
   .bk-route { grid-template-columns: minmax(0, 1fr) 52px minmax(0, 1fr); }
   .bk-when { grid-template-columns: 1fr 1fr; }
   .bk-when .bk-search-btn { grid-column: 1 / -1; }
 }
 
 @media (max-width: 720px) {
-  .bk-stage { padding: 22px 12px 64px; }
   .bk-wrap,
   .bk-foot { padding: 0 12px; }
-  .bk-trust-div { display: none; }
-  .bk-hero,
-  .bk-proof,
   .bk-route,
   .bk-when,
   .bk-steps,
