@@ -1458,12 +1458,7 @@ textarea.va-input {
 .bk-pick.is-change:hover { background: #e7edf5; }
 
 .bk-bar {
-  position: sticky;
-  bottom: 12px;
-  z-index: 20;
-  margin: 18px auto 0;
-  max-width: 1080px;
-  padding: 0 20px;
+  margin: 14px 0 0;
 }
 
 .bk-bar-inner {
@@ -1560,11 +1555,23 @@ textarea.va-input {
 .bk-faixa-track {
   display: flex;
   gap: var(--gap);
-  transform: translateX(calc(var(--i, 0) * -1 * ((100cqi - (var(--vis) - 1) * var(--gap)) / var(--vis) + var(--gap))));
-  transition: transform 0.7s cubic-bezier(0.22, 0.8, 0.3, 1);
+  width: max-content;
+  animation: bk-trem 80s linear infinite;
 }
 
-.bk-faixa-track.is-instant { transition: none; }
+.bk-faixa:hover .bk-faixa-track,
+.bk-faixa:focus-within .bk-faixa-track {
+  animation-play-state: paused;
+}
+
+@keyframes bk-trem {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bk-faixa-track { animation: none; }
+}
 
 .bk-faixa-track > .bk-destino {
   flex: 0 0 calc((100cqi - (var(--vis) - 1) * var(--gap)) / var(--vis));
@@ -1689,7 +1696,6 @@ textarea.va-input {
   .bk-chosen { align-items: stretch; flex-direction: column; }
   .bk-trip-actions { justify-content: stretch; }
   .bk-trip-actions button { flex: 1; }
-  .bk-bar { padding: 0 12px; }
   .bk-bar-inner { align-items: stretch; flex-direction: column; }
   .bk-bar .bk-search-btn { width: 100%; margin: 0; }
 }

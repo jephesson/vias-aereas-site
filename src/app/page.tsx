@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import AirportInput from "@/components/AirportInput";
 import DestinosFaixa from "@/components/DestinosFaixa";
@@ -406,6 +405,25 @@ function CotacaoPage() {
             {tripType === "ida_volta" && selectedOutbound && !outboundOpen && !searching && !searchError && returnOffers.length === 0 ? (
               <p className="bk-status">Nenhum voo de volta encontrado para essa data.</p>
             ) : null}
+            {quoteReady ? (
+              <div className="bk-bar">
+                <div className="bk-bar-inner">
+                  <div>
+                    <p className="bk-bar-price">
+                      {selectedReturn ? "Total da ida e volta" : "Preço total"} <strong>{totalLabel}</strong>
+                    </p>
+                    <p className="bk-bar-deal">
+                      {selectedReturn
+                        ? `${selectedOutbound?.priceLabel} na ida + ${selectedReturn.priceLabel} na volta.`
+                        : "Chame a gente no WhatsApp e pegue um desconto exclusivo de até 30%."}
+                    </p>
+                  </div>
+                  <button type="button" className="bk-search-btn" onClick={openWhatsapp}>
+                    Quero o desconto
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </section>
         ) : null}
 
@@ -440,33 +458,10 @@ function CotacaoPage() {
               <h2 id="destinos-titulo">Destinos em destaque</h2>
               <p>Confira algumas das melhores oportunidades que encontramos para nossos clientes.</p>
             </div>
-            <Link className="bk-destinos-all" href="/destinos">
-              Ver todos os destinos →
-            </Link>
           </div>
           <DestinosFaixa destinos={[...destinosDestaque, ...destinos.filter((destino) => !destino.destaque)]} />
         </section>
       </div>
-
-      {quoteReady ? (
-        <div className="bk-bar">
-          <div className="bk-bar-inner">
-            <div>
-              <p className="bk-bar-price">
-                {selectedReturn ? "Total da ida e volta" : "Preço total"} <strong>{totalLabel}</strong>
-              </p>
-              <p className="bk-bar-deal">
-                {selectedReturn
-                  ? `${selectedOutbound?.priceLabel} na ida + ${selectedReturn.priceLabel} na volta.`
-                  : "Chame a gente no WhatsApp e pegue um desconto exclusivo de até 30%."}
-              </p>
-            </div>
-            <button type="button" className="bk-search-btn" onClick={openWhatsapp}>
-              Quero o desconto
-            </button>
-          </div>
-        </div>
-      ) : null}
 
       <footer className="bk-foot">
         <img

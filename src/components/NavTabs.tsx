@@ -13,7 +13,6 @@ type Tab = {
 
 const tabs: Tab[] = [
   { href: "/", label: "Cotação", match: "exact" },
-  { href: "/bussola-aerea", label: "Bússola Aérea", match: "prefix" },
   { href: "/guias", label: "Guias de Viagem", match: "prefix" },
   { href: "/venda-seus-pontos", label: "Venda seus pontos", match: "prefix" },
   { href: "/afiliados", label: "Afiliados", match: "prefix" },
