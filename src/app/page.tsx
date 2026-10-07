@@ -240,24 +240,34 @@ function CotacaoPage() {
         <div className="bk-stage-inner">
           <div className="bk-hero">
             <div>
-              <p className="bk-kicker">Preço da companhia</p>
-              <h1>Encontre o voo. Pague menos.</h1>
-              <p className="bk-lead">O valor é o da companhia aérea, encontrado na internet. Fale com a gente e pegue um desconto exclusivo de até 30%.</p>
+              <p className="bk-kicker">Passagens em dinheiro e milhas</p>
+              <h1>
+                Encontre o voo.
+                <span>Pague menos.</span>
+              </h1>
+              <p className="bk-lead">
+                Comparamos preços das principais companhias aéreas e encontramos as melhores oportunidades para você.
+              </p>
+              <ul className="bk-proof">
+                <li>
+                  <b>Até 30%</b>
+                  <span>de desconto exclusivo</span>
+                </li>
+                <li>
+                  <b>Atendimento</b>
+                  <span>especializado</span>
+                </li>
+                <li>
+                  <b>Rápido,</b>
+                  <span>seguro e gratuito</span>
+                </li>
+              </ul>
             </div>
-            <ul className="bk-proof">
-              <li>
-                <b>Na CIA</b>
-                <span>Preço da companhia aérea</span>
-              </li>
-              <li>
-                <b>Até 30%</b>
-                <span>Desconto exclusivo no WhatsApp</span>
-              </li>
-              <li>
-                <b>Pronto</b>
-                <span>Mensagem com o voo escolhido</span>
-              </li>
-            </ul>
+            <p className="bk-script">
+              Mais viagens
+              <br />
+              para a sua história
+            </p>
           </div>
         </div>
       </section>
@@ -427,8 +437,81 @@ function CotacaoPage() {
         </div>
       ) : null}
 
-      <footer className="bk-copy">© {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}</footer>
+      <footer className="bk-foot">
+        <div className="bk-trust">
+          <div className="bk-trust-item">
+            <TrustIcon kind="people" />
+            <div>
+              <strong>+10.000</strong>
+              <span>viajantes atendidos</span>
+            </div>
+          </div>
+          <span className="bk-trust-div" aria-hidden="true" />
+          <div className="bk-trust-item">
+            <TrustIcon kind="headset" />
+            <div>
+              <strong>Atendimento especializado</strong>
+              <span>suporte personalizado</span>
+            </div>
+          </div>
+          <span className="bk-trust-div" aria-hidden="true" />
+          <div className="bk-trust-item">
+            <TrustIcon kind="shield" />
+            <div>
+              <strong>Compra segura</strong>
+              <span>acompanhamento do início ao fim</span>
+            </div>
+          </div>
+          <span className="bk-trust-div" aria-hidden="true" />
+          <p className="bk-trust-note">Parceria com as principais companhias aéreas</p>
+          <div className="bk-airlines" aria-label="Companhias parceiras">
+            <span className="al al-latam">LATAM</span>
+            <span className="al al-gol">GOL</span>
+            <span className="al al-azul">Azul</span>
+            <span className="al al-smiles">Smiles</span>
+            <span className="al al-iberia">IBERIA</span>
+            <span className="al al-tap">TAP</span>
+            <span className="al al-af">AIRFRANCE</span>
+          </div>
+        </div>
+        <p className="bk-copy">© {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}</p>
+      </footer>
     </main>
+  );
+}
+
+function TrustIcon({ kind }: { kind: "people" | "headset" | "shield" }) {
+  if (kind === "people") {
+    return (
+      <span className="bk-trust-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <circle cx="11" cy="11" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="21" cy="12" r="2.6" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M4.5 23.5c.8-3.4 3.4-5.2 6.6-5.2s5.7 1.8 6.5 5.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M18 18.6c1.8-.7 3.6-.6 5.2.4 1.6 1 2.6 2.6 3.1 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      </span>
+    );
+  }
+  if (kind === "headset") {
+    return (
+      <span className="bk-trust-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M6 17v-1a10 10 0 0 1 20 0v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <rect x="4" y="16" width="5" height="8" rx="2" stroke="currentColor" strokeWidth="1.8" />
+          <rect x="23" y="16" width="5" height="8" rx="2" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M25.5 24v1.2A2.8 2.8 0 0 1 22.7 28H18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      </span>
+    );
+  }
+  return (
+    <span className="bk-trust-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M16 4.5 26 8.5v7.2c0 5.6-3.8 9.4-10 12.3C9.8 25.1 6 21.3 6 15.7V8.5L16 4.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="m12 16.2 2.6 2.6L20.5 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
   );
 }
 
