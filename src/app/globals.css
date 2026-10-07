@@ -203,7 +203,10 @@ button, input, select, textarea { font: inherit; }
   border-bottom: 0;
 }
 
-.va-topnav--overlay .va-brandtext { display: none; }
+.va-topnav--overlay .va-brandlink {
+  visibility: hidden;
+  pointer-events: none;
+}
 
 .va-topnav--overlay .va-toplogo {
   width: auto;
