@@ -475,8 +475,8 @@ function CotacaoPage() {
       <footer className="bk-foot">
         <img
           className="bk-partners"
-          src="/faixa-parceiros.png"
-          alt="Mais de 10.000 viajantes atendidos, atendimento especializado e compra segura. Parceria com LATAM, GOL, Azul, Smiles, Iberia, TAP e Air France."
+          src="/barra-beneficios.png"
+          alt="Mais de 10.000 viajantes atendidos, atendimento especializado, compra segura e parceria com as principais companhias aéreas: LATAM, GOL, Azul, Smiles, Iberia, TAP e Air France."
         />
         <p className="bk-copy">© {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}</p>
       </footer>
