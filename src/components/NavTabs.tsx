@@ -16,7 +16,7 @@ const tabs: Tab[] = [
   { href: "/bussola-aerea", label: "Bússola Aérea", match: "prefix" },
   { href: "/guias", label: "Guias de Viagem", match: "prefix" },
   { href: "/venda-seus-pontos", label: "Venda seus pontos", match: "prefix" },
-  { href: "https://trademiles.com.br/afiliado/login", label: "Afiliados", disabled: true },
+  { href: "/afiliados", label: "Afiliados", match: "prefix" },
   { href: "/sobre", label: "Sobre", match: "prefix" },
 ];
 

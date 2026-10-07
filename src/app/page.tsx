@@ -1,16 +1,19 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import AirportInput from "@/components/AirportInput";
+import DestinoCard from "@/components/DestinoCard";
 import type { Place } from "@/data/airports";
+import { destinosDestaque } from "@/data/destinos";
 import type { FlightLeg, FlightOffer } from "@/lib/googleFlights";
 import { resolveAffiliateNameFallback, resolveTradeMilesAffiliate } from "@/lib/trademilesAffiliate";
 
 const WHATSAPP_NUMBER = "5551992926814";
 const CNPJ = "63.817.773/0001-85";
 
-type TripType = "ida" | "ida_volta";
+type TripType = "ida" | "ida_volta" | "multi";
 
 function todayISO() {
   const d = new Date();
@@ -115,7 +118,7 @@ function CotacaoPage() {
   const selectedOutbound = outboundOffers.find((offer) => offer.id === outboundId) ?? null;
   const selectedReturn = returnOffers.find((offer) => offer.id === returnId) ?? null;
   const quoteReady = Boolean(
-    selectedOutbound && !outboundOpen && (tripType === "ida" || (selectedReturn && !returnOpen)),
+    tripType !== "multi" && selectedOutbound && !outboundOpen && (tripType === "ida" || (selectedReturn && !returnOpen)),
   );
   const totalNumber = (selectedOutbound?.priceNumber ?? 0) + (selectedReturn?.priceNumber ?? 0);
   const totalLabel = formatMoney(totalNumber);
@@ -127,7 +130,9 @@ function CotacaoPage() {
     return "";
   }, [tripType, dataIda, dataVolta]);
 
-  const canSearch = Boolean(fromPlace && toPlace && dataIda && (tripType === "ida" || dataVolta) && !dateError && totalPax > 0);
+  const canSearch = Boolean(
+    fromPlace && toPlace && dataIda && (tripType !== "ida_volta" || dataVolta) && !dateError && totalPax > 0,
+  );
 
   function swapRoute() {
     setOrigem(destino);
@@ -190,9 +195,30 @@ function CotacaoPage() {
     window.open(url, "_blank");
   }
 
+  function openMultiWhatsapp() {
+    const texto = [
+      "Olá! Quero uma cotação multidestinos.",
+      "",
+      `🧭 *Trecho:* ${origem.trim()} → ${destino.trim()}`,
+      `🧾 *Tipo:* Multidestinos`,
+      `📅 *Ida:* ${formatDate(dataIda)}`,
+      dataVolta ? `📅 *Volta:* ${formatDate(dataVolta)}` : null,
+      `👤 *Passageiros:* ${adultos} adulto(s), ${criancas} criança(s), ${bebes} bebê(s)`,
+      affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(texto)}`, "_blank");
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!canSearch || !fromPlace || !toPlace || searching) return;
+    if (tripType === "multi") {
+      setPaxOpen(false);
+      openMultiWhatsapp();
+      return;
+    }
 
     setSearching(true);
     setSearchError("");
@@ -237,11 +263,12 @@ function CotacaoPage() {
   return (
     <main className="bk">
       <section className="bk-stage">
-        <h1 className="bk-sr">Encontre o voo. Pague menos.</h1>
+        <h1 className="va-sr">Encontre o voo. Pague menos.</h1>
         <img
-          className="bk-banner"
+          className="bk-hero-image"
           src="/hero-por-do-sol.jpg"
           alt="Vias Aéreas. Encontre o voo. Pague menos. Até 30% de desconto exclusivo, atendimento especializado, rápido, seguro e gratuito."
+          fetchPriority="high"
         />
       </section>
 
@@ -249,7 +276,7 @@ function CotacaoPage() {
         <form className="bk-search" onSubmit={handleSubmit}>
           <div className="bk-types">
             <button type="button" className={tripType === "ida_volta" ? "is-on" : ""} onClick={() => setTripType("ida_volta")}>
-              Ida e volta
+              Ir e volta
             </button>
             <button
               type="button"
@@ -260,6 +287,16 @@ function CotacaoPage() {
               }}
             >
               Só ida
+            </button>
+            <button
+              type="button"
+              className={tripType === "multi" ? "is-on" : ""}
+              onClick={() => {
+                setTripType("multi");
+                setSearched(false);
+              }}
+            >
+              Multidestinos
             </button>
           </div>
 
@@ -312,6 +349,9 @@ function CotacaoPage() {
             </button>
             </div>
           </div>
+          {tripType === "multi" ? (
+            <p className="bk-note">Multidestinos a gente monta com você no WhatsApp, com o trecho informado.</p>
+          ) : null}
           {dateError ? <p className="bk-error">{dateError}</p> : null}
           {affiliateName ? (
             <p className="bk-ref">
@@ -319,26 +359,6 @@ function CotacaoPage() {
             </p>
           ) : null}
         </form>
-
-        {searched ? null : (
-          <section className="bk-steps" aria-label="Como funciona">
-            <article>
-              <span>01</span>
-              <h2>Veja os voos</h2>
-              <p>Horário, companhia e o preço encontrado na internet.</p>
-            </article>
-            <article>
-              <span>02</span>
-              <h2>Escolha o seu</h2>
-              <p>Compare as opções e selecione a ida e a volta que fazem sentido.</p>
-            </article>
-            <article>
-              <span>03</span>
-              <h2>Fale com a gente</h2>
-              <p>Chame no WhatsApp e garanta o desconto exclusivo de até 30%.</p>
-            </article>
-          </section>
-        )}
 
         {searched ? (
           <section className="bk-results" aria-live="polite">
@@ -388,6 +408,48 @@ function CotacaoPage() {
             ) : null}
           </section>
         ) : null}
+
+        <section className="bk-beneficios" aria-label="Benefícios">
+          <ul>
+            <li>
+              <BenefitIcon kind="plane" />
+              <span>Todas as companhias aéreas</span>
+            </li>
+            <li>
+              <BenefitIcon kind="miles" />
+              <span>Opções em dinheiro e milhas</span>
+            </li>
+            <li>
+              <BenefitIcon kind="chat" />
+              <span>Suporte via WhatsApp</span>
+            </li>
+            <li>
+              <BenefitIcon kind="star" />
+              <span>Consultoria personalizada</span>
+            </li>
+            <li>
+              <BenefitIcon kind="lock" />
+              <span>Seus dados 100% seguros</span>
+            </li>
+          </ul>
+        </section>
+
+        <section className="bk-destinos" aria-labelledby="destinos-titulo">
+          <div className="bk-destinos-head">
+            <div>
+              <h2 id="destinos-titulo">Destinos em destaque</h2>
+              <p>Confira algumas das melhores oportunidades que encontramos para nossos clientes.</p>
+            </div>
+            <Link className="bk-destinos-all" href="/destinos">
+              Ver todos os destinos →
+            </Link>
+          </div>
+          <div className="bk-destinos-grid">
+            {destinosDestaque.map((destino) => (
+              <DestinoCard key={destino.slug} destino={destino} />
+            ))}
+          </div>
+        </section>
       </div>
 
       {quoteReady ? (
@@ -419,6 +481,45 @@ function CotacaoPage() {
         <p className="bk-copy">© {new Date().getFullYear()} Vias Aéreas • CNPJ {CNPJ}</p>
       </footer>
     </main>
+  );
+}
+
+function BenefitIcon({ kind }: { kind: "plane" | "miles" | "chat" | "star" | "lock" }) {
+  const common = { viewBox: "0 0 32 32", "aria-hidden": true as const };
+  if (kind === "plane") {
+    return (
+      <svg {...common}>
+        <path d="M5 17.5 27 8l-6.2 16.2-4.2-5.2L5 17.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  if (kind === "miles") {
+    return (
+      <svg {...common}>
+        <rect x="5" y="9" width="22" height="14" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M5 14h22M11 9v14" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    );
+  }
+  if (kind === "chat") {
+    return (
+      <svg {...common}>
+        <path d="M7 8h18a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H14l-5 4v-4H7a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  if (kind === "star") {
+    return (
+      <svg {...common}>
+        <path d="m16 6 2.4 5.6L24.5 13l-4.2 3.8 1.2 6L16 19.8 10.5 22.8l1.2-6L7.5 13l6.1-1.4L16 6Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <rect x="8" y="14" width="16" height="11" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 14v-3a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
   );
 }
 

@@ -1,7 +1,6 @@
 import "./globals.css";
-import Link from "next/link";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import NavTabs from "@/components/NavTabs";
+import SiteHeader from "@/components/SiteHeader";
 
 const sans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -9,8 +8,9 @@ const sans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "Vias Aéreas",
-  description: "Solicite cotações e acompanhe nossos destinos.",
+  title: "Vias Aéreas | Passagens aéreas em dinheiro e milhas",
+  description:
+    "Encontre passagens aéreas em dinheiro e milhas com a Vias Aéreas. Compare opções e encontre as melhores oportunidades para sua viagem.",
 };
 
 export default function RootLayout({
@@ -21,33 +21,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={sans.className}>
-        <header className="va-topnav">
-          <div className="va-topnav-inner">
-            <Link className="va-brandlink" href="/">
-              <img
-                className="va-toplogo"
-                src="/logo-vias-aereas.png"
-                alt=""
-              />
-              <div className="va-brandtext">
-                <div className="va-brandname">Vias Aéreas</div>
-                <div className="va-brandsub">Passagens em dinheiro e milhas</div>
-              </div>
-            </Link>
-
-            <NavTabs />
-
-            <a
-              className="va-wa"
-              href="https://wa.me/5551992926814?text=Ol%C3%A1!%20Quero%20falar%20sobre%20passagens."
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Fale no WhatsApp
-            </a>
-          </div>
-        </header>
-
+        <SiteHeader />
         {children}
       </body>
     </html>
