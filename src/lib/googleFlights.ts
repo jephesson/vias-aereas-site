@@ -79,6 +79,11 @@ function money(amount: number) {
   return amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function withTaxes(amount: number) {
+  const cents = Math.round(amount * 100);
+  return Math.round(cents * 1.15) / 100;
+}
+
 const WEEKDAYS: Record<string, string> = {
   sun: "dom",
   mon: "seg",
@@ -185,12 +190,9 @@ function legFrom(
 }
 
 function normalizeRow(row: Record<string, unknown>, roundTrip: boolean): FlightOffer | null {
-  const priceNumber = roundTrip
-    ? asNumber(row.total_price_as_number)
-    : asNumber(row.price_as_number);
-  if (priceNumber == null) return null;
-
-  const priceText = asString(roundTrip ? row.total_price : row.price);
+  const fare = roundTrip ? asNumber(row.total_price_as_number) : asNumber(row.price_as_number);
+  if (fare == null) return null;
+  const priceNumber = withTaxes(fare);
   const fromLabel = asString(row.from_airport);
   const toLabel = asString(row.to_airport);
 
@@ -218,7 +220,7 @@ function normalizeRow(row: Record<string, unknown>, roundTrip: boolean): FlightO
 
   return {
     id: "",
-    priceLabel: priceText || money(priceNumber),
+    priceLabel: money(priceNumber),
     priceNumber,
     outbound,
     inbound,

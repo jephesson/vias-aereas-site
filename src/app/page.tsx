@@ -566,6 +566,7 @@ function FlightChoices({
               <LegView title={direction} date={date} leg={offer.outbound} />
               <span className="bk-fare">
                 <strong>{offer.priceLabel}</strong>
+                <span>com taxas</span>
                 {chosen && !open ? (
                   <button type="button" className="bk-pick is-change" onClick={onChange}>
                     Alterar voo
