@@ -37,6 +37,35 @@ function formatMoney(amount: number) {
   return amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+const CARD_PLANS = [
+  { times: 18, monthly: 1.07, popular: true },
+  { times: 12, monthly: 1.11, popular: false },
+  { times: 11, monthly: 1.14, popular: false },
+  { times: 10, monthly: 1.18, popular: false },
+  { times: 9, monthly: 1.22, popular: false },
+  { times: 8, monthly: 1.28, popular: false },
+  { times: 7, monthly: 1.44, popular: false },
+  { times: 6, monthly: 1.45, popular: false },
+  { times: 5, monthly: 1.7, popular: false },
+  { times: 4, monthly: 2.1, popular: false },
+  { times: 3, monthly: 2.19, popular: false },
+  { times: 2, monthly: 3.03, popular: false },
+  { times: 1, monthly: 3.08, popular: false },
+] as const;
+
+function pixAmount(principal: number) {
+  return Math.round(principal * 0.9 * 100) / 100;
+}
+
+function cardQuote(principal: number, times: number, monthly: number) {
+  const parcela = Math.round((principal * (1 + monthly / 100) ** times / times) * 100) / 100;
+  return { parcela, total: Math.round(parcela * times * 100) / 100 };
+}
+
+function formatRate(monthly: number) {
+  return `${monthly.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}% / mês`;
+}
+
 function airportCode(label: string) {
   const match = label.match(/\(([A-Z]{3})\)/);
   return match?.[1] ?? label;
@@ -117,6 +146,7 @@ export function CotacaoPage({
   const [searchError, setSearchError] = useState("");
   const [searched, setSearched] = useState(false);
   const [paxOpen, setPaxOpen] = useState(false);
+  const [payChoice, setPayChoice] = useState<"pix" | number | null>(null);
 
   const [dataIda, setDataIda] = useState("");
   const [dataVolta, setDataVolta] = useState("");
@@ -132,6 +162,10 @@ export function CotacaoPage({
   );
   const totalNumber = (selectedOutbound?.priceNumber ?? 0) + (selectedReturn?.priceNumber ?? 0);
   const totalLabel = formatMoney(totalNumber);
+  const pixValue = pixAmount(totalNumber);
+  const pixLabel = formatMoney(pixValue);
+  const cardPlans = CARD_PLANS.map((plan) => ({ ...plan, ...cardQuote(totalNumber, plan.times, plan.monthly) }));
+  const chosenPlan = typeof payChoice === "number" ? cardPlans.find((plan) => plan.times === payChoice) ?? null : null;
 
   const dateError = useMemo(() => {
     if (tripType === "ida_volta" && dataIda && dataVolta && !isAfterOrEqual(dataVolta, dataIda)) {
@@ -159,10 +193,16 @@ export function CotacaoPage({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, []);
 
+  function paymentLine() {
+    if (payChoice === "pix") return `💳 *Pagamento:* Pix · ${pixLabel} (10% de desconto sobre ${totalLabel})`;
+    if (!chosenPlan) return "";
+    return `💳 *Pagamento:* ${chosenPlan.times}x de ${formatMoney(chosenPlan.parcela)} no cartão · taxa da maquininha ${formatRate(chosenPlan.monthly)} · total ${formatMoney(chosenPlan.total)}`;
+  }
+
   function buildOfferMessage() {
-    if (!selectedOutbound) return "";
+    if (!selectedOutbound || !paymentLine()) return "";
     const linhas = [
-      "Olá! Quero o desconto exclusivo de até 30% nesta passagem.",
+      "Olá! Quero emitir esta passagem.",
       "",
       `🧭 *Trecho:* ${origem.trim()} → ${destino.trim()}`,
       `🧾 *Tipo:* ${tripType === "ida_volta" ? "Ida e volta" : "Só ida"}`,
@@ -172,7 +212,8 @@ export function CotacaoPage({
       `💰 *Preço da ida:* ${selectedOutbound.priceLabel}`,
       selectedReturn ? legLines("Volta", dataVolta, selectedReturn.outbound) : null,
       selectedReturn ? `💰 *Preço da volta:* ${selectedReturn.priceLabel}` : null,
-      `💰 *Total:* ${totalLabel}`,
+      `💰 *Total com taxas:* ${totalLabel}`,
+      paymentLine(),
       affiliateName ? `🤝 *Indicação:* ${affiliateName}` : null,
     ].filter(Boolean);
 
@@ -180,9 +221,9 @@ export function CotacaoPage({
   }
 
   function openWhatsapp() {
-    if (!selectedOutbound) return;
+    if (!selectedOutbound || !paymentLine()) return;
     const companhias = [selectedOutbound.outbound.airline, selectedReturn?.outbound.airline].filter(Boolean).join(" / ");
-    const observacoes = [`Total: ${totalLabel}`, `Companhia: ${companhias}`].join(" | ");
+    const observacoes = [`Total: ${totalLabel}`, `Companhia: ${companhias}`, paymentLine().replace(/\*/g, "")].join(" | ");
     void fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -239,6 +280,7 @@ export function CotacaoPage({
     setReturnId("");
     setOutboundOpen(true);
     setReturnOpen(true);
+    setPayChoice(null);
     setPaxOpen(false);
 
     try {
@@ -390,11 +432,15 @@ export function CotacaoPage({
                 onSelect={(id) => {
                   setOutboundId(id);
                   setOutboundOpen(false);
+                  setPayChoice(null);
                   requestAnimationFrame(() => {
                     document.getElementById("escolha-volta")?.scrollIntoView({ behavior: "smooth", block: "start" });
                   });
                 }}
-                onChange={() => setOutboundOpen(true)}
+                onChange={() => {
+                  setOutboundOpen(true);
+                  setPayChoice(null);
+                }}
               />
             ) : null}
             {tripType === "ida_volta" && selectedOutbound && !outboundOpen && returnOffers.length > 0 ? (
@@ -410,31 +456,61 @@ export function CotacaoPage({
                 onSelect={(id) => {
                   setReturnId(id);
                   setReturnOpen(false);
+                  setPayChoice(null);
                 }}
-                onChange={() => setReturnOpen(true)}
+                onChange={() => {
+                  setReturnOpen(true);
+                  setPayChoice(null);
+                }}
               />
             ) : null}
             {tripType === "ida_volta" && selectedOutbound && !outboundOpen && !searching && !searchError && returnOffers.length === 0 ? (
               <p className="bk-status">Nenhum voo de volta encontrado para essa data.</p>
             ) : null}
             {quoteReady ? (
-              <div className="bk-bar">
-                <div className="bk-bar-inner">
-                  <div>
-                    <p className="bk-bar-price">
-                      {selectedReturn ? "Total da ida e volta" : "Preço total"} <strong>{totalLabel}</strong>
-                    </p>
-                    <p className="bk-bar-deal">
-                      {selectedReturn
-                        ? `${selectedOutbound?.priceLabel} na ida + ${selectedReturn.priceLabel} na volta.`
-                        : "Chame a gente no WhatsApp e pegue um desconto exclusivo de até 30%."}
-                    </p>
-                  </div>
-                  <button type="button" className="bk-search-btn" onClick={openWhatsapp}>
-                    Quero o desconto
-                  </button>
+              <section className="bk-pay" aria-label="Como pagar">
+                <div className="bk-pay-head">
+                  <h2>Como pagar</h2>
+                  <p>
+                    Preço com taxas <strong>{totalLabel}</strong>
+                    {selectedReturn ? `. ${selectedOutbound?.priceLabel} na ida + ${selectedReturn.priceLabel} na volta.` : "."}
+                  </p>
                 </div>
-              </div>
+                <button
+                  type="button"
+                  className={`bk-pay-pix ${payChoice === "pix" ? "is-on" : ""}`}
+                  aria-pressed={payChoice === "pix"}
+                  onClick={() => setPayChoice("pix")}
+                >
+                  <span>
+                    <strong>Pix</strong>
+                    <small>10% de desconto</small>
+                  </span>
+                  <b>{pixLabel}</b>
+                </button>
+                <div className="bk-pay-list">
+                  {cardPlans.map((plan) => (
+                    <button
+                      key={plan.times}
+                      type="button"
+                      className={`bk-pay-opt ${payChoice === plan.times ? "is-on" : ""}`}
+                      aria-pressed={payChoice === plan.times}
+                      onClick={() => setPayChoice(plan.times)}
+                    >
+                      <strong>
+                        {plan.times}x {formatMoney(plan.parcela)}
+                      </strong>
+                      <span>
+                        {plan.popular ? <em>Mais escolhido</em> : null}
+                        {formatRate(plan.monthly)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <button type="button" className="bk-search-btn bk-pay-send" disabled={payChoice == null} onClick={openWhatsapp}>
+                  Enviar para emitir
+                </button>
+              </section>
             ) : null}
           </section>
         ) : null}
