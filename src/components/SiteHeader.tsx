@@ -6,7 +6,7 @@ import NavTabs from "@/components/NavTabs";
 
 export default function SiteHeader() {
   const pathname = usePathname() || "/";
-  const overlay = pathname === "/";
+  const overlay = pathname === "/" || pathname === "/fantasiagame";
 
   return (
     <header className={`va-topnav ${overlay ? "va-topnav--overlay" : ""}`}>

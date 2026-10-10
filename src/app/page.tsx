@@ -55,11 +55,22 @@ export default function Page() {
   );
 }
 
-function CotacaoPage() {
+export function CotacaoPage({
+  welcome,
+  affiliateRef,
+  affiliateLabel,
+}: {
+  welcome?: string;
+  affiliateRef?: string;
+  affiliateLabel?: string;
+} = {}) {
   const searchParams = useSearchParams();
   const minToday = useMemo(() => todayISO(), []);
-  const ref = searchParams.get("ref")?.trim() ?? "";
-  const affiliateFallbackName = useMemo(() => resolveAffiliateNameFallback(ref), [ref]);
+  const ref = (affiliateRef || searchParams.get("ref") || "").trim();
+  const affiliateFallbackName = useMemo(
+    () => affiliateLabel || resolveAffiliateNameFallback(ref),
+    [affiliateLabel, ref],
+  );
   const [affiliateId, setAffiliateId] = useState<string | null>(null);
   const [affiliateName, setAffiliateName] = useState("");
   const paxRef = useRef<HTMLDivElement>(null);
@@ -77,7 +88,7 @@ function CotacaoPage() {
       const affiliate = await resolveTradeMilesAffiliate(ref);
       if (cancelled) return;
       setAffiliateId(affiliate?.id ?? null);
-      setAffiliateName(affiliate?.name || affiliateFallbackName);
+      setAffiliateName(affiliateLabel || affiliate?.name || affiliateFallbackName);
     }
 
     resolveAffiliate().catch(() => {
@@ -89,7 +100,7 @@ function CotacaoPage() {
     return () => {
       cancelled = true;
     };
-  }, [ref, affiliateFallbackName]);
+  }, [ref, affiliateFallbackName, affiliateLabel]);
 
   const [tripType, setTripType] = useState<TripType>("ida_volta");
   const [origem, setOrigem] = useState("");
@@ -273,6 +284,7 @@ function CotacaoPage() {
 
       <div className="bk-wrap">
         <form className="bk-search" onSubmit={handleSubmit}>
+          {welcome ? <p className="bk-welcome">{welcome}</p> : null}
           <div className="bk-types">
             <button type="button" className={tripType === "ida_volta" ? "is-on" : ""} onClick={() => setTripType("ida_volta")}>
               Ir e volta
@@ -352,7 +364,7 @@ function CotacaoPage() {
             <p className="bk-note">Multidestinos a gente monta com você no WhatsApp, com o trecho informado.</p>
           ) : null}
           {dateError ? <p className="bk-error">{dateError}</p> : null}
-          {affiliateName ? (
+          {affiliateName && !welcome ? (
             <p className="bk-ref">
               Indicação de <b>{affiliateName}</b>
             </p>

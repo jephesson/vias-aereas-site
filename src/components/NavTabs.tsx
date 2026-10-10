@@ -21,6 +21,7 @@ const tabs: Tab[] = [
 function isActive(pathname: string, tab: Tab) {
   const path = (pathname || "/").split("?")[0].split("#")[0];
 
+  if (tab.href === "/" && (path === "/" || path === "/fantasiagame")) return true;
   if (tab.match === "exact") return path === tab.href;
   return tab.href === "/" ? path === "/" : path.startsWith(tab.href);
 }

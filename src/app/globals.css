@@ -999,6 +999,18 @@ textarea.va-input {
   box-shadow: 0 22px 50px rgba(12, 35, 72, 0.14);
 }
 
+.bk-welcome {
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
 .bk-note {
   margin: 10px 4px 0;
   color: var(--muted2);
