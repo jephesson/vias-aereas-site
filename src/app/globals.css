@@ -1251,6 +1251,15 @@ textarea.va-input {
 .bk-search-btn:disabled { background: #c65a2e; cursor: default; }
 .bk-cell.is-off { opacity: 0.45; }
 
+.bk-noreturn strong {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  color: var(--navy);
+  font-size: 16px;
+  font-weight: 750;
+}
+
 .bk-steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

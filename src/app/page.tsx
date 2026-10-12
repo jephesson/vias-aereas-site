@@ -377,13 +377,19 @@ export function CotacaoPage({
                 if (dataVolta && value && !isAfterOrEqual(dataVolta, value)) setDataVolta("");
               }}
             />
-            <DateField
-              label="Volta"
-              value={dataVolta}
-              min={dataIda || minToday}
-              disabled={tripType === "ida"}
-              onChange={setDataVolta}
-            />
+            {tripType === "ida" ? (
+              <div className="bk-cell bk-noreturn">
+                <span>Volta</span>
+                <strong>Sem volta</strong>
+              </div>
+            ) : (
+              <DateField
+                label="Volta"
+                value={dataVolta}
+                min={dataIda || minToday}
+                onChange={setDataVolta}
+              />
+            )}
             <div className="bk-pax bk-cell" ref={paxRef}>
               <span>Passageiros</span>
               <button type="button" className="va-input bk-pax-btn" onClick={() => setPaxOpen((open) => !open)}>
