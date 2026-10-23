@@ -2147,6 +2147,8 @@ textarea.va-input {
 .ct-button:disabled { opacity: 0.6; cursor: wait; }
 .ct-button-ghost { background: #eef3f8; color: var(--navy); }
 .ct-button-danger { background: var(--navy); }
+.ct-button.is-on { box-shadow: inset 0 0 0 2px var(--navy); }
+.ct-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .ct-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
 .ct-pills span,

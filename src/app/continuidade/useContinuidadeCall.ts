@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { DataConnection, Peer } from "peerjs";
 
 type Role = "operator" | "client";
+type Facing = "user" | "environment";
 
 type SignalType =
   | "offer"
@@ -25,11 +27,11 @@ export type ContinuidadeStatus = {
   cameraConnected: boolean;
 };
 
-type Signal = {
-  i: number;
-  from: Role;
-  type: SignalType;
-  data?: RTCSessionDescriptionInit | RTCIceCandidateInit | null;
+type Wire = {
+  type: string;
+  data?: unknown;
+  clientName?: string;
+  expiresAt?: number;
 };
 
 const ICE_SERVERS: RTCIceServer[] = [
@@ -37,42 +39,45 @@ const ICE_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun1.l.google.com:19302" },
 ];
 
-function headers(role: Role, operatorSecret?: string, clientId?: string) {
-  return {
-    "Content-Type": "application/json",
-    "x-continuidade-role": role,
-    ...(operatorSecret ? { "x-continuidade-secret": operatorSecret } : {}),
-    ...(clientId ? { "x-continuidade-client": clientId } : {}),
-  };
+const SESSION_MS = 15 * 60 * 1000;
+
+function peerSuffix(value: string) {
+  const clean = value.replace(/[^a-zA-Z0-9]/g, "");
+  return (clean || "cliente").slice(0, 24);
 }
 
 export function useContinuidadeCall(options: {
   token: string;
   role: Role;
-  operatorSecret?: string;
   clientId?: string;
+  clientName?: string;
   enabled: boolean;
 }) {
-  const { token, role, operatorSecret, clientId, enabled } = options;
+  const { token, role, clientId, clientName, enabled } = options;
   const polite = role === "client";
   const [status, setStatus] = useState<ContinuidadeStatus | null>(null);
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [localCamera, setLocalCamera] = useState<MediaStream | null>(null);
   const [localScreen, setLocalScreen] = useState<MediaStream | null>(null);
+  const [facing, setFacing] = useState<Facing | null>(null);
   const [linkState, setLinkState] = useState("Preparando");
   const [mediaError, setMediaError] = useState("");
   const [closed, setClosed] = useState<"ended" | "expired" | "missing" | "busy" | null>(null);
 
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const makingOffer = useRef(false);
-  const cursor = useRef(0);
   const pendingIce = useRef<RTCIceCandidateInit[]>([]);
   const cameraSender = useRef<RTCRtpSender | null>(null);
   const screenSender = useRef<RTCRtpSender | null>(null);
   const cameraStream = useRef<MediaStream | null>(null);
   const screenStream = useRef<MediaStream | null>(null);
-  const context = useRef({ token, role, operatorSecret, clientId });
-  context.current = { token, role, operatorSecret, clientId };
+  const channelRef = useRef<DataConnection | null>(null);
+  const peerRef = useRef<Peer | null>(null);
+  const outbox = useRef<Wire[]>([]);
+  const expiresRef = useRef(0);
+  const endedRef = useRef(false);
+  const context = useRef({ token, role, clientId, clientName: clientName || "Cliente" });
+  context.current = { token, role, clientId, clientName: clientName || "Cliente" };
 
   const stopLocal = useCallback(() => {
     cameraStream.current?.getTracks().forEach((track) => track.stop());
@@ -83,34 +88,20 @@ export function useContinuidadeCall(options: {
     screenSender.current = null;
     setLocalCamera(null);
     setLocalScreen(null);
+    setFacing(null);
   }, []);
 
   const closePeer = useCallback(() => {
-    pcRef.current?.getSenders().forEach((sender) => {
-      try {
-        sender.track?.stop();
-      } catch {
-        /* already stopped */
-      }
-    });
     pcRef.current?.close();
     pcRef.current = null;
     setRemoteStream(null);
   }, []);
 
-  const postSignal = useCallback(async (type: SignalType, data?: unknown) => {
-    const current = context.current;
-    const response = await fetch(`/api/continuidade/${current.token}/signal`, {
-      method: "POST",
-      headers: headers(current.role, current.operatorSecret, current.clientId),
-      body: JSON.stringify({ type, data }),
-    });
-    if (!response.ok) {
-      const body = (await response.json().catch(() => null)) as { error?: string } | null;
-      if (body?.error === "ended" || body?.error === "expired" || body?.error === "missing") {
-        setClosed(body.error);
-      }
-    }
+  const postSignal = useCallback((type: SignalType, data?: unknown) => {
+    const payload: Wire = { type, data };
+    const channel = channelRef.current;
+    if (channel?.open) channel.send(payload);
+    else outbox.current.push(payload);
   }, []);
 
   const flushIce = useCallback(async (pc: RTCPeerConnection) => {
@@ -120,7 +111,7 @@ export function useContinuidadeCall(options: {
       try {
         await pc.addIceCandidate(candidate);
       } catch {
-        /* candidate for a previous description */
+        /* candidate de uma descrição anterior */
       }
     }
   }, []);
@@ -131,7 +122,7 @@ export function useContinuidadeCall(options: {
     pcRef.current = pc;
 
     pc.onicecandidate = (event) => {
-      if (event.candidate) void postSignal("ice", event.candidate.toJSON());
+      if (event.candidate) postSignal("ice", event.candidate.toJSON());
     };
 
     pc.ontrack = (event) => {
@@ -140,16 +131,14 @@ export function useContinuidadeCall(options: {
       event.track.onended = () => {
         setRemoteStream((current) => {
           if (!current) return null;
-          const live = current.getTracks().some((track) => track.readyState === "live");
-          return live ? current : null;
+          return current.getTracks().some((track) => track.readyState === "live") ? current : null;
         });
       };
     };
 
     pc.oniceconnectionstatechange = () => {
-      const state = pc.iceConnectionState;
       const labels: Record<string, string> = {
-        new: "Preparando",
+        new: "Conectando",
         checking: "Conectando",
         connected: "Ao vivo",
         completed: "Ao vivo",
@@ -157,12 +146,12 @@ export function useContinuidadeCall(options: {
         failed: "Sem caminho direto",
         closed: "Encerrada",
       };
-      setLinkState(labels[state] ?? "Conectando");
-      if (state === "failed") {
+      setLinkState(labels[pc.iceConnectionState] ?? "Conectando");
+      if (pc.iceConnectionState === "failed") {
         try {
           pc.restartIce();
         } catch {
-          /* restart not available */
+          /* este navegador não reinicia o gelo */
         }
       }
     };
@@ -173,9 +162,9 @@ export function useContinuidadeCall(options: {
         const offer = await pc.createOffer();
         if (pc.signalingState !== "stable") return;
         await pc.setLocalDescription(offer);
-        await postSignal("offer", { type: pc.localDescription?.type, sdp: pc.localDescription?.sdp });
+        postSignal("offer", { type: pc.localDescription?.type, sdp: pc.localDescription?.sdp });
       } catch {
-        /* the other side will retry on the next poll */
+        /* o outro lado tenta de novo */
       } finally {
         makingOffer.current = false;
       }
@@ -184,179 +173,346 @@ export function useContinuidadeCall(options: {
     return pc;
   }, [postSignal]);
 
-  const handleSignal = useCallback(
-    async (signal: Signal) => {
-      if (signal.type === "end-session") {
-        setClosed("ended");
-        return;
-      }
-      const pc = ensurePc();
-      if ((signal.type === "offer" || signal.type === "answer") && signal.data && "type" in signal.data) {
-        const description = signal.data;
-        const collision = description.type === "offer" && (makingOffer.current || pc.signalingState !== "stable");
-        if (collision && !polite) return;
-        if (description.type === "answer" && pc.signalingState !== "have-local-offer") return;
-        if (collision) {
-          await Promise.all([pc.setLocalDescription({ type: "rollback" }), pc.setRemoteDescription(description)]);
-        } else {
-          await pc.setRemoteDescription(description);
-        }
-        await flushIce(pc);
-        if (description.type === "offer") {
-          await pc.setLocalDescription(await pc.createAnswer());
-          await postSignal("answer", { type: pc.localDescription?.type, sdp: pc.localDescription?.sdp });
-        }
-        return;
-      }
-      if (signal.type === "ice" && signal.data) {
-        if (!pc.remoteDescription) {
-          pendingIce.current.push(signal.data as RTCIceCandidateInit);
-          return;
-        }
-        try {
-          await pc.addIceCandidate(signal.data as RTCIceCandidateInit);
-        } catch {
-          /* ignore stale candidate */
-        }
-      }
-    },
-    [ensurePc, flushIce, polite, postSignal],
-  );
+  const handleSignalRef = useRef<(signal: { type: string; data?: unknown }) => Promise<void>>(async () => undefined);
 
-  useEffect(() => {
-    if (!enabled || !token) return;
-    let stopped = false;
-
-    async function poll() {
-      const current = context.current;
-      const response = await fetch(`/api/continuidade/${current.token}/signal?after=${cursor.current}`, {
-        headers: headers(current.role, current.operatorSecret, current.clientId),
-        cache: "no-store",
-      });
-      const body = (await response.json().catch(() => null)) as {
-        error?: "ended" | "expired" | "missing" | "busy";
-        cursor?: number;
-        signals?: Signal[];
-        status?: ContinuidadeStatus;
-      } | null;
-      if (stopped || !body) return;
-      if (!response.ok) {
-        if (body.error === "expired" && current.role === "operator") {
-          setStatus((previous) => (previous ? { ...previous, expired: true } : previous));
-          return;
-        }
-        if (body.error === "ended" || body.error === "expired" || body.error === "missing" || body.error === "busy") {
-          setClosed(body.error);
-        }
+  handleSignalRef.current = async (signal) => {
+    if (signal.type === "end-session") {
+      setClosed("ended");
+      return;
+    }
+    const pc = ensurePc();
+    if ((signal.type === "offer" || signal.type === "answer") && signal.data && typeof signal.data === "object" && "type" in signal.data) {
+      const description = signal.data as RTCSessionDescriptionInit;
+      const collision = description.type === "offer" && (makingOffer.current || pc.signalingState !== "stable");
+      if (collision && !polite) return;
+      if (description.type === "answer" && pc.signalingState !== "have-local-offer") return;
+      if (collision) {
+        await Promise.all([pc.setLocalDescription({ type: "rollback" }), pc.setRemoteDescription(description)]);
+      } else {
+        await pc.setRemoteDescription(description);
+      }
+      await flushIce(pc);
+      if (description.type === "offer") {
+        await pc.setLocalDescription(await pc.createAnswer());
+        postSignal("answer", { type: pc.localDescription?.type, sdp: pc.localDescription?.sdp });
+      }
+      return;
+    }
+    if (signal.type === "ice" && signal.data) {
+      const candidate = signal.data as RTCIceCandidateInit;
+      if (!pc.remoteDescription) {
+        pendingIce.current.push(candidate);
         return;
       }
-      if (body.status) setStatus(body.status);
-      for (const signal of body.signals ?? []) {
-        try {
-          await handleSignal(signal);
-          cursor.current = signal.i;
-        } catch {
-          break;
-        }
+      try {
+        await pc.addIceCandidate(candidate);
+      } catch {
+        /* candidato atrasado */
       }
     }
+  };
 
-    const timer = window.setInterval(() => {
-      void poll().catch(() => undefined);
-    }, 700);
-    void poll().catch(() => undefined);
+  const onDataRef = useRef<(raw: unknown) => Promise<void>>(async () => undefined);
+  onDataRef.current = async (raw) => {
+    if (!raw || typeof raw !== "object") return;
+    const msg = raw as Wire;
+    if (msg.type === "busy") {
+      setClosed("busy");
+      return;
+    }
+    if ((msg.type === "hello" || msg.type === "renew") && typeof msg.expiresAt === "number") {
+      expiresRef.current = msg.expiresAt;
+      setStatus((prev) => ({
+        clientName: msg.clientName || prev?.clientName || "",
+        expiresAt: msg.expiresAt as number,
+        ended: false,
+        expired: false,
+        operatorConnected: true,
+        clientConnected: true,
+        screenSharing: prev?.screenSharing ?? false,
+        cameraConnected: prev?.cameraConnected ?? false,
+      }));
+      return;
+    }
+    if (msg.type === "camera-started" || msg.type === "camera-stopped") {
+      setStatus((prev) => (prev ? { ...prev, cameraConnected: msg.type === "camera-started" } : prev));
+    }
+    if (msg.type === "screen-started" || msg.type === "screen-stopped") {
+      setStatus((prev) => (prev ? { ...prev, screenSharing: msg.type === "screen-started" } : prev));
+    }
+    if (msg.type === "end-session") {
+      setClosed("ended");
+      return;
+    }
+    if (msg.type === "offer" || msg.type === "answer" || msg.type === "ice") {
+      await handleSignalRef.current(msg);
+    }
+  };
+
+  useEffect(() => {
+    if (!enabled || !/^[A-Z0-9]{12}$/.test(token)) {
+      if (enabled && token) setClosed("missing");
+      return;
+    }
+
+    let stopped = false;
+    let timer = 0;
+    let attempt = 0;
+
+    if (role === "operator") {
+      const key = `continuidade-exp:${token}`;
+      const saved = Number(sessionStorage.getItem(key));
+      const expiresAt = saved > Date.now() ? saved : Date.now() + SESSION_MS;
+      sessionStorage.setItem(key, String(expiresAt));
+      expiresRef.current = expiresAt;
+      setStatus({
+        clientName: context.current.clientName,
+        expiresAt,
+        ended: false,
+        expired: false,
+        operatorConnected: true,
+        clientConnected: false,
+        screenSharing: false,
+        cameraConnected: false,
+      });
+    }
+
+    const schedule = (fn: () => void, ms: number) => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        if (!stopped && !endedRef.current) fn();
+      }, ms);
+    };
+
+    const watch = (conn: DataConnection) => {
+      channelRef.current = conn;
+      conn.on("data", (raw) => {
+        void onDataRef.current(raw);
+      });
+      conn.on("open", () => {
+        setStatus((prev) => ({
+          clientName: context.current.clientName || prev?.clientName || "Cliente",
+          expiresAt: role === "operator" ? expiresRef.current : (prev?.expiresAt ?? 0),
+          ended: false,
+          expired: false,
+          operatorConnected: true,
+          clientConnected: true,
+          screenSharing: Boolean(screenStream.current) || Boolean(prev?.screenSharing),
+          cameraConnected: Boolean(cameraStream.current) || Boolean(prev?.cameraConnected),
+        }));
+        setLinkState((current) => (current === "Ao vivo" ? current : "Conectando"));
+        if (role === "operator") {
+          conn.send({ type: "hello", clientName: context.current.clientName, expiresAt: expiresRef.current });
+        }
+        const queued = outbox.current;
+        outbox.current = [];
+        for (const item of queued) conn.send(item);
+      });
+      conn.on("close", () => {
+        if (channelRef.current !== conn || stopped || endedRef.current) return;
+        channelRef.current = null;
+        setStatus((prev) => (prev ? { ...prev, clientConnected: false, operatorConnected: role === "operator" } : prev));
+        if (role === "client") {
+          setLinkState("Reconectando");
+          schedule(() => {
+            const live = peerRef.current;
+            if (!live || live.destroyed || !live.open) {
+              void boot();
+              return;
+            }
+            watch(live.connect(`vaop${token}`, { reliable: true, serialization: "json" }));
+          }, 1200);
+        } else {
+          setLinkState((current) => (current === "Ao vivo" ? "Reconectando" : "Aguardando o titular"));
+        }
+      });
+    };
+
+    const boot = async () => {
+      if (stopped || endedRef.current) return;
+      const { Peer } = await import("peerjs");
+      if (stopped || endedRef.current) return;
+      const peerId = role === "operator" ? `vaop${token}` : `vacl${peerSuffix(clientId || "cliente")}`;
+      const peer = new Peer(peerId, {
+        host: "0.peerjs.com",
+        port: 443,
+        path: "/",
+        secure: true,
+        config: { iceServers: ICE_SERVERS },
+      });
+      peerRef.current = peer;
+
+      peer.on("open", () => {
+        attempt = 0;
+        if (role === "operator") {
+          setLinkState((current) => (current === "Ao vivo" ? current : "Aguardando o titular"));
+          return;
+        }
+        setLinkState((current) => (current === "Ao vivo" ? current : "Conectando"));
+        watch(peer.connect(`vaop${token}`, { reliable: true, serialization: "json" }));
+      });
+
+      peer.on("connection", (incoming) => {
+        if (role !== "operator") return;
+        const current = channelRef.current;
+        if (current?.open && current !== incoming) {
+          incoming.on("open", () => {
+            incoming.send({ type: "busy" });
+            incoming.close();
+          });
+          return;
+        }
+        watch(incoming);
+      });
+
+      peer.on("disconnected", () => {
+        if (stopped || endedRef.current || peer.destroyed) return;
+        setLinkState("Reconectando");
+        peer.reconnect();
+      });
+
+      peer.on("error", (error) => {
+        if (stopped || endedRef.current) return;
+        const kind = error.type;
+        if (!peer.destroyed) peer.destroy();
+        if (kind === "peer-unavailable") {
+          setLinkState("Aguardando o operador");
+          schedule(() => void boot(), 1500);
+          return;
+        }
+        attempt += 1;
+        if (attempt > 8) {
+          setMediaError("Não consegui manter a sessão aberta. Recarregue a página.");
+          return;
+        }
+        setLinkState("Reconectando");
+        schedule(() => void boot(), Math.min(1200 * attempt, 5000));
+      });
+    };
+
+    const onLeave = () => peerRef.current?.destroy();
+    window.addEventListener("beforeunload", onLeave);
+    void boot();
 
     return () => {
       stopped = true;
-      window.clearInterval(timer);
+      window.clearTimeout(timer);
+      window.removeEventListener("beforeunload", onLeave);
+      peerRef.current?.destroy();
+      peerRef.current = null;
+      channelRef.current = null;
     };
-  }, [enabled, handleSignal, token]);
+  }, [clientId, enabled, role, token]);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const timer = window.setInterval(() => {
+      if (expiresRef.current && Date.now() > expiresRef.current) setClosed("expired");
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [enabled]);
 
   useEffect(() => {
     if (!closed) return;
+    if (!endedRef.current && (closed === "ended" || closed === "expired")) {
+      endedRef.current = true;
+      const channel = channelRef.current;
+      if (channel?.open) channel.send({ type: "end-session" });
+    } else {
+      endedRef.current = true;
+    }
     stopLocal();
     closePeer();
+    peerRef.current?.destroy();
   }, [closePeer, closed, stopLocal]);
 
-  useEffect(() => {
-    return () => {
-      cameraStream.current?.getTracks().forEach((track) => track.stop());
-      screenStream.current?.getTracks().forEach((track) => track.stop());
-      pcRef.current?.close();
-    };
-  }, []);
-
-  const startCamera = useCallback(async () => {
+  const startCamera = useCallback(async (nextFacing: Facing = "user") => {
     setMediaError("");
     if (!navigator.mediaDevices?.getUserMedia) {
       setMediaError("Este navegador não abriu a câmera. Use Safari no iPhone ou Chrome no Android, pelo link da sessão.");
       return;
     }
+    let stream: MediaStream;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
-        video: { facingMode: { ideal: "user" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: { exact: nextFacing }, width: { ideal: 1280 }, height: { ideal: 720 } },
       });
-      cameraStream.current?.getTracks().forEach((track) => track.stop());
-      cameraStream.current = stream;
-      setLocalCamera(stream);
-      const pc = ensurePc();
-      const track = stream.getVideoTracks()[0];
-      if (cameraSender.current) {
-        await cameraSender.current.replaceTrack(track);
-      } else {
-        cameraSender.current = pc.addTrack(track, stream);
-      }
-      track.onended = () => {
-        setLocalCamera(null);
-        void postSignal("camera-stopped");
-      };
-      await postSignal("camera-started");
     } catch (error) {
       const denied = error instanceof DOMException && (error.name === "NotAllowedError" || error.name === "SecurityError");
-      setMediaError(
-        denied
-          ? "A câmera precisa da sua permissão. Toque em permitir e tente de novo."
-          : "Não foi possível abrir a câmera frontal deste celular.",
-      );
+      if (denied) {
+        setMediaError("A câmera precisa da sua permissão. Toque em permitir e escolha de novo.");
+        return;
+      }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: nextFacing, width: { ideal: 1280 }, height: { ideal: 720 } },
+        });
+      } catch (second) {
+        const deniedAgain = second instanceof DOMException && (second.name === "NotAllowedError" || second.name === "SecurityError");
+        setMediaError(
+          deniedAgain
+            ? "A câmera precisa da sua permissão. Toque em permitir e escolha de novo."
+            : nextFacing === "environment"
+              ? "Não encontrei a câmera traseira. Use a frontal."
+              : "Não foi possível abrir a câmera frontal deste celular.",
+        );
+        return;
+      }
     }
+
+    cameraStream.current?.getTracks().forEach((track) => track.stop());
+    cameraStream.current = stream;
+    setLocalCamera(stream);
+    setFacing(nextFacing);
+    const pc = ensurePc();
+    const track = stream.getVideoTracks()[0];
+    if (cameraSender.current) await cameraSender.current.replaceTrack(track);
+    else cameraSender.current = pc.addTrack(track, stream);
+    track.onended = () => {
+      setLocalCamera(null);
+      setFacing(null);
+      postSignal("camera-stopped");
+    };
+    postSignal("camera-started");
   }, [ensurePc, postSignal]);
 
   const startScreen = useCallback(async () => {
-    setMediaError("");
     if (!navigator.mediaDevices?.getDisplayMedia) {
       setMediaError("Este navegador não compartilha a tela. Abra a sessão no Chrome ou no Edge do computador.");
       return;
     }
+    let stream: MediaStream;
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-      screenStream.current?.getTracks().forEach((track) => track.stop());
-      screenStream.current = stream;
-      setLocalScreen(stream);
-      const pc = ensurePc();
-      const track = stream.getVideoTracks()[0];
-      if (screenSender.current) {
-        await screenSender.current.replaceTrack(track);
-      } else {
-        screenSender.current = pc.addTrack(track, stream);
-      }
-      track.onended = () => {
-        screenStream.current = null;
-        setLocalScreen(null);
-        if (screenSender.current && pcRef.current) {
-          pcRef.current.removeTrack(screenSender.current);
-          screenSender.current = null;
-        }
-        void postSignal("screen-stopped");
-      };
-      await postSignal("screen-started");
+      stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
     } catch (error) {
-      const denied = error instanceof DOMException && error.name === "NotAllowedError";
+      const denied = error instanceof DOMException && (error.name === "NotAllowedError" || error.name === "AbortError");
       setMediaError(denied ? "O compartilhamento foi cancelado. Escolha a aba ou a janela da emissão." : "Não foi possível compartilhar a tela.");
+      return;
     }
+
+    setMediaError("");
+    screenStream.current?.getTracks().forEach((track) => track.stop());
+    screenStream.current = stream;
+    setLocalScreen(stream);
+    const pc = ensurePc();
+    const track = stream.getVideoTracks()[0];
+    if (screenSender.current) await screenSender.current.replaceTrack(track);
+    else screenSender.current = pc.addTrack(track, stream);
+    track.onended = () => {
+      screenStream.current = null;
+      setLocalScreen(null);
+      if (screenSender.current && pcRef.current) {
+        pcRef.current.removeTrack(screenSender.current);
+        screenSender.current = null;
+      }
+      postSignal("screen-stopped");
+    };
+    postSignal("screen-started");
   }, [ensurePc, postSignal]);
 
-  const stopScreen = useCallback(async () => {
+  const stopScreen = useCallback(() => {
     screenStream.current?.getTracks().forEach((track) => track.stop());
     screenStream.current = null;
     setLocalScreen(null);
@@ -364,28 +520,20 @@ export function useContinuidadeCall(options: {
       pcRef.current.removeTrack(screenSender.current);
       screenSender.current = null;
     }
-    await postSignal("screen-stopped");
+    postSignal("screen-stopped");
   }, [postSignal]);
 
-  const finish = useCallback(async () => {
-    const current = context.current;
-    await fetch(`/api/continuidade/${current.token}`, {
-      method: "POST",
-      headers: headers(current.role, current.operatorSecret, current.clientId),
-      body: JSON.stringify({ action: "end" }),
-    }).catch(() => undefined);
+  const finish = useCallback(() => {
     setClosed("ended");
   }, []);
 
-  const renew = useCallback(async () => {
-    const current = context.current;
-    const response = await fetch(`/api/continuidade/${current.token}`, {
-      method: "POST",
-      headers: headers(current.role, current.operatorSecret, current.clientId),
-      body: JSON.stringify({ action: "renew" }),
-    });
-    const body = (await response.json().catch(() => null)) as (ContinuidadeStatus & { ok?: boolean }) | null;
-    if (response.ok && body) setStatus((currentStatus) => ({ ...(currentStatus ?? body), ...body }));
+  const renew = useCallback(() => {
+    const expiresAt = Date.now() + SESSION_MS;
+    expiresRef.current = expiresAt;
+    sessionStorage.setItem(`continuidade-exp:${context.current.token}`, String(expiresAt));
+    setStatus((prev) => (prev ? { ...prev, expiresAt, expired: false } : prev));
+    const channel = channelRef.current;
+    if (channel?.open) channel.send({ type: "renew", expiresAt });
   }, []);
 
   return {
@@ -393,6 +541,7 @@ export function useContinuidadeCall(options: {
     remoteStream,
     localCamera,
     localScreen,
+    facing,
     linkState,
     mediaError,
     closed,

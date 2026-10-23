@@ -5,10 +5,12 @@ import { useSearchParams } from "next/navigation";
 import VideoStage from "./VideoStage";
 import { useContinuidadeCall } from "./useContinuidadeCall";
 
-type Room = { token: string; secret: string; clientName: string };
+type Room = { token: string; clientName: string };
 
-function secretKey(token: string) {
-  return `continuidade-secret:${token}`;
+function makeToken() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
 }
 
 function formatToken(token: string) {
@@ -28,18 +30,13 @@ export default function Operador() {
   const [draft, setDraft] = useState<Room | null>(null);
   const [stored, setStored] = useState<Room | null>(null);
   const [name, setName] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [formError, setFormError] = useState("");
   const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!existing) return;
-    const secret = sessionStorage.getItem(secretKey(existing));
-    if (!secret) return;
+    if (!/^[A-Z0-9]{12}$/.test(existing)) return;
     setStored({
       token: existing,
-      secret,
       clientName: sessionStorage.getItem(`continuidade-name:${existing}`) ?? "Cliente",
     });
   }, [existing]);
@@ -48,7 +45,7 @@ export default function Operador() {
   const call = useContinuidadeCall({
     token: room?.token ?? "",
     role: "operator",
-    operatorSecret: room?.secret,
+    clientName: room?.clientName,
     enabled: Boolean(room),
   });
 
@@ -61,32 +58,16 @@ export default function Operador() {
     return () => window.clearInterval(timer);
   }, [room]);
 
-  async function createSession(event: FormEvent) {
+  function createSession(event: FormEvent) {
     event.preventDefault();
-    setCreating(true);
-    setFormError("");
-    try {
-      const response = await fetch("/api/continuidade", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientName: name }),
-      });
-      const body = (await response.json()) as { token?: string; operatorSecret?: string; clientName?: string };
-      if (!response.ok || !body.token || !body.operatorSecret) {
-        setFormError("Não foi possível abrir a sessão. Tente de novo.");
-        return;
-      }
-      sessionStorage.setItem(secretKey(body.token), body.operatorSecret);
-      sessionStorage.setItem(`continuidade-name:${body.token}`, body.clientName ?? "Cliente");
-      const next = new URL(window.location.href);
-      next.searchParams.set("sessao", body.token);
-      window.history.replaceState(null, "", next);
-      setDraft({ token: body.token, secret: body.operatorSecret, clientName: body.clientName ?? "Cliente" });
-    } catch {
-      setFormError("Não foi possível abrir a sessão. Tente de novo.");
-    } finally {
-      setCreating(false);
-    }
+    const token = makeToken();
+    const clientName = name.trim() || "Cliente";
+    sessionStorage.setItem(`continuidade-name:${token}`, clientName);
+    sessionStorage.setItem(`continuidade-exp:${token}`, String(Date.now() + 15 * 60 * 1000));
+    const next = new URL(window.location.href);
+    next.searchParams.set("sessao", token);
+    window.history.replaceState(null, "", next);
+    setDraft({ token, clientName });
   }
 
   async function copyLink() {
@@ -142,11 +123,10 @@ export default function Operador() {
               Nome do titular
               <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Nome de quem vai validar" maxLength={80} />
             </label>
-            <button className="ct-button" type="submit" disabled={creating}>
-              {creating ? "Abrindo..." : "Criar sessão"}
+            <button className="ct-button" type="submit">
+              Criar sessão
             </button>
           </form>
-          {formError && <p className="ct-error">{formError}</p>}
         </section>
       </main>
     );
@@ -192,8 +172,8 @@ export default function Operador() {
             </button>
             {call.mediaError && <p className="ct-error">{call.mediaError}</p>}
             <p className="ct-note">
-              O navegador pede qual aba ou janela compartilhar. A imagem da câmera só atravessa a sessão e é descartada quando ela
-              termina.
+              O navegador abre um quadro para você escolher a aba ou a janela. Cancelar essa escolha não encerra a sessão. A câmera
+              do titular não fica gravada.
             </p>
           </div>
         </div>

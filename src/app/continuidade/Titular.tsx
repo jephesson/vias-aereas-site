@@ -34,7 +34,7 @@ export default function Titular({ token }: { token: string }) {
         : call.closed === "expired"
           ? "O tempo desta sessão acabou. Peça um novo link ao operador."
           : call.closed === "missing"
-            ? "Este link não existe ou já foi encerrado."
+            ? "Este link não está completo. Peça um novo link ao operador."
             : "Sessão encerrada. Sua câmera foi desligada e nada ficou gravado.";
     return (
       <main className="ct-page">
@@ -63,14 +63,21 @@ export default function Titular({ token }: { token: string }) {
         <div className="ct-preview">
           <VideoStage stream={call.localCamera} empty="Sua câmera aparece aqui." mirror />
         </div>
-        {!call.localCamera && (
-          <button className="ct-button" type="button" onClick={() => void call.startCamera()}>
-            Permitir câmera
+        <div className="ct-actions">
+          <button className={`ct-button${call.facing === "user" ? " is-on" : ""}`} type="button" onClick={() => void call.startCamera("user")}>
+            Câmera frontal
           </button>
-        )}
-        <button className="ct-button ct-button-danger" type="button" onClick={() => void call.finish()}>
-          Encerrar
-        </button>
+          <button
+            className={`ct-button${call.facing === "environment" ? " is-on" : " ct-button-ghost"}`}
+            type="button"
+            onClick={() => void call.startCamera("environment")}
+          >
+            Câmera traseira
+          </button>
+          <button className="ct-button ct-button-danger" type="button" onClick={() => void call.finish()}>
+            Encerrar
+          </button>
+        </div>
         {call.mediaError && <p className="ct-error">{call.mediaError}</p>}
         <p className="ct-note">
           {call.localCamera
